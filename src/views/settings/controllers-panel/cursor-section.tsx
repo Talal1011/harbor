@@ -14,9 +14,13 @@ import { useT } from "@/lib/i18n";
 import { captureFocusReturn, tvFocus } from "@/lib/keyboard-navigation";
 import { navOwnsFocus } from "@/lib/keyboard-navigation/geometry";
 import { useSettings } from "@/lib/settings";
-import { Section } from "../shared";
+import { Section, ToggleRow } from "../shared";
 import { SettingRow } from "../kit";
 import { SButton } from "../ui";
+
+const IDLE_MS_MIN = 1000;
+const IDLE_MS_MAX = 10_000;
+const IDLE_MS_STEP = 500;
 
 function presetLabel(id: ControllerCursorId, t: (s: string) => string): string {
   if (id === "ring") return t("Ring");
@@ -38,6 +42,9 @@ export function CursorSection() {
   const current = settings.controllerCursor;
   const image = settings.controllerCursorImage;
   const size = settings.controllerCursorSize;
+  const enabled = settings.controllerCursorEnabled;
+  const hideMs = settings.controllerCursorHideMs;
+  const hideSec = Math.round(hideMs / 100) / 10;
 
   const pick = async (f: File | undefined) => {
     if (!f) return;
@@ -78,6 +85,13 @@ export function CursorSection() {
         "The pointer your right stick moves around Harbor. Pick a shape or use your own image.",
       )}
     >
+        <ToggleRow
+          label={t("Show cursor")}
+          sub={t("When off, the right stick no longer shows a cursor on screen. Focus navigation still works.")}
+          value={enabled}
+          onChange={(v) => update({ controllerCursorEnabled: v })}
+        />
+
       <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
         {tiles.map((id) => {
           const on = current === id;
