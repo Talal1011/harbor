@@ -63,7 +63,7 @@ import { recentlyPlayed, subscribePlayback, type WatchedSet } from "@/lib/playba
 import { detectAnimeForCw, useDetectedAnimeVersion } from "@/lib/anime-detect";
 import { buildSimklHomeRows } from "@/lib/simkl/home-rails";
 import { loadSimklWatchedMap, loadSimklStatusMap, type WatchlistStatus } from "@/lib/simkl/list-status";
-import { fetchSimklPlaybackItems } from "@/lib/simkl/playback";
+import { useExternalCw } from "@/lib/feed/external-cw";
 import { useSimkl } from "@/lib/simkl/provider";
 import { useAnilist } from "@/lib/anilist/provider";
 import { loadAnilistWatchedMap } from "@/lib/anilist/watched-map";
@@ -110,7 +110,7 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
   const [traktRows, setTraktRows] = useState<HomeRow[]>([]);
   const [simklRows, setSimklRows] = useState<HomeRow[]>([]);
   const [letterboxdRows, setLetterboxdRows] = useState<HomeRow[]>([]);
-  const [simklCw, setSimklCw] = useState<LibraryItem[]>([]);
+  const externalCw = useExternalCw(!hideSharedCw && settings.externalContinueWatching);
   const [traktWatched, setTraktWatched] = useState<Set<string>>(() => new Set());
   const [simklWatchedMap, setSimklWatchedMap] = useState<Map<string, Set<string>>>(() => new Map());
   const [simklStatusMap, setSimklStatusMap] = useState<Map<string, WatchlistStatus>>(() => new Map());
@@ -377,22 +377,6 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
   }, [simklConnected]);
 
   useEffect(() => {
-    if (!simklConnected) {
-      setSimklCw([]);
-      return;
-    }
-    let cancelled = false;
-    fetchSimklPlaybackItems()
-      .then((cw) => {
-        if (!cancelled) setSimklCw(cw);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [simklConnected]);
-
-  useEffect(() => {
     if (!letterboxd.isActive) {
       setLetterboxdRows([]);
       return;
@@ -559,7 +543,7 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
   const continueWatching = useMemo(() => {
     const cwBase = hideSharedCw
       ? []
-      : [...items.filter((i) => !ANIME_CLOUD_ID.test(i._id)), ...simklCw];
+      : [...items.filter((i) => !ANIME_CLOUD_ID.test(i._id)), ...externalCw];
     const eligible = [...cwBase, ...localCwItems]
       .filter(
         (i) =>
@@ -608,10 +592,10 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
       if (root) seenRoot.add(root);
     }
     return [...byId.values()].sort((a, b) => cwSortKey(b) - cwSortKey(a));
-  }, [items, simklCw, localCwItems, cwVersion, cwRootVersion, settings.animeOnlyInAnimeRoom, settings.hideContent.anime, hideSharedCw, animeDetectVer]);
+  }, [items, externalCw, localCwItems, cwVersion, cwRootVersion, settings.animeOnlyInAnimeRoom, settings.hideContent.anime, hideSharedCw, animeDetectVer]);
   useEffect(() => {
     let cancelled = false;
-    const ids = [...localCwItems, ...simklCw]
+    const ids = [...localCwItems, ...externalCw]
       .filter((i) => isCwMember(i))
       .map((i) => i._id);
     if (ids.length === 0) return;
@@ -624,7 +608,7 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
     return () => {
       cancelled = true;
     };
-  }, [localCwItems, simklCw]);
+  }, [localCwItems, externalCw]);
   const resurfaceLibrary = useMemo(() => {
     const pool = [
       ...items.filter((i) => !ANIME_CLOUD_ID.test(i._id)),

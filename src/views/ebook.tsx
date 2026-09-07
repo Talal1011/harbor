@@ -43,7 +43,8 @@ import { NytMark } from "@/components/icons/nyt-mark";
 import { NYT_ATTRIBUTION, type NytList } from "@/lib/ebook/nyt";
 import { isNytPlaceholder } from "@/lib/ebook/nyt-rail";
 import { nytRailItems, nytRankFor } from "@/lib/ebook/nyt-rail";
-import { useNytAvailability, useNytList, useResolveNytBooks } from "@/lib/ebook/use-nyt";
+import { nytBestsellerFor } from "@/lib/ebook/nyt-match";
+import { useNytAvailability, useNytList, useNytSnapshot, useResolveNytBooks } from "@/lib/ebook/use-nyt";
 import { useAnilist } from "@/lib/anilist/provider";
 import { useT, useUiLanguage } from "@/lib/i18n";
 import {
@@ -96,6 +97,7 @@ import {
   prefetchSourceEBookContent,
   searchSourceEBookCatalog,
   sourceEBookChapters,
+  restoreSourceEBookChapters,
   sourceEBookContent,
   sourceEBookDetail,
   type EBookChapter,
@@ -1424,7 +1426,11 @@ function EBookLibraryHero({
   const loading = ebooks.length === 0;
   const currentTitle = current ? ebookTitleForLanguage(current, titleLanguage) : "";
   const authors = current?.authors.filter(Boolean).slice(0, 2).join(", ") ?? "";
-  const rank = current ? nytRankFor(bestsellers ?? null, current) : null;
+  const snapshot = useNytSnapshot();
+  const listRank = current ? nytRankFor(bestsellers ?? null, current) : null;
+  const anyMatch = current ? nytBestsellerFor(snapshot, current) : null;
+  const rank = listRank ?? anyMatch?.book ?? null;
+  const rankList = listRank ? null : (anyMatch?.list ?? null);
   const weeksLabel =
     rank && rank.weeksOnList > 0
       ? rank.weeksOnList === 1
@@ -1494,7 +1500,11 @@ function EBookLibraryHero({
 
         <div className="ebook-hero-copy" style={fade}>
           <span className="ebook-hero-kicker">
-            {rank ? `#${rank.rank} New York Times Bestseller` : t("Featured book")}
+            {rank
+              ? rankList
+                ? `#${rank.rank} New York Times Bestseller · ${rankList.displayName}`
+                : `#${rank.rank} New York Times Bestseller`
+              : t("Featured book")}
           </span>
           {loading && (
             <div className="ebook-hero-skeleton">
@@ -2645,7 +2655,10 @@ function EBookDetails({
   onOpen: (ebook: EBook) => void;
 }) {
   const detailBestsellers = useNytList();
-  const detailRank = ebook ? nytRankFor(detailBestsellers, ebook) : null;
+  const detailSnapshot = useNytSnapshot();
+  const detailRank = ebook
+    ? (nytRankFor(detailBestsellers, ebook) ?? nytBestsellerFor(detailSnapshot, ebook)?.book ?? null)
+    : null;
   const t = useT();
   const [saved, setSaved] = useState(() => (ebook ? ebookInLibrary(ebook.id) : false));
   const [favorite, setFavorite] = useState(() => (ebook ? ebookIsFavorite(ebook.id) : false));
@@ -2659,6 +2672,7 @@ function EBookDetails({
   const [recommendationsError, setRecommendationsError] = useState(false);
   const [recommendationsAttempt, setRecommendationsAttempt] = useState(0);
   const [chapters, setChapters] = useState<EBookChapter[] | null>(null);
+  const [savedChapters, setSavedChapters] = useState<EBookChapter[]>([]);
   const [sourceOptions, setSourceOptions] = useState<EBook[]>([]);
   const [sourceRoute, setSourceRoute] = useState<string | null>(null);
   const [selectedVolume, setSelectedVolume] = useState<string | null>(null);
@@ -2895,13 +2909,22 @@ function EBookDetails({
     }
     setSelectedVolume(null);
     setChapters(null);
+    setSavedChapters([]);
     void sourceEBookChapters(sourceRoute)
-      .then((items) => active && setChapters(items))
+      .then(async (items) => {
+        if (!active) return;
+        const saved = ebook
+          ? await restoreSourceEBookChapters(sourceRoute, profile, ebook.id, items).catch(() => [])
+          : [];
+        if (!active) return;
+        setSavedChapters(saved);
+        setChapters(items);
+      })
       .catch(() => active && setChapters([]));
     return () => {
       active = false;
     };
-  }, [sourceRoute]);
+  }, [sourceRoute, profile, ebook?.id]);
   const volumeGroups = useMemo(() => {
     const groups = new Map<string, { title?: string; chapters: EBookChapter[] }>();
     for (const chapter of chapters ?? []) {
@@ -2986,15 +3009,32 @@ function EBookDetails({
       return;
     }
     const resume = loadEBookResume(profile, ebook.id);
+    if (
+      resume &&
+      ![...chapters, ...savedChapters].some((chapter) => chapter.id === resume.chapterId)
+    ) {
+      onAutoReadConsumed();
+      return;
+    }
     const target =
       chapters.find((chapter) => chapter.id === resume?.chapterId) ??
+      savedChapters.find((chapter) => chapter.id === resume?.chapterId) ??
       [...chapters].sort(
         (left, right) =>
           (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER),
       )[0];
     onAutoReadConsumed();
     if (target) readChapter(target);
-  }, [autoRead, chapters, ebook, onAutoReadConsumed, profile, readChapter, sourceRoute]);
+  }, [
+    autoRead,
+    chapters,
+    ebook,
+    onAutoReadConsumed,
+    profile,
+    readChapter,
+    savedChapters,
+    sourceRoute,
+  ]);
   if (!ebook)
     return (
       <div className="flex flex-1 items-center justify-center text-ink-muted">
@@ -3291,6 +3331,7 @@ function EBookDetails({
           bookCover={ebook.cover}
           internalCover={ebook.internalCover}
           chapter={reading.chapter}
+          savedChapters={savedChapters}
           content={reading.content}
           error={
             reading.error === "This chapter could not be loaded."
