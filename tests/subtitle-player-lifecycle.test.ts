@@ -184,6 +184,7 @@ test("delayed hash enrichment may upgrade only the current automatic selection",
   );
 });
 
+
 test("prepared player-source seeds publish eligibility only after each bridge settles its batch", () => {
   assert.match(mpvSource, /const seedBatch = new PreparedSubtitleSeedBatch\(orderedSeeds\)/);
   assert.match(mpvSource, /autoSelectionEligible: false/);

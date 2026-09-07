@@ -16,14 +16,13 @@ export function AmbienceSection() {
   const soundEffectsEnabled = settings.soundTheme !== "none";
   return (
     <>
-      <Section
-        title={t("Sidebar")}
-        subtitle={t("How the navigation icons behave.")}
-      >
+      <Section title={t("Sidebar")} subtitle={t("How the navigation icons behave.")}>
         <SettingGroup>
           <ToggleRow
             label={t("Animated sidebar icons")}
-            sub={t("Sidebar icons play a short animation when you hover them. Turn this off to keep them as plain static icons.")}
+            sub={t(
+              "Sidebar icons play a short animation when you hover them. Turn this off to keep them as plain static icons.",
+            )}
             value={settings.navIconAnimations}
             onChange={(v) => update({ navIconAnimations: v })}
             leading={<MousePointer2 size={18} strokeWidth={2} />}
@@ -33,7 +32,9 @@ export function AmbienceSection() {
 
       <Section
         title={t("Screensaver")}
-        subtitle={t("When Harbor sits idle in the foreground, it drifts through cinematic backdrops with a clock and what's trending. Any movement or key brings you back. Off by default.")}
+        subtitle={t(
+          "When Harbor sits idle in the foreground, it drifts through cinematic backdrops with a clock and what's trending. Any movement or key brings you back. Off by default.",
+        )}
       >
         <SettingGroup>
           <ToggleRow
@@ -83,7 +84,9 @@ export function AmbienceSection() {
 
       <Section
         title={t("Sound effects")}
-        subtitle={t("Subtle audio feedback as you navigate and click. Off by default; pick a style to turn it on.")}
+        subtitle={t(
+          "Subtle audio feedback as you navigate and click. Off by default; pick a style to turn it on.",
+        )}
       >
         <SettingGroup>
           <SettingRow
@@ -100,7 +103,9 @@ export function AmbienceSection() {
                 { value: "retro", label: t("Retro") },
                 { value: "cinematic", label: t("Cinematic") },
               ]}
-              onChange={(v) => update({ soundTheme: v as "none" | "glass" | "modern" | "retro" | "cinematic" })}
+              onChange={(v) =>
+                update({ soundTheme: v as "none" | "glass" | "modern" | "retro" | "cinematic" })
+              }
             />
           </SettingRow>
 
@@ -141,14 +146,24 @@ export function AmbienceSection() {
 export function DisplaySection() {
   const t = useT();
   const { settings, update } = useSettings();
-  const glassBlur = Number.isFinite(settings.defaultLiquidGlassBlur) ? settings.defaultLiquidGlassBlur : 2;
-  const glassTint = Number.isFinite(settings.defaultLiquidGlassTint) ? settings.defaultLiquidGlassTint : 40;
+  const glassBlur = Number.isFinite(settings.defaultLiquidGlassBlur)
+    ? settings.defaultLiquidGlassBlur
+    : 8;
+  const glassTint = Number.isFinite(settings.defaultLiquidGlassTint)
+    ? settings.defaultLiquidGlassTint
+    : 20;
+  const glassOpacity = Number.isFinite(settings.experimentalLiquidGlassOpacity)
+    ? settings.experimentalLiquidGlassOpacity
+    : 25;
+  const { poster: previewPoster } = useSampleArtwork();
   return (
     <>
       <PosterCardSection />
       <Section
         title={t("Title text")}
-        subtitle={t("Resize the row titles on Home and the title shown in the player, without scaling the rest of the interface. You can also lead the player title with the series name instead of the episode.")}
+        subtitle={t(
+          "Resize the row titles on Home and the title shown in the player, without scaling the rest of the interface. You can also lead the player title with the series name instead of the episode.",
+        )}
       >
         <SettingGroup>
           <SizeSlider
@@ -167,7 +182,9 @@ export function DisplaySection() {
           />
           <ToggleRow
             label={t("Show series name first in the player")}
-            sub={t("Lead with the show name instead of the episode title at the top of the player.")}
+            sub={t(
+              "Lead with the show name instead of the episode title at the top of the player.",
+            )}
             value={settings.playerTitleSeriesFirst}
             onChange={(v) => update({ playerTitleSeriesFirst: v })}
             leading={<Tv size={18} strokeWidth={2} />}
@@ -177,13 +194,16 @@ export function DisplaySection() {
 
       <Section
         title={t("Accessibility")}
-        subtitle={t("Make everything bigger and easier to read: sidebar, menus, popups, every page.")}
+        subtitle={t(
+          "Make everything bigger and easier to read: sidebar, menus, popups, every page.",
+        )}
       >
         <SettingGroup>
           <SliderRow
             label={t("Interface scale")}
-            desc={t("Scales the whole interface live as you drag.")}
-            tip={t("Make everything bigger and easier to read: sidebar, menus, popups, every page. The whole interface scales live as you drag, so you can see the change right here. Great on 4K and ultrawide monitors, or whenever the text feels small.")}
+            tip={t(
+              "Make everything bigger and easier to read: sidebar, menus, popups, every page. The whole interface scales live as you drag, so you can see the change right here. Great on 4K and ultrawide monitors, or whenever the text feels small.",
+            )}
             icon={<ZoomIn size={18} strokeWidth={2} />}
             value={settings.uiScale}
             min={0.8}
@@ -204,7 +224,9 @@ export function DisplaySection() {
           <ToggleRow
             label={t("Use liquid glass")}
             newId="theme:liquid-glass"
-            sub={t("Use liquid glass for the search pill and row scroll arrows. The appearance settings below are shared by glass surfaces across Harbor.")}
+            sub={t(
+              "Use liquid glass for the search pill and row scroll arrows. The appearance settings below are shared by glass surfaces across Harbor.",
+            )}
             value={settings.liquidGlass}
             onChange={(v) => update({ liquidGlass: v })}
             leading={<Waves size={18} strokeWidth={2} />}
@@ -213,7 +235,9 @@ export function DisplaySection() {
             <Nested>
               <ToggleRow
                 label={t("Enhanced liquid glass")}
-                sub={t("A richer glass treatment. May look better while using more graphics resources.")}
+                sub={t(
+                  "A richer glass treatment. May look better while using more graphics resources.",
+                )}
                 value={settings.experimentalLiquidGlassEnabled}
                 onChange={(v) => update({ experimentalLiquidGlassEnabled: v })}
                 leading={<Sparkles size={18} strokeWidth={2} />}
@@ -223,13 +247,15 @@ export function DisplaySection() {
                   label={t("Glass opacity")}
                   desc={t("How solid the enhanced glass looks.")}
                   icon={<Droplet size={18} strokeWidth={2} />}
-                  value={settings.experimentalLiquidGlassOpacity}
+                  value={glassOpacity}
                   min={5}
                   max={100}
                   step={5}
-                  readout={`${settings.experimentalLiquidGlassOpacity}%`}
+                  readout={`${glassOpacity}%`}
                   resetTo={DEFAULT.experimentalLiquidGlassOpacity}
-                  onChange={(experimentalLiquidGlassOpacity) => update({ experimentalLiquidGlassOpacity })}
+                  onChange={(experimentalLiquidGlassOpacity) =>
+                    update({ experimentalLiquidGlassOpacity })
+                  }
                 />
               ) : (
                 <>
@@ -239,7 +265,7 @@ export function DisplaySection() {
                     icon={<Droplet size={18} strokeWidth={2} />}
                     value={glassBlur}
                     min={0}
-                    max={8}
+                    max={20}
                     step={0.5}
                     readout={`${glassBlur}px`}
                     resetTo={DEFAULT.defaultLiquidGlassBlur}
@@ -263,8 +289,6 @@ export function DisplaySection() {
           )}
         </SettingGroup>
       </Section>
-
-
     </>
   );
 }
