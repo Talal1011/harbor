@@ -1,5 +1,36 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "Manga sync": "Manga sync",
+  "{title} · Chapter {chapter}": "{title} · Chapter {chapter}",
+  "Reorder extensions": "Reorder extensions",
+  "Reset order": "Reset order",
+  "Filter sources...": "Filter sources...",
+  Scanlator: "Scanlator",
+  "Resolving pages": "Resolving pages",
+  "Match manga": "Match manga",
+  "Choose a match, or select None to skip": "Choose a match, or select None to skip",
+  "Search title on {tracker}": "Search title on {tracker}",
+  "Select this if you don't want to sync to {tracker}":
+    "Select this if you don't want to sync to {tracker}",
+  "No matches. Check the search box or try a different title.":
+    "No matches. Check the search box or try a different title.",
+  "★ {n}": "★ {n}",
+  "Tip: press": "Tip: press",
+  "to reopen this anytime": "to reopen this anytime",
+  "Chapter progress": "Chapter progress",
+  "Download current page": "Download current page",
+  "Download page": "Download page",
+  "Updating... ({n}/{total})": "Updating... ({n}/{total})",
+  "Update all ({n})": "Update all ({n})",
+  "The lists you created, full of saved manga": "The lists you created, full of saved manga",
+  "Show cursor": "Show cursor",
+  "When off, the right stick no longer shows a cursor on screen. Focus navigation still works.":
+    "When off, the right stick no longer shows a cursor on screen. Focus navigation still works.",
+  "Hide after idle": "Hide after idle",
+  "The cursor fades away when you stop moving the stick. Move it again to bring it back.":
+    "The cursor fades away when you stop moving the stick. Move it again to bring it back.",
+  "{n} s": "{n} s",
+  "In the manga reader.": "In the manga reader.",
   "Choose whether the content advisory appears in full color or a restrained monochrome tone.":
     "Choose whether the content advisory appears in full color or a restrained monochrome tone.",
   "Content advisory theme": "Content advisory theme",
