@@ -243,9 +243,7 @@ export function RuleBuilder({
   return (
     <Section
       title={t("Automations")}
-      subtitle={t(
-        "Choose which releases trigger an alert and where each alert goes.",
-      )}
+      subtitle={t("Choose which releases trigger an alert and where each alert goes.")}
     >
       {editing ? (
         <RuleEditor
@@ -271,9 +269,7 @@ export function RuleBuilder({
           )}
           {rules.length === 0 ? (
             <p className={`max-w-[70ch] ${ROW_DESC}`}>
-              {t(
-                "No rules yet. Add one to choose which releases you hear about.",
-              )}
+              {t("No rules yet. Add one to choose which releases you hear about.")}
             </p>
           ) : (
             rules.map((r) => (
@@ -286,10 +282,16 @@ export function RuleBuilder({
             ))
           )}
           <div ref={listRef} className="flex">
-            {noChannel ? <SButton variant="primary" onClick={onSetUp}>{t("Set up a destination")}</SButton> : <SButton variant="primary" onClick={startNew}>
-              <Plus size={18} strokeWidth={2.4} className="shrink-0" />
-              {t("New rule")}
-            </SButton>}
+            {noChannel ? (
+              <SButton variant="primary" onClick={onSetUp}>
+                {t("Set up a destination")}
+              </SButton>
+            ) : (
+              <SButton variant="primary" onClick={startNew}>
+                <Plus size={18} strokeWidth={2.4} className="shrink-0" />
+                {t("New rule")}
+              </SButton>
+            )}
           </div>
         </>
       )}
@@ -373,7 +375,10 @@ function RuleEditor({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const t = useT();
 
-  const noChannel = !(draft.channels.discord && canDiscord) && !(draft.channels.telegram && canTelegram) && !(draft.channels.desktop && canDesktop);
+  const noChannel =
+    !(draft.channels.discord && canDiscord) &&
+    !(draft.channels.telegram && canTelegram) &&
+    !(draft.channels.desktop && canDesktop);
   const live = useRef({ draft, onSave, onDelete, onCancel });
   live.current = { draft, onSave, onDelete, onCancel };
 
@@ -423,10 +428,23 @@ function RuleEditor({
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
         title={t("Delete this rule?")}
-        sub={t("{name} will be removed. Alerts from your other rules will continue.", { name: rule.name || t(EVENT_LABELS[rule.trigger.event]) })}
-        actions={<><ModalButton ghost onClick={() => setConfirmDelete(false)}>{t("Keep rule")}</ModalButton><button type="button" className={ROW_ACTION_DANGER} onClick={onDelete}>{t("Delete rule")}</button></>}
+        sub={t("{name} will be removed. Alerts from your other rules will continue.", {
+          name: rule.name || t(EVENT_LABELS[rule.trigger.event]),
+        })}
+        actions={
+          <>
+            <ModalButton ghost onClick={() => setConfirmDelete(false)}>
+              {t("Keep rule")}
+            </ModalButton>
+            <button type="button" className={ROW_ACTION_DANGER} onClick={onDelete}>
+              {t("Delete rule")}
+            </button>
+          </>
+        }
       >
-        <p className={ROW_DESC}>{t("You can also turn off Rule is active to pause it without deleting it.")}</p>
+        <p className={ROW_DESC}>
+          {t("You can also turn off Rule is active to pause it without deleting it.")}
+        </p>
       </SettingsModal>
       <SettingGroup label={isNew ? t("New rule") : t("Edit rule")}>
         <SettingRow
@@ -551,7 +569,9 @@ function RuleEditor({
       {country && (
         <ChipPicker
           label={t("Countries")}
-          hint={t("Pick the countries of origin you follow. With none picked, every country counts.")}
+          hint={t(
+            "Pick the countries of origin you follow. With none picked, every country counts.",
+          )}
           items={COUNTRIES.map((c) => ({
             key: c.code,
             label: c.name,
@@ -586,9 +606,7 @@ function RuleEditor({
               onToggle: () =>
                 setTrigger({
                   ...person,
-                  personIds: cur.includes(p.id)
-                    ? cur.filter((x) => x !== p.id)
-                    : [...cur, p.id],
+                  personIds: cur.includes(p.id) ? cur.filter((x) => x !== p.id) : [...cur, p.id],
                 }),
             };
           })}

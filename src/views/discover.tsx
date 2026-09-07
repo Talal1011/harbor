@@ -406,7 +406,8 @@ export function Discover({ active = true }: { active?: boolean }) {
     base.forEach((it, i) => {
       out.push(it);
       for (const s of SPECIAL_ROWS) {
-        if (s.after === i || (s.after === -1 && i === peopleAfter)) out.push({ key: s.key, title: s.title });
+        if (s.after === i || (s.after === -1 && i === peopleAfter))
+          out.push({ key: s.key, title: s.title });
       }
     });
     return out;
@@ -468,39 +469,35 @@ export function Discover({ active = true }: { active?: boolean }) {
       case "special:genres":
         return <GenreTiles title={renamed} />;
       case "special:queue":
-        return shownQueue.length > 0 ? <DiscoveryQueueCta items={shownQueue} title={renamed} /> : null;
+        return shownQueue.length > 0 ? (
+          <DiscoveryQueueCta items={shownQueue} title={renamed} />
+        ) : null;
       case "special:languages":
         return <LanguageTiles title={renamed} />;
       case "special:collections":
-        return settings.tmdbKey ? (
-            <CollectionsRow title={renamed} />
-        ) : null;
+        return settings.tmdbKey ? <CollectionsRow title={renamed} /> : null;
       case "special:critics":
         return criticsPick && !(hideAnime && metaLooksAnime(criticsPick)) ? (
-            <CriticsPick meta={criticsPick} title={renamed} />
+          <CriticsPick meta={criticsPick} title={renamed} />
         ) : null;
       case "special:studios":
-        return settings.tmdbKey ? (
-            <BrandTiles kind="studio" title={renamed} />
-        ) : null;
+        return settings.tmdbKey ? <BrandTiles kind="studio" title={renamed} /> : null;
       case "special:awards":
         return <AwardTiles title={renamed} />;
       case "special:networks":
-        return settings.tmdbKey ? (
-            <BrandTiles kind="network" title={renamed} />
-        ) : null;
+        return settings.tmdbKey ? <BrandTiles kind="network" title={renamed} /> : null;
       case "special:people":
         return <TopPeopleCta title={renamed} />;
       default:
         return (
-            <Rail
-              railId={item.key}
-              allRails={dailyRows}
-              deduped={dedupedShown}
-              loadMore={loadMore}
-              ensureLoaded={ensureLoaded}
-              titleOverride={renamed}
-            />
+          <Rail
+            railId={item.key}
+            allRails={dailyRows}
+            deduped={dedupedShown}
+            loadMore={loadMore}
+            ensureLoaded={ensureLoaded}
+            titleOverride={renamed}
+          />
         );
     }
   };

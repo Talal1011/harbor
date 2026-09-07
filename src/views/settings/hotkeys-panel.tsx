@@ -17,7 +17,7 @@ import { SEEK_STEP_OPTIONS } from "@/lib/seek-step";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
 import { Dropdown } from "@/components/dropdown";
-import { Section, ToggleRow, Segmented} from "./shared";
+import { Section, ToggleRow } from "./shared";
 import { ModalButton, ROW_DESC, SettingRow, SettingsModal } from "./kit";
 import { SSection } from "./ui";
 import { usePageActions } from "./page-actions";
@@ -230,7 +230,10 @@ export function HotkeysPanel() {
       )}
       {tab === "behaviour" && (
         <>
-          <Section title={t("Navigation")} subtitle={t("Move focus with the keyboard, like a TV remote.")}>
+          <Section
+            title={t("Navigation")}
+            subtitle={t("Move focus with the keyboard, like a TV remote.")}
+          >
             <ToggleRow
               label={t("TV navigation")}
               sub={t(

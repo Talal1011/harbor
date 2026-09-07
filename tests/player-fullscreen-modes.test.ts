@@ -71,8 +71,8 @@ test("exiting any fullscreen also leaves borderless", () => {
 });
 
 test("the fullscreen mode setting exposes borderless to the user", () => {
-  assert.match(settingsSource, /\{ value: "fullscreen", label: t\("True fullscreen"\) \}/);
-  assert.match(settingsSource, /\{ value: "borderless", label: t\("Borderless window"\) \}/);
-  assert.match(settingsSource, /\{ value: "maximized", label: t\("Maximize"\) \}/);
+  assert.match(settingsSource, /<option value="fullscreen">\{t\("True fullscreen"\)\}<\/option>/);
+  assert.match(settingsSource, /<option value="borderless">\{t\("Borderless window"\)\}<\/option>/);
+  assert.match(settingsSource, /<option value="maximized">\{t\("Maximize"\)\}<\/option>/);
   assert.match(settingsSource, /normalizeFullscreenMode\(settings\.fullscreenMode\)/);
 });

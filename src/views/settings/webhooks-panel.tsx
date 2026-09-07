@@ -109,11 +109,16 @@ export function WebhooksPanel() {
           ? settings.webhooks.telegramUrl
           : "";
     const setStatus =
-      kind === "discord" ? setDiscordStatus : kind === "telegram" ? setTelegramStatus : setDesktopStatus;
+      kind === "discord"
+        ? setDiscordStatus
+        : kind === "telegram"
+          ? setTelegramStatus
+          : setDesktopStatus;
     if (kind === "desktop" ? !settings.webhooks.desktopEnabled : !url) return;
     inFlightRef.current[kind] = true;
     setStatus({ state: "busy", message: t("Sending…") });
-    const service = kind === "discord" ? "Discord" : kind === "telegram" ? "Telegram" : "your desktop";
+    const service =
+      kind === "discord" ? "Discord" : kind === "telegram" ? "Telegram" : "your desktop";
     const testPayload: WebhookPayload = {
       text: t("Harbor test message ({service}). If you can read this, it's wired up.", {
         service,
@@ -198,9 +203,7 @@ export function WebhooksPanel() {
 
           <Section
             title={t("Media types")}
-            subtitle={t(
-              "Choose which types of releases to include in calendar alerts.",
-            )}
+            subtitle={t("Choose which types of releases to include in calendar alerts.")}
           >
             <ToggleRow
               label={t("Movies")}

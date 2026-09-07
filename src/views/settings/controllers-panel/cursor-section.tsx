@@ -87,7 +87,9 @@ export function CursorSection() {
     >
       <ToggleRow
         label={t("Show cursor")}
-        sub={t("When off, the right stick no longer shows a cursor on screen. Focus navigation still works.")}
+        sub={t(
+          "When off, the right stick no longer shows a cursor on screen. Focus navigation still works.",
+        )}
         value={enabled}
         onChange={(v) => update({ controllerCursorEnabled: v })}
       />
@@ -102,10 +104,12 @@ export function CursorSection() {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => empty ? openPicker() : update({ controllerCursor: id })}
+                  onClick={() => (empty ? openPicker() : update({ controllerCursor: id }))}
                   aria-pressed={on}
                   className={`flex min-h-[104px] flex-col items-center justify-center gap-2 rounded-[10px] border bg-elevated px-3 py-4 transition-colors duration-150 ${
-                    on ? "border-accent text-ink" : "border-edge-soft text-ink-muted hover:border-edge"
+                    on
+                      ? "border-accent text-ink"
+                      : "border-edge-soft text-ink-muted hover:border-edge"
                   }`}
                 >
                   <span className="flex h-11 w-11 items-center justify-center text-accent">
@@ -139,7 +143,9 @@ export function CursorSection() {
           <SettingRow
             label={t("Your own image")}
             desc={t("PNG, WEBP, SVG or GIF. Harbor shrinks it to 128px so it stays small on disk.")}
-            warn={failed ? t("That image could not be used. Try a smaller PNG or WEBP.") : undefined}
+            warn={
+              failed ? t("That image could not be used. Try a smaller PNG or WEBP.") : undefined
+            }
           >
             <span ref={upload} className="contents">
               <SButton onClick={openPicker}>
@@ -200,7 +206,9 @@ export function CursorSection() {
           <SettingRow
             wide
             label={t("Hide after idle")}
-            desc={t("The cursor fades away when you stop moving the stick. Move it again to bring it back.")}
+            desc={t(
+              "The cursor fades away when you stop moving the stick. Move it again to bring it back.",
+            )}
           >
             <div className="flex w-full flex-wrap items-center gap-4">
               <div className="flex h-11 min-w-[260px] max-w-[520px] flex-1 items-center gap-4">

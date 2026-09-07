@@ -1,5 +1,115 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "Return to beta": "Return to beta",
+  "Experimental {version} · Build {buildId}": "Experimental {version} · Build {buildId}",
+  "Couldn't verify your Harbor account access. Check your connection and try again.":
+    "Couldn't verify your Harbor account access. Check your connection and try again.",
+  "No verified experimental build is available for this device yet.":
+    "No verified experimental build is available for this device yet.",
+  "No tested return to beta is available for this build.":
+    "No tested return to beta is available for this build.",
+  "The experimental build changed during the check. Check again before downloading.":
+    "The experimental build changed during the check. Check again before downloading.",
+  "Couldn't check experimental builds. Check your connection and try again.":
+    "Couldn't check experimental builds. Check your connection and try again.",
+  "Couldn't verify this return to beta. Check your connection and try again.":
+    "Couldn't verify this return to beta. Check your connection and try again.",
+  "Couldn't save the recovery backup. Free some storage and try again.":
+    "Couldn't save the recovery backup. Free some storage and try again.",
+  "Return to beta did not finish. Your recovery files have been kept. Try again from Experimental builds.":
+    "Return to beta did not finish. Your recovery files have been kept. Try again from Experimental builds.",
+  "Harbor Setup did not finish updating Harbor. Check for updates to try again.":
+    "Harbor Setup did not finish updating Harbor. Check for updates to try again.",
+  "Couldn't save the update channel. Free some storage and try again.":
+    "Couldn't save the update channel. Free some storage and try again.",
+  "Leave experimental builds before changing your normal update channel.":
+    "Leave experimental builds before changing your normal update channel.",
+  "Finish the current download or installation before changing channels.":
+    "Finish the current download or installation before changing channels.",
+  "Continue the return to beta in Experimental builds below.":
+    "Continue the return to beta in Experimental builds below.",
+  "No newer experimental build is available for this device.":
+    "No newer experimental build is available for this device.",
+  "Replace this experimental installation with a tested beta. Compatible settings and watch progress stay in place. Beta updates resume after a successful restart.":
+    "Replace this experimental installation with a tested beta. Compatible settings and watch progress stay in place. Beta updates resume after a successful restart.",
+  "Automatic return to beta is not available for this platform yet.":
+    "Automatic return to beta is not available for this platform yet.",
+  "Beta version": "Beta version",
+  "Choose a tested beta": "Choose a tested beta",
+  "Beta {version}": "Beta {version}",
+  "Harbor saves a local recovery backup before installing. It can contain account details. Old backups are not restored automatically, and recovery files use extra disk space.":
+    "Harbor saves a local recovery backup before installing. It can contain account details. Old backups are not restored automatically, and recovery files use extra disk space.",
+  "Install beta {version} and restart? This replaces the experimental app, not your current settings.":
+    "Install beta {version} and restart? This replaces the experimental app, not your current settings.",
+  "Install beta {version} and restart": "Install beta {version} and restart",
+  "Download and verify beta": "Download and verify beta",
+  "Downloading beta: {pct}%": "Downloading beta: {pct}%",
+  "Saving recovery files and installing beta…": "Saving recovery files and installing beta…",
+  "Beta download verified. Ready to install.": "Beta download verified. Ready to install.",
+  "Checking the selected beta…": "Checking the selected beta…",
+  "Experimental builds": "Experimental builds",
+  "Return to a regular build": "Return to a regular build",
+  "Experimental access requires a Harbor account with a Tester, Moderator, Admin, or Dev badge.":
+    "Experimental access requires a Harbor account with a Tester, Moderator, Admin, or Dev badge.",
+  "Checking experimental builds…": "Checking experimental builds…",
+  "Experimental updates are enabled on this device.":
+    "Experimental updates are enabled on this device.",
+  "Experimental updates are off.": "Experimental updates are off.",
+  "Test upcoming changes": "Test upcoming changes",
+  "Available to Harbor accounts with a Tester, Moderator, Admin, or Dev badge.":
+    "Available to Harbor accounts with a Tester, Moderator, Admin, or Dev badge.",
+  "These builds may crash or change your settings. Back up Harbor before installing. Downloads and installation still require your approval.":
+    "These builds may crash or change your settings. Back up Harbor before installing. Downloads and installation still require your approval.",
+  "Installed: Harbor {version}": "Installed: Harbor {version}",
+  "Update channel: {channel}": "Update channel: {channel}",
+  "Experimental installation currently requires a managed Windows installation with a tested return to beta.":
+    "Experimental installation currently requires a managed Windows installation with a tested return to beta.",
+  "Leave experimental builds": "Leave experimental builds",
+  "Enable experimental builds": "Enable experimental builds",
+  "View experimental update": "View experimental update",
+  "Check experimental builds": "Check experimental builds",
+  "Enable experimental updates on this device? This replaces your normal update feed until you leave. It does not install a build now.":
+    "Enable experimental updates on this device? This replaces your normal update feed until you leave. It does not install a build now.",
+  "Enable and check": "Enable and check",
+  "Leaving only turns off experimental checks. Use Return to beta below to replace the experimental app.":
+    "Leaving only turns off experimental checks. Use Return to beta below to replace the experimental app.",
+  "Find on your sources": "Find on your sources",
+  "Search your manga sources": "Search your manga sources",
+  "Add a manga source first — a Suwayomi server, Mangayomi, a local folder, or a plugin — then pick the matching copy here.":
+    "Add a manga source first — a Suwayomi server, Mangayomi, a local folder, or a plugin — then pick the matching copy here.",
+  "Searching your sources…": "Searching your sources…",
+  "No match on your extensions. Edit the query above or check the language filter in the manga tab.":
+    "No match on your extensions. Edit the query above or check the language filter in the manga tab.",
+  "Everything from {name}": "Everything from {name}",
+  "Filter, sort and search the full catalogue": "Filter, sort and search the full catalogue",
+  Launch: "Launch",
+  "Start Harbor in the couch-friendly Big Picture layout whenever the app opens.":
+    "Start Harbor in the couch-friendly Big Picture layout whenever the app opens.",
+  "Animate backdrop art on Big Picture screens.": "Animate backdrop art on Big Picture screens.",
+  "Press Esc to stop.": "Press Esc to stop.",
+  "Harbor and the installer": "Harbor and the installer",
+  "The Big Picture opener and the boat that builds itself while Harbor installs.":
+    "The Big Picture opener and the boat that builds itself while Harbor installs.",
+  "The General": "The General",
+  "Anime upscalers": "Anime upscalers",
+  "Screensaver style": "Screensaver style",
+  "Cinematic drifts through backdrops from what's trending. Cat and boat plays a hand drawn illustration instead.":
+    "Cinematic drifts through backdrops from what's trending. Cat and boat plays a hand drawn illustration instead.",
+  "Cat and boat": "Cat and boat",
+  "Desktop notifications": "Desktop notifications",
+  "Get a system notification on this device when something you follow drops.":
+    "Get a system notification on this device when something you follow drops.",
+  "Notifications are blocked for Harbor. Enable them in your system settings, then turn this back on.":
+    "Notifications are blocked for Harbor. Enable them in your system settings, then turn this back on.",
+  "Add a Discord or Telegram destination, or turn on Desktop notifications, first. Rules need somewhere to send their alerts.":
+    "Add a Discord or Telegram destination, or turn on Desktop notifications, first. Rules need somewhere to send their alerts.",
+  "Show a system notification on this device.": "Show a system notification on this device.",
+  "Turn on Desktop notifications on the Destinations tab first.":
+    "Turn on Desktop notifications on the Destinations tab first.",
+  "Harbor test message ({service}). If you can read this, it's wired up.":
+    "Harbor test message ({service}). If you can read this, it's wired up.",
+  "Connect Discord or Telegram, or turn on desktop notifications, and Harbor alerts you when something you follow is about to drop. Hit Send test to send yourself a sample first.":
+    "Connect Discord or Telegram, or turn on desktop notifications, and Harbor alerts you when something you follow is about to drop. Hit Send test to send yourself a sample first.",
   "Manga sync": "Manga sync",
   "{title} · Chapter {chapter}": "{title} · Chapter {chapter}",
   "Reorder extensions": "Reorder extensions",

@@ -68,13 +68,21 @@ export function markSettingSeen(id: string): void {
 }
 
 export function useSettingsNew(): (id: string) => boolean {
-  useSyncExternalStore(subscribe, () => snapshot, () => snapshot);
+  useSyncExternalStore(
+    subscribe,
+    () => snapshot,
+    () => snapshot,
+  );
   const seen = new Set(store.sections);
   return (id: string) => NEW_SECTIONS.has(id) && !seen.has(id);
 }
 
 export function useSettingNew(): (id: string) => boolean {
-  useSyncExternalStore(subscribe, () => snapshot, () => snapshot);
+  useSyncExternalStore(
+    subscribe,
+    () => snapshot,
+    () => snapshot,
+  );
   const seen = new Set(store.items);
   return (id: string) => NEW_SETTINGS.has(id) && !seen.has(id);
 }

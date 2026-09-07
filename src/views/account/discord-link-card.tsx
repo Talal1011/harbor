@@ -92,12 +92,7 @@ export function DiscordLinkCard({
         icon={<DiscordIcon size={24} className="text-[#5865F2]" />}
       >
         {canDesktop ? (
-          <button
-            type="button"
-            onClick={() => void run()}
-            disabled={busy}
-            className={ROW_ACTION}
-          >
+          <button type="button" onClick={() => void run()} disabled={busy} className={ROW_ACTION}>
             {busy ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
