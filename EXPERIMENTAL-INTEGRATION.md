@@ -1,5 +1,9 @@
 # Experimental integration candidate — not published
 
+Current candidate: Experimental 0.0.2, internal 0.999.2. The earlier 0.999.1 build below is retained as historical context.
+
+2026-09-07 follow-up: Talal reports playback, subtitle switching/Off while loading, settings and library passed on 0.999.1, and settings/data remained intact after manually returning to 0.9.124. This is manual test evidence, not an automatic recovery test. Candidate 0.999.2 changes recovery discovery/account transport only, with no user-data schema changes. Account requests now use the same native-aware transport as sign-in/token refresh; rejected authentication is denied rather than mislabeled as connectivity failure. The specific original account failure still needs confirmation in the packaged app. Thirty updater/account tests pass. New candidate requires signed artifacts and an Experimental-only release; public beta remains unchanged.
+
 Prepared 2026-09-07 on `experimental/0.0.1`.
 Internal app/installer version: `0.999.1` (all eight version files updated).
 Base: upstream beta-branch `7098dddf`.
@@ -43,3 +47,13 @@ Each PR is recorded as a local merge, preserving its commit history. No upstream
 6. Test included contributors' affected features before publishing the isolated Experimental feed.
 
 Public beta 0.9.124 remains unchanged.
+
+## Standalone recovery follow-up (source only)
+
+- Added recovery discovery on updater startup and Experimental checks, independently of account badge verification. Exact installed version must match the current Experimental manifest and its immutable approval; missing/withdrawn/unapproved manifests remain unavailable.
+- Existing saved recovery contexts still use their immutable history, so a newer latest pointer does not replace them. A standalone install with no saved context cannot discover an older build after the latest pointer advances; publishing needs a durable per-version discovery index or bundled build identity for that separate case.
+- Reject saved contexts belonging to another installed version.
+- All 28 updater tests passed; scoped format/lint passed.
+- No recovery approval was invented or published. The currently unpublished candidate has no approved target to discover. Manual beta compatibility testing and publisher metadata remain prerequisites for end-to-end recovery testing.
+- Previously signed installers are unchanged and do not contain this follow-up. A fresh uniquely versioned build is required before testing the source changes.
+- Linux build command was started but stopped after confirming the configuration only overlays bundle settings and would still build Windows on this host. No Linux runtime/toolchain is available; no Linux verification is claimed.
