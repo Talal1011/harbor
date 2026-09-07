@@ -39,6 +39,7 @@ export type View =
   | "collections-hub"
   | "live"
   | "vod"
+  | "sports"
   | "downloads"
   | "wrapped"
   | "manga"
@@ -163,6 +164,7 @@ export type Frame =
   | { kind: "library" }
   | { kind: "live" }
   | { kind: "vod" }
+  | { kind: "sports" }
   | { kind: "downloads" }
   | { kind: "manga"; mangaId?: string }
   | { kind: "ebook"; ebookId?: string }
@@ -215,6 +217,7 @@ export type SettingsSection =
   | "trakt"
   | "anilist"
   | "simkl"
+  | "letterboxd"
   | "parental"
   | "relay"
   | "streaming"
@@ -380,6 +383,8 @@ function frameKey(f: Frame): string {
       return "live";
     case "vod":
       return "vod";
+    case "sports":
+      return "sports";
     case "downloads":
       return "downloads";
     case "manga":
@@ -517,6 +522,7 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       if (f.kind === "collections-hub") return "collections-hub";
       if (f.kind === "live") return "live";
       if (f.kind === "vod") return "vod";
+      if (f.kind === "sports") return "sports";
       if (f.kind === "downloads") return "downloads";
       if (f.kind === "manga") return "manga";
       if (f.kind === "ebook") return "ebook";
@@ -779,6 +785,11 @@ export function ViewProvider({ children }: { children: ReactNode }) {
           scrollMem.current.clear();
           rowScrollMem.current.clear();
           return [{ kind: "vod" }];
+        }
+        if (v === "sports") {
+          scrollMem.current.clear();
+          rowScrollMem.current.clear();
+          return [{ kind: "sports" }];
         }
         if (v === "manga") {
           scrollMem.current.clear();
@@ -1447,6 +1458,9 @@ export function useScrollMemory(
     let settleId: number | null = null;
     let saveTimer: number | null = null;
     let revealId: number | null = null;
+    let lastTop = 0;
+    let parked = el.clientHeight === 0;
+    let everVisible = !parked;
 
     const initialSnap = recallScroll(key);
     const wantsHide =
@@ -1471,7 +1485,16 @@ export function useScrollMemory(
       }
     };
 
-    const tryRestore = () => {
+    const armSettle = () => {
+      cancelSettle();
+      settleId = window.setTimeout(() => {
+        restoring = false;
+        settleId = null;
+        reveal();
+      }, 30000);
+    };
+
+    const tryRestore = (clamp = false) => {
       if (!restoring) return;
       const snap = recallScroll(key);
       if (!snap) {
@@ -1489,25 +1512,12 @@ export function useScrollMemory(
         return;
       }
       const max = el.scrollHeight - el.clientHeight;
-      if (max < target - 4) return;
+      if (max < target - 4 && !clamp) return;
       el.scrollTop = Math.min(target, max);
       restoring = false;
       cancelSettle();
       reveal();
     };
-
-    settleId = window.setTimeout(() => {
-      restoring = false;
-      settleId = null;
-      reveal();
-    }, 30000);
-    if (wantsHide) revealId = window.setTimeout(reveal, 220);
-
-    tryRestore();
-
-    const ro = new ResizeObserver(tryRestore);
-    ro.observe(el);
-    if (el.firstElementChild) ro.observe(el.firstElementChild);
 
     const saveNow = () => {
       if (el.clientHeight === 0) return;
@@ -1527,25 +1537,60 @@ export function useScrollMemory(
       }
     };
 
+    const flushParked = () => {
+      if (saveTimer === null || restoring || lastTop <= 0) return;
+      cancelSave();
+      rememberScroll(key, { delta: 0, fallback: lastTop });
+    };
+
+    const onResize = () => {
+      const hidden = el.clientHeight === 0;
+      if (hidden && !parked) {
+        parked = true;
+        flushParked();
+        return;
+      }
+      if (!hidden && parked) {
+        parked = false;
+        restoring = true;
+        armSettle();
+        tryRestore(everVisible);
+        everVisible = true;
+        return;
+      }
+      if (!hidden) everVisible = true;
+      tryRestore();
+    };
+
     const onScroll = () => {
       if (restoring) return;
       if (el.clientHeight === 0) return;
+      lastTop = el.scrollTop;
       cancelSave();
       saveTimer = window.setTimeout(() => {
         saveTimer = null;
         saveNow();
       }, 200);
     };
+
+    armSettle();
+    if (wantsHide) revealId = window.setTimeout(reveal, 220);
+    tryRestore();
+
+    const ro = new ResizeObserver(onResize);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
     el.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
+      if (!restoring && el.clientHeight > 0 && el.scrollTop > 0) saveNow();
+      else if (el.clientHeight === 0) flushParked();
       cancelSave();
       cancelSettle();
       if (revealId !== null) clearTimeout(revealId);
       reveal();
       ro.disconnect();
       el.removeEventListener("scroll", onScroll);
-      if (!restoring && el.clientHeight > 0 && el.scrollTop > 0) saveNow();
     };
   }, [active, key, ref, rememberScroll, recallScroll, hideUntilRestored]);
 }

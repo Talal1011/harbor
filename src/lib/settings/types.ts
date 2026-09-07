@@ -7,6 +7,7 @@ import type { CustomStreamFilter } from "@/lib/streams/custom-filters";
 import type { SyncIndicatorPosition } from "@/lib/sync-toast-position";
 import type { FullscreenClockFormat, FullscreenClockStyle } from "@/lib/local-time";
 import type { SubtitleOffsetPosition, SubtitleOffsetSize } from "@/lib/player/subtitle-offset";
+import type { BufferSizeId } from "@/lib/player/buffer-profile";
 import type { UiLanguage } from "@/lib/i18n/languages";
 
 export type StreamingService =
@@ -181,7 +182,9 @@ export type Settings = {
   heroFeed: "trending" | "trakt" | "simkl" | "classic";
   heroTrailers: boolean;
   heroTrailerAudio: boolean;
+  navIconAnimations: boolean;
   screensaver: boolean;
+  screensaverStyle: "ambient" | "catBoat";
   screensaverDelayMin: number;
   resumePrompt: boolean;
   resumePlayback: boolean;
@@ -260,7 +263,7 @@ export type Settings = {
   instantPlaybackPreparation: boolean;
   autoNextStreamOnStall: boolean;
   autoNextStreamOnStallSec: number;
-  fullscreenMode: "fullscreen" | "maximized";
+  fullscreenMode: "fullscreen" | "borderless" | "maximized";
   seasonSourceLock: boolean;
   rememberLastStream: boolean;
   keepSourceNextEpisode: boolean;
@@ -334,6 +337,7 @@ export type Settings = {
   subOffsetIndicatorPosition: SubtitleOffsetPosition;
   subOffsetIndicatorSize: SubtitleOffsetSize;
   subShowInPip: boolean;
+  subHideSdh: boolean;
   secondarySubLang: string;
   subSecondaryPlacement: "top" | "bottom";
   subSecondaryScale: number;
@@ -404,7 +408,11 @@ export type Settings = {
   mpvExtraOptions: string;
   mpvQuality: "balanced" | "performance" | "quality";
   mpvHwdec: "auto" | "on" | "off";
+  mpvRenderer: "gpu-next" | "gpu";
+  uiGraphicsBackend: "auto" | "d3d11" | "opengl" | "vulkan" | "software";
+  mpvForceYuv420p: boolean;
   mpvBufferBoost: boolean;
+  mpvBufferSize: BufferSizeId;
   mpvDownmixStereo: boolean;
   volumeBoostMax: number;
   mpvTweaks: Record<string, string>;
@@ -439,6 +447,7 @@ export type Settings = {
   bigPictureOverscan: number | null;
   playerHdrStage: "auto" | "off" | "always";
   opensubtitlesApiKey: string;
+  theIntroDbKey: string;
   jimakuToken: string;
   subdlApiKey: string;
   subsourceApiKey: string;
@@ -456,6 +465,9 @@ export type Settings = {
   localEpisodeSortDesc: boolean;
   smoothScroll: boolean;
   showSimklCard: boolean;
+  showLetterboxdCard: boolean;
+  externalContinueWatching: boolean;
+  cwSources: { library: boolean; trakt: boolean; simkl: boolean; local: boolean };
   showPlaylistsTab: boolean;
   skipProfileScreen: boolean;
   profilePromptInterval: "launch" | "15m" | "30m" | "never";
@@ -624,6 +636,7 @@ export type Settings = {
   ebookDownloadDir: string;
   ebookDownloadCreateFolders: boolean;
   nytKey: string;
+  sportsApiKey: string;
   stremioDeeplinkInstall: boolean;
   iptvPlaylists: Array<{
     id: string;

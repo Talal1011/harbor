@@ -1,3 +1,4 @@
+import { usePreviewNavCustomization } from "@/lib/theme-preview";
 import { ChevronDown, ChevronUp, Lock } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { HarborMark } from "@/components/icons/harbor-mark";
@@ -14,7 +15,7 @@ import { CollapseToggle } from "@/chrome/sidebar/collapse-toggle";
 import { SidebarBigPictureEntry } from "@/chrome/sidebar/big-picture-entry";
 import { NAV_ITEMS, applyNavCustomization, type NavItem } from "@/chrome/nav-items";
 
-const PRIMARY_IDS = new Set(["home", "discover", "catalogs", "movies", "shows", "kids", "anime", "live", "vod"]);
+const PRIMARY_IDS = new Set(["home", "discover", "catalogs", "movies", "shows", "kids", "anime", "live", "sports", "vod"]);
 
 export function Sidebar() {
   const { view, setView, chromeHidden } = useView();
@@ -178,7 +179,7 @@ function ScrollableNav({
   const { settings } = useSettings();
   const kid = useActiveKid();
   const t = useT();
-  const items = applyNavCustomization(NAV_ITEMS, settings.navCustomization);
+  const items = applyNavCustomization(NAV_ITEMS, usePreviewNavCustomization(settings.navCustomization));
   const isItemVisible = (item: NavItem) => {
     if (kid) return item.view === "kids";
     if (item.view === "kids") return false;
@@ -341,7 +342,7 @@ function NavItem({
   big,
   view,
 }: {
-  render: (active: boolean) => ReactNode;
+  render: (active: boolean, hovered?: boolean) => ReactNode;
   label: string;
   active?: boolean;
   onClick?: () => void;
@@ -375,7 +376,7 @@ function NavItem({
       }`}
     >
       <span className={`relative ${big ? "scale-110" : ""} ${gated ? "opacity-70" : ""}`}>
-        {render(Boolean(active || hovered))}
+        {render(Boolean(active || hovered), hovered)}
         {gated && (
           <span className="absolute -bottom-1 -end-1 flex h-4 w-4 items-center justify-center rounded-full bg-canvas text-ink-subtle ring-1 ring-edge">
             <Lock size={9} strokeWidth={2.4} />
