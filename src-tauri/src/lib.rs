@@ -53,6 +53,8 @@ mod cast_server;
 mod cf_relay;
 #[cfg(desktop)]
 mod cf_solver;
+#[cfg(desktop)]
+mod desktop_notify;
 mod discord_auth;
 #[cfg(desktop)]
 mod discord_rp;
@@ -648,6 +650,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(
@@ -823,6 +826,7 @@ pub fn run() {
             harbor_flush_done,
             harbor_startup_ready,
             close_aux_windows,
+            desktop_notify::send_clickable_notification,
             installer_handoff::handoff_probe,
             installer_handoff::handoff_stage,
             installer_handoff::handoff_launch,

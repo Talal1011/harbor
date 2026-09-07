@@ -512,6 +512,7 @@ export const DEFAULT: Settings = {
   webhooks: {
     discordUrl: "",
     telegramUrl: "",
+    desktopEnabled: false,
     notifyMovies: true,
     notifyTv: true,
     notifyAnime: true,

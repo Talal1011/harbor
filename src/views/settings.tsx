@@ -224,7 +224,7 @@ const SECTION_META: Record<SectionId, { label: string; sub: string }> = {
   },
   webhooks: {
     label: "Webhooks",
-    sub: "Push upcoming releases to Discord or Telegram. Pick which calendars feed the notifications.",
+    sub: "Push upcoming releases to Discord, Telegram, or your desktop. Pick which calendars feed the notifications.",
   },
   bug: {
     label: "Report a bug",

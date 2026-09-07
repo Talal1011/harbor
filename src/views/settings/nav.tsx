@@ -10425,7 +10425,9 @@ export function SettingsNav({
   const relayLive = settings.togetherRelayUrl ? "live" : null;
 
   const webhookActive =
-    (settings.webhooks.discordUrl || settings.webhooks.telegramUrl) &&
+    (settings.webhooks.discordUrl ||
+      settings.webhooks.telegramUrl ||
+      settings.webhooks.desktopEnabled) &&
     Object.values(settings.webhooks.sources).some(Boolean);
 
   const status: Record<SectionId, string | null> = {

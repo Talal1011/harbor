@@ -166,6 +166,7 @@ export function RuleBuilder({
   canDiscord,
   canTelegram,
   onSetUp,
+  canDesktop,
 }: {
   rules: Rule[];
   onChange: (rules: Rule[]) => void;
@@ -173,10 +174,11 @@ export function RuleBuilder({
   canDiscord: boolean;
   canTelegram: boolean;
   onSetUp: () => void;
+  canDesktop: boolean;
 }) {
   const t = useT();
   const [editing, setEditing] = useState<Rule | null>(null);
-  const noChannel = !canDiscord && !canTelegram;
+  const noChannel = !canDiscord && !canTelegram && !canDesktop;
 
   const listRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -234,7 +236,7 @@ export function RuleBuilder({
       name: "",
       enabled: true,
       trigger: { event: "newMovie" },
-      channels: { discord: canDiscord, telegram: !canDiscord && canTelegram },
+      channels: { discord: canDiscord, telegram: !canDiscord && canTelegram, desktop: canDesktop },
     });
   };
 
@@ -252,6 +254,7 @@ export function RuleBuilder({
           trackedPeople={trackedPeople}
           canDiscord={canDiscord}
           canTelegram={canTelegram}
+          canDesktop={canDesktop}
           nameRef={nameRef}
           onSave={upsert}
           onDelete={() => remove(editing.id)}
@@ -262,7 +265,7 @@ export function RuleBuilder({
           {noChannel && (
             <Callout>
               {t(
-                "Add a Discord or Telegram destination first. Rules need somewhere to send their alerts.",
+                "Add a Discord or Telegram destination, or turn on Desktop notifications, first. Rules need somewhere to send their alerts.",
               )}
             </Callout>
           )}
@@ -315,7 +318,11 @@ function RuleRow({
   const t = useT();
   const name = rule.name || t(EVENT_LABELS[rule.trigger.event]);
   const channels =
-    [rule.channels.discord && "Discord", rule.channels.telegram && "Telegram"]
+    [
+      rule.channels.desktop && "Desktop",
+      rule.channels.discord && "Discord",
+      rule.channels.telegram && "Telegram",
+    ]
       .filter(Boolean)
       .join(" + ") || t("nowhere yet");
   return (
@@ -345,6 +352,7 @@ function RuleEditor({
   trackedPeople,
   canDiscord,
   canTelegram,
+  canDesktop,
   nameRef,
   onSave,
   onDelete,
@@ -355,6 +363,7 @@ function RuleEditor({
   trackedPeople: TrackedPerson[];
   canDiscord: boolean;
   canTelegram: boolean;
+  canDesktop: boolean;
   nameRef: RefObject<HTMLInputElement | null>;
   onSave: (rule: Rule) => void;
   onDelete: () => void;
@@ -364,7 +373,7 @@ function RuleEditor({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const t = useT();
 
-  const noChannel = !(draft.channels.discord && canDiscord) && !(draft.channels.telegram && canTelegram);
+  const noChannel = !(draft.channels.discord && canDiscord) && !(draft.channels.telegram && canTelegram) && !(draft.channels.desktop && canDesktop);
   const live = useRef({ draft, onSave, onDelete, onCancel });
   live.current = { draft, onSave, onDelete, onCancel };
 
@@ -587,6 +596,17 @@ function RuleEditor({
       )}
 
       <SettingGroup label={t("Then notify")}>
+        <ToggleRow
+          label="Desktop"
+          sub={t("Show a system notification on this device.")}
+          value={draft.channels.desktop}
+          onChange={(v) => setDraft({ ...draft, channels: { ...draft.channels, desktop: v } })}
+          lockReason={
+            canDesktop
+              ? undefined
+              : t("Turn on Desktop notifications on the Destinations tab first.")
+          }
+        />
         <ToggleRow
           label="Discord"
           sub={t("Post the alert to the Discord channel set up on the Destinations tab.")}

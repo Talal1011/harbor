@@ -49,6 +49,7 @@
     "dialog:allow-message",
     "fs:default",
     "deep-link:default",
+    "notification:default",
     {
       "identifier": "fs:allow-write-file",
       "allow": [{ "path": "**" }]

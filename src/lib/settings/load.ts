@@ -445,7 +445,16 @@ export function loadStoredSettings(rawKey: string = STORAGE_KEY): Settings {
           anime: parsed.customCalendar?.mediaTypes?.anime !== false,
         },
       },
-      webhookRules: Array.isArray(parsed.webhookRules) ? parsed.webhookRules : [],
+      webhookRules: Array.isArray(parsed.webhookRules)
+        ? parsed.webhookRules.map((r) => ({
+            ...r,
+            channels: {
+              discord: r.channels?.discord ?? false,
+              telegram: r.channels?.telegram ?? false,
+              desktop: r.channels?.desktop ?? false,
+            },
+          }))
+        : [],
       customStreamFilters: Array.isArray(parsed.customStreamFilters)
         ? parsed.customStreamFilters
         : DEFAULT.customStreamFilters,
