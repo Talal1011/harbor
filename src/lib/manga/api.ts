@@ -218,6 +218,22 @@ export function searchMangaEverywhere(query: string) {
   );
 }
 
+/** Everywhere search without the stop-on-first-strong-match early exit: slower,
+ * but every extension reports, so pickers can show each source's copy. */
+export function searchMangaEverywhereExhaustive(query: string) {
+  const revision = suwayomiSourcesRevision();
+  return cached(
+    "searchAllEx",
+    `${revision}|${query}`,
+    5 * MIN,
+    (p) => p.searchAll?.(query, { exhaustive: true }) ?? p.search(query, 0),
+    {
+      tries: 1,
+      timeout: 60_000,
+    },
+  );
+}
+
 /** Search every configured source and return IDs routed back to the source that owns them. */
 export async function searchMangaAcrossSources(query: string): Promise<MangaSummary[]> {
   await ensureMangaSources();
