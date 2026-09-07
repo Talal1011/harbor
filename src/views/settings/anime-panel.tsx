@@ -1,9 +1,8 @@
-import { Info } from "lucide-react";
+import { Info } from "./icons";
 import { useState } from "react";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
 import { ROW_DESC, Section, ToggleRow } from "./shared";
-import { SettingRow } from "./kit";
 import { isTauri } from "./player-panel/internals";
 import { SvpSection } from "./anime-panel/svp-section";
 import { MotionCompare } from "./anime-panel/motion-compare";
@@ -50,28 +49,20 @@ export function AnimePanel() {
         <>
       <Section
         title={t("Smooth motion")}
-        subtitle={t("Anime is drawn on twos and threes, so fast pans can judder. Smoothing fills in the gaps so motion glides.")}
       >
         <ToggleRow
           label={t("Motion smoothing")}
-          sub={t("Harbor's built-in frame interpolation. Smooths panning, best on anime. Needs a display refresh rate above the video's frame rate, and can stutter on weak GPUs. Lighter than SVP.")}
+          sub={t("Smooths camera movement using Harbor's player. Works best when your screen refreshes faster than the video's frame rate.")}
           value={settings.playerMotionInterp}
           onChange={(v) => update({ playerMotionInterp: v })}
           lockReason={
             svpDriving
-              ? t("SVP is already handling frame interpolation. Turn off SVP below to use this instead. Running both delays the audio.")
+              ? t("SVP is handling motion smoothing. Turn it off on the SVP page to use Harbor's smoothing instead.")
               : undefined
           }
         />
 
-        <SettingRow
-          wide
-          label={t("Before and after")}
-          desc={t("The same camera pan on each setting. The lit lane is what you get right now.")}
-          tip={t("Interpolation invents frames between the drawn ones, so a pan travels in many small moves instead of a few big jumps.")}
-        >
-          <MotionCompare smoothed={svpDriving || settings.playerMotionInterp} />
-        </SettingRow>
+        <MotionCompare />
       </Section>
         </>
       )}

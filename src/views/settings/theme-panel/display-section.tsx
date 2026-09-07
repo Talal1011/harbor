@@ -1,9 +1,8 @@
 import { fillStyle, SliderReset } from "@/components/slider";
 import { DEFAULT } from "@/lib/settings/defaults";
 import { Dropdown } from "@/components/dropdown";
-import { Droplet, Hourglass, MousePointer2, Moon, Palette, Play, Sparkles, Text, Tv, Type, Volume1, Volume2, Waves, ZoomIn } from "lucide-react";
+import { Droplet, Hourglass, MousePointer2, Moon, Palette, Sailboat, Play, Sparkles, Text, Tv, Type, Volume1, Volume2, Waves, ZoomIn } from "../icons";
 import type { ReactNode } from "react";
-import { useSampleArtwork } from "@/lib/sample-artwork";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
 import { Section, ToggleRow } from "../shared";
@@ -44,6 +43,20 @@ export function AmbienceSection() {
             onChange={(v) => update({ screensaver: v })}
             leading={<Moon size={18} strokeWidth={2} />}
           />
+          <SettingRow
+            label={t("Screensaver style")}
+            desc={t("Cinematic drifts through backdrops from what's trending. Cat and boat plays a hand drawn illustration instead.")}
+            icon={<Sailboat size={18} strokeWidth={2} />}
+          >
+            <Dropdown
+              value={settings.screensaverStyle}
+              onChange={(v) => update({ screensaverStyle: v as typeof settings.screensaverStyle })}
+              options={[
+                { value: "ambient", label: t("Cinematic") },
+                { value: "catBoat", label: t("Cat and boat") },
+              ]}
+            />
+          </SettingRow>
           {settings.screensaver && (
             <Nested>
               <SettingRow
@@ -130,10 +143,9 @@ export function DisplaySection() {
   const { settings, update } = useSettings();
   const glassBlur = Number.isFinite(settings.defaultLiquidGlassBlur) ? settings.defaultLiquidGlassBlur : 2;
   const glassTint = Number.isFinite(settings.defaultLiquidGlassTint) ? settings.defaultLiquidGlassTint : 40;
-  const { poster: previewPoster } = useSampleArtwork();
   return (
     <>
-      <PosterCardSection previewPoster={previewPoster} />
+      <PosterCardSection />
       <Section
         title={t("Title text")}
         subtitle={t("Resize the row titles on Home and the title shown in the player, without scaling the rest of the interface. You can also lead the player title with the series name instead of the episode.")}
@@ -311,6 +323,8 @@ export function SliderRow({
       <div className="flex w-full max-w-[520px] flex-wrap items-center gap-4">
         <input
           type="range"
+          aria-label={label}
+          aria-valuetext={readout}
           min={min}
           max={max}
           step={step}
@@ -323,7 +337,7 @@ export function SliderRow({
           {readout}
         </span>
         {resetTo !== undefined && (
-          <SliderReset show={value !== resetTo} onReset={() => onChange(resetTo)} />
+          <SliderReset settingName={label} show={value !== resetTo} onReset={() => onChange(resetTo)} />
         )}
       </div>
     </SettingRow>

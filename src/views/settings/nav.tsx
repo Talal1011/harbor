@@ -1055,6 +1055,26 @@ const NAV_ITEM_BY_ID = new Map(NAV_GROUPS.flatMap((g) => g.items).map((i) => [i.
 
 const SETTINGS_OPTIONS: SettingsOption[] = [
   {
+    label: "Screensaver style",
+    section: "theme",
+    anchorTitle: "Screensaver style",
+    keywords: [
+      "screensaver",
+      "screen saver",
+      "idle screen",
+      "when harbor sits idle",
+      "cat",
+      "cat and boat",
+      "boat",
+      "illustration",
+      "animation while idle",
+      "cinematic backdrops",
+      "ambient",
+      "what shows when idle",
+      "change the screensaver",
+    ],
+  },
+  {
     label: "Set up my TV from this computer",
     section: "tv",
     anchorTitle: "The link to your TV",
@@ -1231,7 +1251,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Auto-play next episode on the TV",
     section: "tv",
-    anchorTitle: "Bingeing",
+    anchorTitle: "Between episodes",
     keywords: [
       "tv autoplay",
       "auto next tv",
@@ -1354,9 +1374,9 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "Bingeing on the TV",
+    label: "Between episodes on the TV",
     section: "tv",
-    anchorTitle: "Bingeing",
+    anchorTitle: "Between episodes",
     keywords: [
       "still watching",
       "are you still watching",
@@ -2744,6 +2764,9 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     anchorTitle: "Your themes",
     keywords: [
       "theme studio",
+      "put the menu on top",
+      "top dock navigation",
+      "move the menu",
       "custom theme",
       "editor",
       "browse theme library",
@@ -2893,7 +2916,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Harbor identity (avatar / color)",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: ["avatar", "profile photo", "upload photo", "color", "identity", "picture"],
   },
   {
@@ -3085,7 +3108,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Harbor identity",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: [
       "display name",
       "nickname",
@@ -3099,13 +3122,13 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Upload photo",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: ["avatar", "upload", "profile picture", "custom photo", "image", "change avatar"],
   },
   {
     label: "or use one of our avatars",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: [
       "avatar catalog",
       "built-in avatars",
@@ -3118,19 +3141,19 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Random avatar",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: ["random", "shuffle", "surprise avatar", "dice"],
   },
   {
     label: "Reset to Stremio avatar",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: ["reset avatar", "default avatar", "remove photo", "revert", "reset to default"],
   },
   {
     label: "Your color",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: [
       "color",
       "cursor color",
@@ -3144,7 +3167,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Profiles (switch, add, edit)",
     section: "account",
-    anchorTitle: "Harbor identity",
+    anchorTitle: "Your profile",
     keywords: [
       "pin",
       "set a pin",
@@ -4122,13 +4145,13 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Show torrent name",
     section: "streaming",
-    anchorTitle: "Torrent name",
+    anchorTitle: "Picker details",
     keywords: ["torrent name", "filename", "release name", "raw title", "release filename"],
   },
   {
     label: "Show full descriptions",
     section: "streaming",
-    anchorTitle: "Stream descriptions",
+    anchorTitle: "Picker details",
     keywords: [
       "full description",
       "aiostreams",
@@ -4423,7 +4446,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     label: "Auto-confirm peer-to-peer streaming",
     section: "p2p",
     anchorTitle: "Power tools & diagnostics",
-    keywords: ["auto confirm", "consent prompt", "skip prompt", "p2p prompt", "uncached torrents"],
+    keywords: ["auto confirm", "consent prompt", "skip prompt", "p2p prompt", "uncached torrents", "p2p confirm", "skip torrent warning", "dont ask torrent"],
   },
   {
     label: "Copy diagnostics",
@@ -5419,7 +5442,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "See the mpv.conf your dials above generate",
+    label: "View generated mpv options",
     section: "mpv",
     anchorTitle: "Advanced (mpv.conf)",
     keywords: [
@@ -6607,9 +6630,9 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     keywords: ["actual behavior", "what went wrong", "actual result", "instead"],
   },
   {
-    label: "Screenshots and recordings",
+    label: "Attachments",
     section: "bug",
-    anchorTitle: "Screenshots and recordings",
+    anchorTitle: "Attachments",
     keywords: [
       "attach screenshot",
       "screen recording",
@@ -6638,15 +6661,15 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "Credit (optional)",
+    label: "Contact & credit",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: ["reporter name", "github username", "contact", "anonymous report", "display name"],
   },
   {
     label: "Credit me in the release notes if this report leads to a fix.",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: ["release notes credit", "attribution consent", "credit reporter", "name in notes"],
   },
   {
@@ -7657,7 +7680,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Move Refresh next to Back",
     section: "streaming",
-    anchorTitle: "Refresh button",
+    anchorTitle: "Picker details",
     keywords: [
       "refresh button",
       "refresh position",
@@ -8586,9 +8609,6 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     section: "theme",
     anchorTitle: "Window title bar",
     keywords: [
-      "menu on top",
-      "top bar",
-      "move the menu",
       "frost top bar",
       "blur top bar",
       "scroll blur",
@@ -8807,7 +8827,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Contact email or Discord",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: [
       "email",
       "discord",
@@ -8906,7 +8926,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "Let structural tiers auto-apply",
+    label: "Apply audio-based corrections automatically",
     section: "subtitles",
     anchorTitle: "Subtitle auto-sync",
     keywords: ["auto apply", "structural", "apply fix without asking", "no prompt sync"],
@@ -8958,12 +8978,6 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     section: "p2p",
     anchorTitle: "Power tools & diagnostics",
     keywords: ["no torrents", "disable p2p", "turn off torrents", "debrid only"],
-  },
-  {
-    label: "Auto-confirm peer-to-peer streaming",
-    section: "p2p",
-    anchorTitle: "Power tools & diagnostics",
-    keywords: ["p2p confirm", "skip torrent warning", "auto confirm", "dont ask torrent"],
   },
   {
     label: "Keep downloading after you leave",
@@ -9909,10 +9923,24 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
       "sidebar icons",
     ],
   },
+  {
+    label: "Licenses & attribution",
+    section: "licenses",
+    keywords: ["licenses", "licences", "attribution", "acknowledgements", "open source credits"],
+  },
+  {
+    label: "Icons & animation",
+    section: "icons",
+    keywords: ["icons", "animation", "illustrators", "drawings", "icon credits"],
+  },
 ];
 
 setSettingsSearchVocabulary([
-  ...SETTINGS_OPTIONS.flatMap((o) => [o.label, ...(o.keywords ?? [])]),
+  ...SETTINGS_OPTIONS.flatMap((o) => [
+    o.label,
+    ...(o.anchorTitle ? [o.anchorTitle] : []),
+    ...(o.keywords ?? []),
+  ]),
   ...NAV_GROUPS.flatMap((g) => [
     g.heading ?? "",
     ...g.items.flatMap((it) => [it.label, ...(it.keywords ?? [])]),
@@ -9944,7 +9972,12 @@ export function useNavSearch(trimmed: string) {
     return SETTINGS_OPTIONS.filter(
       (o) =>
         (o.label !== "Experimental builds" || experimentalAccess) &&
-        matchesSettingsSearch(trimmed, [o.label], t, o.keywords ?? []),
+        matchesSettingsSearch(
+          trimmed,
+          o.anchorTitle ? [o.label, o.anchorTitle] : [o.label],
+          t,
+          o.keywords ?? [],
+        ),
     ).sort(
       (a, b) =>
         rankSettingsSearch(trimmed, a.label, a.keywords ?? []) -

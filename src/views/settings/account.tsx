@@ -1,7 +1,7 @@
 import { SettingGroup } from "./kit";
 import { useSettings } from "@/lib/settings";
 import { useState } from "react";
-import { Info, Link2 } from "lucide-react";
+import { Info, Link2 } from "./icons";
 import { useT } from "@/lib/i18n";
 import { ROW_DESC, Section, ToggleRow } from "./shared";
 import { useSubTabs } from "./sub-tabs";
@@ -21,7 +21,7 @@ export function AccountStub() {
   const t = useT();
   const [tab, setTab] = useState<Tab>("you");
   const tabs = [
-    { id: "you" as const, label: t("You") },
+    { id: "you" as const, label: t("Your profile") },
     { id: "profiles" as const, label: t("Profiles") },
     { id: "harbor" as const, label: t("Harbor account") },
     { id: "stremio" as const, label: t("Stremio") },
@@ -43,11 +43,11 @@ function ProfilesTab() {
   return (
     <Section
       title={t("Profiles")}
-      subtitle={t("Everyone who uses this Harbor gets their own watch history, avatar, color, and optional PIN. Switch anytime.")}
+      subtitle={t("Create profiles for the people who use Harbor. Each can have its own appearance, settings, and PIN.")}
     >
       <SettingGroup label={t("Everyone on this Harbor")}>
         <p className={`max-w-[70ch] ${ROW_DESC}`}>
-          {t("Tap to switch. The pencil renames, recolors, or adds a PIN.")}
+          {t("Choose a profile to switch. Use the pencil to edit its details and access settings.")}
         </p>
         <ProfilesStrip />
       </SettingGroup>

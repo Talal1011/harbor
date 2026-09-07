@@ -1,4 +1,4 @@
-import { Check, Download, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { Check, Download, ExternalLink, Loader2, RefreshCw } from "../icons";
 import { useEffect, useRef, useState } from "react";
 import { downloadShader } from "@/lib/shaders";
 import { tvFocus } from "@/lib/keyboard-navigation";
@@ -9,9 +9,49 @@ import { useT } from "@/lib/i18n";
 import { openUrl } from "@/lib/window";
 import { RowNote, Segmented, ToggleRow } from "../shared";
 import { Nested, ROW_ACTION, ROW_ACTION_PRIMARY, SettingRow } from "../kit";
-import { SRow } from "../ui";
 import { BeforeAfter } from "./before-after";
-import { appliesLabel, segmentedWide, STAGE_ICON, TIER_LOAD } from "./stages";
+import { appliesLabel, segmentedWide, TIER_LOAD } from "./stages";
+import amdLogo from "@/assets/shader-logos/amd.svg?url";
+import nvidiaLogo from "@/assets/shader-logos/nvidia.svg?url";
+import qualcommLogo from "@/assets/shader-logos/qualcomm.svg?url";
+
+const SHADER_LOGO: Record<string, string> = {
+  fsr: amdLogo,
+  cas: amdLogo,
+  nis: nvidiaLogo,
+  sgsr: qualcommLogo,
+};
+
+const SHADER_MARK: Record<string, string> = {
+  fsrcnnx: "FSX",
+  ravu: "RAVU",
+  nnedi3: "NN3",
+  ssimsuperres: "SSR",
+  krig: "KRIG",
+  "adaptive-sharpen": "AS",
+  "hdr-toys": "HDR",
+};
+
+function ShaderMark({ id }: { id: string }) {
+  const logo = SHADER_LOGO[id];
+  return (
+    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-elevated text-ink-muted">
+      {logo ? (
+        <img
+          src={logo}
+          alt=""
+          aria-hidden
+          className="h-[18px] w-[18px] object-contain"
+          style={{ filter: "brightness(0) invert(0.72)" }}
+        />
+      ) : (
+        <span className="text-[10.5px] font-bold leading-none tracking-tight">
+          {SHADER_MARK[id] ?? id.slice(0, 3).toUpperCase()}
+        </span>
+      )}
+    </span>
+  );
+}
 
 export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
   const t = useT();
@@ -22,7 +62,6 @@ export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
   const [busy, setBusy] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const Icon = STAGE_ICON[entry.stage];
   const downloadRef = useRef<HTMLButtonElement | null>(null);
   const handoff = useRef<{ parent: HTMLElement; index: number } | null>(null);
 
@@ -100,7 +139,7 @@ export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
       {installed ? (
         <ToggleRow
           label={t(entry.name)}
-          leading={<Icon size={18} strokeWidth={2.2} />}
+          leading={<ShaderMark id={entry.id} />}
           sub={detail}
           value={enabled}
           onChange={(v) => patch({ enabled: v })}
@@ -110,7 +149,7 @@ export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
       ) : (
         <SettingRow
           label={t(entry.name)}
-          icon={<Icon size={18} strokeWidth={2.2} />}
+          icon={<ShaderMark id={entry.id} />}
           desc={detail}
           warn={verifyNote}
         >
@@ -118,6 +157,7 @@ export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
             ref={downloadRef}
             type="button"
             onClick={startDownload}
+            aria-label={t("Download {name}", { name: entry.name })}
             aria-busy={busy}
             className={ROW_ACTION_PRIMARY}
           >
@@ -186,12 +226,14 @@ export function ShaderCard({ entry }: { entry: ShaderCatalogEntry }) {
           </SettingRow>
         )}
 
-        <SRow
-          title={t("Source")}
-          description={entry.source.label}
+        <button
+          type="button"
+          className="flex min-h-11 w-fit items-center gap-2 text-start text-[14px] text-ink-muted hover:text-ink"
           onClick={() => openUrl(entry.source.url)}
-          trailing={<ExternalLink size={18} className="shrink-0 text-ink-subtle" />}
-        />
+        >
+          <span>{t("Source")}: {entry.source.label}</span>
+          <ExternalLink size={15} className="shrink-0" />
+        </button>
       </Nested>
     </>
   );
