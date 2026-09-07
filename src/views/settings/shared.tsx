@@ -50,6 +50,7 @@ export type SectionId =
   | "icons"
   | "remotes"
   | "tv"
+  | "bigPicture"
   | "storage"
   | "trackers"
   | "updates"
