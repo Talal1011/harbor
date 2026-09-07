@@ -1,6 +1,6 @@
 import { resetOmdbBudget, subscribeOmdbBudget, type OmdbBudget, omdbBudget as readOmdbBudget } from "@/lib/providers/omdb";
 import { useEffect, useState } from "react";
-import { Music, Check, RotateCw } from "lucide-react";
+import { Music, Check, RotateCw } from "../icons";
 import { useSettings } from "@/lib/settings";
 import { hasCustomMetaAddon } from "@/lib/meta-resource";
 import { useT } from "@/lib/i18n";
@@ -22,7 +22,7 @@ export function ProvidersTab(props: ProviderKeysArgs) {
       <Section
         title={t("Metadata providers")}
         subtitle={t(
-          "A free TMDB key is highly recommended. It unlocks the full Harbor experience. The rest are optional, and Cinemeta works out of the box without any.",
+          "Add TMDB for more catalogs and artwork. Other providers add the features listed below. You can use Harbor with Cinemeta without adding a key.",
         )}
       >
         <SettingGroup>
@@ -43,7 +43,7 @@ export function ProvidersTab(props: ProviderKeysArgs) {
           <ToggleRow
             label={t("Use Cinemeta for title metadata")}
             sub={t(
-              "Only turn this off if you already have a metadata addon installed, such as AIOMetadata or AIOStreams. Without one, titles and collections can open completely blank. Cinemeta can go stale and show released episodes as TBA, which is the reason to replace it.",
+              "Cinemeta supplies titles and descriptions. Turn it off when an installed metadata addon supplies them instead.",
             )}
             value={settings.cinemetaEnabled}
             onChange={(v) => update({ cinemetaEnabled: v })}
@@ -58,7 +58,7 @@ export function ProvidersTab(props: ProviderKeysArgs) {
           <ToggleRow
             label={t("Prefer my installed metadata addon")}
             sub={t(
-              "Use a custom meta addon you installed (e.g. a localized Cinemeta) for titles and descriptions instead of the built-in Cinemeta. Falls back to Cinemeta if yours has no data.",
+              "Try your addon first for titles and descriptions. Use Cinemeta when the addon has no result.",
             )}
             value={settings.preferCustomMetaAddon}
             onChange={(v) => update({ preferCustomMetaAddon: v })}

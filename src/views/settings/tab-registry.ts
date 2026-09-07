@@ -1,20 +1,26 @@
+import anilistLogo from "@/assets/anilist.png";
+import malLogo from "@/assets/mal.png";
+import simklLogo from "@/assets/simkl.png";
+import traktLogo from "@/assets/trakt.png";
+import letterboxdLogo from "@/assets/addon-logos/letterboxd.png";
+import stremioLogo from "@/assets/stremio.png";
 import type { SectionId } from "./shared";
 
-export type TabEntry = { id: string; label: string; icon: string };
+export type TabEntry = { id: string; label: string; icon: string; img?: string };
 
 export const SECTION_TABS: Partial<Record<SectionId, TabEntry[]>> = {
   account: [
-    { id: "you", label: "You", icon: "UserRound" },
+    { id: "you", label: "Your profile", icon: "UserRound" },
     { id: "profiles", label: "Profiles", icon: "Users" },
-    { id: "harbor", label: "Harbor account", icon: "Anchor" },
-    { id: "stremio", label: "Stremio", icon: "Plug" },
+    { id: "harbor", label: "Harbor account", icon: "Harbor" },
+    { id: "stremio", label: "Stremio", icon: "Play", img: stremioLogo },
   ],
   player: [
-    { id: "play", label: "Play", icon: "Play" },
+    { id: "play", label: "Play", icon: "PlayStart" },
     { id: "engine", label: "Engine", icon: "Cpu" },
     { id: "aspect", label: "Aspect", icon: "RectangleHorizontal" },
     { id: "audio", label: "Audio", icon: "Volume2" },
-    { id: "onscreen", label: "On screen", icon: "LayoutDashboard" },
+    { id: "onscreen", label: "On screen", icon: "OnscreenControls" },
     { id: "xray", label: "X-Ray", icon: "ScanEye" },
     { id: "adskip", label: "Ad skip", icon: "SkipForward" },
     { id: "intros", label: "Intros", icon: "FastForward" },
@@ -28,7 +34,7 @@ export const SECTION_TABS: Partial<Record<SectionId, TabEntry[]>> = {
     { id: "advanced", label: "mpv.conf", icon: "FileCode" },
   ],
   shaders: [
-    { id: "anime4k", label: "Anime4K", icon: "Sparkles" },
+    { id: "anime4k", label: "Anime Shaders", icon: "Sparkles" },
     { id: "more", label: "More shaders", icon: "Layers" },
   ],
   anime: [
@@ -36,52 +42,52 @@ export const SECTION_TABS: Partial<Record<SectionId, TabEntry[]>> = {
     { id: "svp", label: "SVP", icon: "Film" },
   ],
   language: [
-    { id: "app", label: "Harbor", icon: "Languages" },
+    { id: "app", label: "Harbor", icon: "AppLanguage" },
     { id: "audio", label: "Audio", icon: "AudioLines" },
     { id: "discovery", label: "What you see", icon: "Eye" },
   ],
   subtitles: [
-    { id: "languages", label: "Languages", icon: "Languages" },
+    { id: "languages", label: "Languages", icon: "SubtitleLanguages" },
     { id: "sources", label: "Sources", icon: "Download" },
     { id: "sync", label: "Sync", icon: "Timer" },
-    { id: "look", label: "Look", icon: "Type" },
+    { id: "look", label: "Look", icon: "SubtitleStyle" },
   ],
   streaming: [
     { id: "services", label: "Services", icon: "Tv" },
     { id: "home-servers", label: "Home servers", icon: "Server" },
-    { id: "filters", label: "Filters", icon: "Filter" },
+    { id: "filters", label: "Filters", icon: "SourcePreferences" },
     { id: "sorting", label: "Sorting", icon: "ArrowDownUp" },
     { id: "picker", label: "Picker", icon: "MousePointerClick" },
   ],
   p2p: [
-    { id: "engine", label: "Engine", icon: "Cpu" },
-    { id: "server", label: "Server", icon: "Server" },
+    { id: "engine", label: "Engine", icon: "TorrentEngine" },
+    { id: "server", label: "Server", icon: "TorrentServer" },
   ],
   library: [
     { id: "home", label: "Home", icon: "House" },
     { id: "cards", label: "Cards", icon: "LayoutGrid" },
     { id: "detail", label: "Detail pages", icon: "FileText" },
     { id: "providers", label: "Metadata", icon: "Database" },
-    { id: "ai", label: "AI search", icon: "Sparkles" },
-    { id: "library", label: "Library", icon: "Library" },
+    { id: "ai", label: "AI search", icon: "DiscoverySearch" },
+    { id: "library", label: "Library", icon: "SavedLibrary" },
   ],
   theme: [
-    { id: "theme", label: "Theme", icon: "Palette" },
+    { id: "theme", label: "Theme", icon: "ThemeSwatches" },
     { id: "library", label: "Your themes", icon: "Brush" },
-    { id: "logo", label: "Logo & icon", icon: "Shapes" },
+    { id: "logo", label: "Logo & icon", icon: "LogoIdentity" },
     { id: "type", label: "Typography", icon: "Type" },
-    { id: "interface", label: "Interface", icon: "LayoutDashboard" },
+    { id: "interface", label: "Interface", icon: "AppInterface" },
     { id: "ambience", label: "Ambience", icon: "Sun" },
     { id: "window", label: "Window", icon: "AppWindow" },
   ],
   badges: [
     { id: "badges", label: "Badges", icon: "BadgeCheck" },
-    { id: "rules", label: "Custom rules", icon: "SlidersHorizontal" },
+    { id: "rules", label: "Custom rules", icon: "BadgeRules" },
     { id: "packs", label: "Packs", icon: "Package" },
   ],
   hotkeys: [
     { id: "keys", label: "Shortcuts", icon: "Keyboard" },
-    { id: "behaviour", label: "Behaviour", icon: "Settings2" },
+    { id: "behaviour", label: "Behaviour", icon: "KeyboardBehavior" },
   ],
   controllers: [
     { id: "setup", label: "Setup", icon: "Gamepad2" },
@@ -89,8 +95,8 @@ export const SECTION_TABS: Partial<Record<SectionId, TabEntry[]>> = {
   ],
   tv: [
     { id: "devices", label: "Devices", icon: "Cast" },
-    { id: "look", label: "Look", icon: "Palette" },
-    { id: "watching", label: "Watching", icon: "Play" },
+    { id: "look", label: "Look", icon: "TvAppearance" },
+    { id: "watching", label: "Watching", icon: "TvPlayback" },
     { id: "content", label: "Content", icon: "Shield" },
   ],
   storage: [
@@ -101,11 +107,18 @@ export const SECTION_TABS: Partial<Record<SectionId, TabEntry[]>> = {
   webhooks: [
     { id: "destinations", label: "Destinations", icon: "Send" },
     { id: "what", label: "Sources", icon: "Rss" },
-    { id: "rules", label: "Rules", icon: "Filter" },
+    { id: "rules", label: "Rules", icon: "NotificationRules" },
   ],
   relay: [
     { id: "status", label: "Status", icon: "Activity" },
-    { id: "manage", label: "Manage", icon: "Settings2" },
+    { id: "manage", label: "Manage", icon: "RelaySettings" },
+  ],
+  trackers: [
+    { id: "trakt", label: "Trakt", icon: "CircleUser", img: traktLogo },
+    { id: "simkl", label: "Simkl", icon: "RefreshCw", img: simklLogo },
+    { id: "anilist", label: "AniList", icon: "ListVideo", img: anilistLogo },
+    { id: "mal", label: "MyAnimeList", icon: "BookMarked", img: malLogo },
+    { id: "letterboxd", label: "Letterboxd", icon: "Clapperboard", img: letterboxdLogo },
   ],
   advanced: [
     { id: "system", label: "System", icon: "MonitorCog" },

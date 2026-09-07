@@ -1,3 +1,5 @@
+import settingsRefinements from "./pt/settings-refinements";
+import experimentalUpdates from "./pt/experimental-updates";
 import coverage from "./pt/coverage";
 import chrome from "./pt/chrome";
 import common from "./pt/common";
@@ -71,6 +73,8 @@ const pt: Record<string, string> = {
   ...wiringSweep2,
   ...wiringSweep3,
   ...wiringSweep4,
+  ...experimentalUpdates,
+  ...settingsRefinements,
 };
 
 export default pt;

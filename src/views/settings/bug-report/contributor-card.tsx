@@ -1,4 +1,4 @@
-import { ChevronRight, GitPullRequest } from "lucide-react";
+import { ChevronRight, GitPullRequest } from "../icons";
 import { GitHubIcon } from "@/components/github-icon";
 import { openUrl } from "@/lib/window";
 import { useT } from "@/lib/i18n";
@@ -17,7 +17,7 @@ export function ContributorCard() {
     <Section
       title={t("Want to fix it yourself?")}
       subtitle={t(
-        "{app} is open source. PRs that reference a bug get reviewed within 48h and ship with credit in the release notes.",
+        "{app} is open source. Browse existing fixes or contribute a patch for the problem you found.",
         { app: "Harbor" },
       )}
     >

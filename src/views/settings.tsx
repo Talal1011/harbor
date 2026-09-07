@@ -7,6 +7,7 @@ import { groupForSection, TOP_GROUPS } from "./settings/groups";
 import { requestTracker } from "./settings/tracker-request";
 import { SubTabsProvider, type SubTabReg } from "./settings/sub-tabs";
 import { SettingsSidebar } from "./settings/settings-sidebar";
+import { tabsFor } from "./settings/tab-registry";
 import { PageActionsProvider, type PageActionReg } from "./settings/page-actions";
 import { SettingsFooter } from "./settings/settings-footer";
 import { SettingsActiveContext, type SectionId } from "./settings/shared";
@@ -20,6 +21,8 @@ import { resetOmdbBudget } from "@/lib/providers/omdb";
 import { useSettings } from "@/lib/settings";
 import { useView } from "@/lib/view";
 import { useT } from "@/lib/i18n";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { isBackKey } from "@/lib/keyboard-navigation/geometry";
 
 const IS_WEB = typeof window !== "undefined" && !("__TAURI_INTERNALS__" in window);
 
@@ -311,9 +314,37 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   );
   const [relayMode, setRelayMode] = useState<RelayMode>("panel");
   const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
+  const [pendingPage, setPendingPage] = useState<{ section: SectionId; tab?: string } | null>(null);
   const [query, setQuery] = useState("");
+  const compact = useMediaQuery("(max-width: 899px)");
+  const [browseOpen, setBrowseOpen] = useState(false);
+  const browseRef = useRef<HTMLButtonElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const scrollRef = useRef<HTMLElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!compact) setBrowseOpen(false);
+  }, [compact]);
+
+  useEffect(() => {
+    if (!compact || !browseOpen) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (!isBackKey(event) || document.querySelector('[role="dialog"]')) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setBrowseOpen(false);
+      browseRef.current?.focus({ preventScroll: true });
+    };
+    window.addEventListener("keydown", dismiss, true);
+    return () => window.removeEventListener("keydown", dismiss, true);
+  }, [compact, browseOpen]);
+
+  const closeBrowse = () => {
+    if (!compact) return;
+    setBrowseOpen(false);
+    requestAnimationFrame(() => titleRef.current?.focus({ preventScroll: true }));
+  };
 
   useLayoutEffect(() => {
     const shell = shellRef.current;
@@ -355,7 +386,9 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   ]);
 
   const handleNav = (id: SectionId, anchor?: string) => {
+    closeBrowse();
     setLanding(null);
+    setPendingPage(null);
     startTransition(() => {
       setActive(id);
       setPendingAnchor(anchor ?? null);
@@ -364,6 +397,8 @@ export function Settings({ visible = true }: { visible?: boolean }) {
 
   const pendingTab = useRef<string | null>(null);
   const selectFromRail = (id: SectionId, tab?: string) => {
+    closeBrowse();
+    setPendingPage(null);
     pendingTab.current = tab ?? null;
     if (id === active) {
       if (tab) subRegRef.current?.onChange(tab);
@@ -371,6 +406,12 @@ export function Settings({ visible = true }: { visible?: boolean }) {
       return;
     }
     handleNav(id);
+  };
+
+  const openPage = (id: SectionId, tab?: string) => {
+    selectFromRail(id, tab);
+    setPendingAnchor(null);
+    setPendingPage({ section: id, tab });
   };
 
   useEffect(() => {
@@ -385,9 +426,21 @@ export function Settings({ visible = true }: { visible?: boolean }) {
 
   const [pageActions, setPageActions] = useState<PageActionReg>(null);
   const [subRegRaw, setSubReg] = useState<SubTabReg>(null);
-  const subReg = subRegRaw && subRegRaw.tabs.length > 0 ? subRegRaw : null;
+  const subReg = subRegRaw?.section === active && subRegRaw.tabs.length > 0 ? subRegRaw : null;
   const subRegRef = useRef<SubTabReg>(null);
   subRegRef.current = subReg;
+  useEffect(() => {
+    if (!import.meta.env.DEV || !subReg) return;
+    const listed = tabsFor(active).map((tab) => tab.id);
+    if (listed.length === 0) return;
+    const live = subReg.tabs.map((tab) => tab.id);
+    const missing = live.filter((id) => !listed.includes(id));
+    if (missing.length) {
+      console.warn(
+        `[settings] tab-registry drift on "${active}" - sidebar missing [${missing.join(", ")}]`,
+      );
+    }
+  }, [active, subReg]);
   useEffect(() => {
     const want = pendingTab.current;
     if (!want || !subReg) return;
@@ -396,6 +449,15 @@ export function Settings({ visible = true }: { visible?: boolean }) {
       if (subReg.value !== want) subReg.onChange(want);
     }
   }, [subReg]);
+
+  useEffect(() => {
+    if (!pendingPage || active !== pendingPage.section) return;
+    if (pendingPage.tab && subReg?.value !== pendingPage.tab) return;
+    scrollRef.current?.scrollTo({ top: 0 });
+    titleRef.current?.focus({ preventScroll: true });
+    setPendingPage(null);
+  }, [active, pendingPage, subReg?.value]);
+
   const triedTabs = useRef<Set<string>>(new Set());
   const restoreTab = useRef<string | null>(null);
   const pendingAnchorRef = useRef<string | null>(null);
@@ -521,26 +583,38 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   }, [themeLibOpen]);
 
   const chromeHidden = wide || (active === "relay" && relayMode !== "panel");
-  const caption = landingGroup ? null : SECTION_META[active].sub;
 
   return (
-    <SettingsActiveContext.Provider value={{ setActive }}>
+    <SettingsActiveContext.Provider value={{ setActive: handleNav, openPage }}>
     <PageActionsProvider value={{ reg: pageActions, setReg: setPageActions }}>
-    <SubTabsProvider value={{ reg: subReg, setReg: setSubReg }}>
+    <SubTabsProvider value={{ section: active, reg: subReg, setReg: setSubReg }}>
     <div ref={shellRef} className="harbor-settings-shell flex h-full flex-col bg-canvas">
       <div
         data-tauri-drag-region
-        className="shrink-0"
+        className="hset-top-space shrink-0"
         style={{ blockSize: "var(--hset-chrome-h, 92px)" }}
       />
-      <div className="hset-grid">
-        <SettingsTools query={query} setQuery={setQuery} onSubmit={handleNav} />
+      <div className="hset-grid" data-browse-open={compact && browseOpen ? "" : undefined}>
+        <SettingsTools query={query} setQuery={(value) => {
+          setQuery(value);
+          if (compact && value.trim()) setBrowseOpen(true);
+        }} onSubmit={handleNav} />
         <div className="hset-heading">
           <div className="hset-content">
-            <h1 className="hset-title">
-              {landingGroup ? t(landingGroup.label) : t(SECTION_META[active].label)}
+            <h1 ref={titleRef} tabIndex={-1} className="hset-title">
+              {t(landingGroup?.label ?? SECTION_META[active].label)}
             </h1>
           </div>
+          <button
+            ref={browseRef}
+            type="button"
+            className="hset-browse-toggle"
+            aria-expanded={browseOpen}
+            aria-controls="hset-page-navigation"
+            onClick={() => setBrowseOpen((open) => !open)}
+          >
+            {browseOpen ? t("Close pages") : t("Browse pages")}
+          </button>
         </div>
         <SettingsSidebar
           active={active}
@@ -550,12 +624,8 @@ export function Settings({ visible = true }: { visible?: boolean }) {
           onSelect={selectFromRail}
           onJump={handleNav}
         />
-        <main ref={scrollRef} className="hset-main" data-hset-wide={wide ? "" : undefined}>
+        <main ref={scrollRef} inert={compact && browseOpen} className="hset-main" data-hset-wide={wide ? "" : undefined}>
         <div className="hset-content">
-          {caption && !chromeHidden && (
-            <p className="hset-caption">{t(caption)}</p>
-          )}
-
           <Suspense
             fallback={
               <div

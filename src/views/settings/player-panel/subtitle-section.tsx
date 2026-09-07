@@ -1,7 +1,8 @@
-import { fillStyle } from "@/components/slider";
-import { Plus, RotateCcw, X } from "lucide-react";
+import { fillStyle, SliderReset } from "@/components/slider";
+import { DEFAULT } from "@/lib/settings/defaults";
+import { Plus, RotateCcw, X } from "../icons";
 import { useEffect, useRef, useState } from "react";
-import godfatherStill from "@/assets/godfather-offer.svg";
+import subtitleStill from "@/assets/settings-preview/steamboat-willie.webp";
 import { sfntFamilyName } from "@/lib/font-family-name";
 import { saveFontData } from "@/lib/font-storage";
 import { useSettings } from "@/lib/settings";
@@ -10,7 +11,7 @@ import { advanceFocus, captureFocusReturn } from "@/lib/keyboard-navigation";
 import { ModalShell, useModalExit } from "@/components/modal-shell";
 import { ColorPopoverTrigger } from "../color-picker";
 import { Segmented, ToggleRow } from "../shared";
-import { ROW_ACTION, ROW_ACTION_DANGER, ROW_DESC, SettingGroup, SettingRow } from "../kit";
+import { ROW_ACTION, ROW_ACTION_DANGER, ROW_DESC, SettingGroup, SettingRow, SettingsWorkbench } from "../kit";
 import { usePageActions } from "../page-actions";
 import { ChoiceBlock } from "./choice";
 import { previewFamily } from "./internals";
@@ -175,9 +176,7 @@ export function SubtitleStylePanel() {
   );
 
   return (
-    <div className="flex flex-col gap-5">
-      <SubtitlePreview />
-
+    <SettingsWorkbench preview={<SubtitlePreview />}>
       <SettingGroup label={t("Background")}>
         {styles.map((s) => (
           <ChoiceBlock
@@ -207,6 +206,7 @@ export function SubtitleStylePanel() {
                 style={fillStyle(settings.subBoxOpacity, 0.2, 1, 0.05)}
               />
               <span className={SLIDER_VALUE}>{`${boxOpacityPct}%`}</span>
+              <SliderReset show={settings.subBoxOpacity !== DEFAULT.subBoxOpacity} onReset={() => update({ subBoxOpacity: DEFAULT.subBoxOpacity })} />
             </div>
           </SettingRow>
         )}
@@ -232,6 +232,7 @@ export function SubtitleStylePanel() {
                 style={fillStyle(Math.max(1, settings.subBorderSize), 1, 6, 0.5)}
               />
               <span className={SLIDER_VALUE}>{`${Math.max(1, settings.subBorderSize)}px`}</span>
+              <SliderReset show={settings.subBorderSize !== DEFAULT.subBorderSize} onReset={() => update({ subBorderSize: DEFAULT.subBorderSize })} />
             </div>
           </SettingRow>
         )}
@@ -269,6 +270,7 @@ export function SubtitleStylePanel() {
               style={fillStyle(settings.subFontSize, 16, 120)}
             />
             <span className={SLIDER_VALUE}>{`${settings.subFontSize}px`}</span>
+              <SliderReset show={settings.subFontSize !== DEFAULT.subFontSize} onReset={() => update({ subFontSize: DEFAULT.subFontSize })} />
           </div>
         </SettingRow>
 
@@ -300,6 +302,7 @@ export function SubtitleStylePanel() {
               style={fillStyle(settings.subOpacity ?? 1, 0.2, 1, 0.05)}
             />
             <span className={SLIDER_VALUE}>{`${opacityPct}%`}</span>
+              <SliderReset show={(settings.subOpacity ?? 1) !== DEFAULT.subOpacity} onReset={() => update({ subOpacity: DEFAULT.subOpacity })} />
           </div>
         </SettingRow>
 
@@ -321,6 +324,7 @@ export function SubtitleStylePanel() {
               style={fillStyle(settings.subMarginY, 0, 100)}
             />
             <span className={SLIDER_VALUE}>{`${settings.subMarginY}%`}</span>
+              <SliderReset show={settings.subMarginY !== DEFAULT.subMarginY} onReset={() => update({ subMarginY: DEFAULT.subMarginY })} />
           </div>
         </SettingRow>
 
@@ -414,11 +418,12 @@ export function SubtitleStylePanel() {
           onChange={(v) => update({ subShowInPip: v })}
         />
       </SettingGroup>
-    </div>
+    </SettingsWorkbench>
   );
 }
 
 function SubtitlePreview() {
+  const t = useT();
   const { settings } = useSettings();
   const fontSize = Math.max(16, Math.min(120, settings.subFontSize));
   const previewSize = Math.round(fontSize * 0.55);
@@ -467,7 +472,7 @@ function SubtitlePreview() {
   return (
     <div
       className="relative h-56 overflow-hidden rounded-[10px] bg-cover bg-center"
-      style={{ backgroundImage: `url(${godfatherStill})` }}
+      style={{ backgroundImage: `url(${subtitleStill})` }}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-canvas/60 via-transparent to-transparent" />
       <div
@@ -487,7 +492,7 @@ function SubtitlePreview() {
               textAlign: align as "left" | "center" | "right",
             }}
           >
-            I&apos;m gonna make him an offer he can&apos;t refuse.
+            {t("This is how your subtitles will look.")}
           </div>
         </div>
       </div>
@@ -646,6 +651,7 @@ function FontPicker() {
             <div key={f.id} className="flex min-w-0 items-stretch gap-1.5">
               <button
                 type="button"
+                aria-pressed={sel}
                 onClick={() => update({ subFontFamily: f.id })}
                 title={
                   broken ? t("This font did not load. Remove it and upload it again.") : undefined

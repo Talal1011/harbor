@@ -1,4 +1,4 @@
-import { Check, ChevronDown, ImageDown, RefreshCw, Trash2, Upload } from "lucide-react";
+import { Check, ChevronDown, ImageDown, RefreshCw, Trash2, Upload } from "../icons";
 import { useEffect, useRef, useState } from "react";
 import { applyAppIcon } from "@/lib/app-icon";
 import { useSettings } from "@/lib/settings";
@@ -7,7 +7,6 @@ import { SettingRow } from "../kit";
 import { SButton, SRow } from "../ui";
 import { processLogoImage } from "./image-utils";
 import { APP_ICON_PRESETS } from "./app-icon-presets";
-import { LogoPreview } from "./logo-preview";
 
 const PRESET_SRCS = APP_ICON_PRESETS.map((p) => p.src);
 
@@ -340,11 +339,6 @@ export function LogoPicker() {
   const t = useT();
   return (
     <div className="flex flex-col gap-5">
-      <LogoPreview
-        mark={settings.customLogoMark}
-        wordmark={settings.customLogoWordmark}
-        icon={settings.customAppIcon}
-      />
       <div className="harbor-settings-group">
         <LogoSlot
           label={t("App logo")}

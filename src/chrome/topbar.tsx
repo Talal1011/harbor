@@ -10,7 +10,6 @@ import { DownloadsButton } from "@/components/downloads-popover";
 import { BookmarksButton } from "@/components/bookmarks-popover";
 import { NotificationCenter } from "@/components/notification-center/notification-center";
 import { ThreeLiquidGlassSurface } from "@/components/ThreeLiquidGlassSurface";
-import { ProfileButton } from "@/chrome/profile-button";
 import { RecordingPill } from "@/chrome/recording-pill";
 import { SleepTimerButton } from "@/chrome/sleep-timer-button";
 import {
@@ -116,7 +115,7 @@ export function Topbar({ connecting = false }: { connecting?: boolean } = {}) {
       data-cleannav={settings.topbarAppearance === "transparent" ? "on" : undefined}
       className={`pointer-events-none fixed inset-x-0 top-0 ${topKind === "picker" || connecting ? "z-[130]" : "z-[55]"} h-20`}
     >
-      {settings.topbarScrollBlur && settings.topbarAppearance !== "transparent" && (
+      {!inSettings && settings.topbarScrollBlur && settings.topbarAppearance !== "transparent" && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 transition-opacity duration-[350ms] ease-out"
@@ -182,7 +181,6 @@ export function Topbar({ connecting = false }: { connecting?: boolean } = {}) {
               {!kid && <NotificationCenter />}
               {!kid && <BookmarksButton />}
               {!onLiveRoot && !kid && <TogetherButton />}
-              {!kid && <ProfileButton />}
             </div>
           )}
             {IS_TAURI && !settings.useNativeTitleBar && !settings.hybridTitleBar && (

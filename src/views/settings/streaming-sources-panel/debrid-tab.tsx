@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, ChevronRight } from "lucide-react";
+import { Activity, AlertTriangle, ChevronRight } from "../icons";
 import { useEffect, useRef, useState } from "react";
 import allDebridLogo from "@/assets/addon-logos/alldebrid.webp";
 import debridLinkLogo from "@/assets/addon-logos/debridlink.png";
@@ -222,6 +222,7 @@ function useAioStatusHealth(): AioStatusSnapshot | null {
   const { authKey } = useAuth();
   const [snapshot, setSnapshot] = useState<AioStatusSnapshot | null>(null);
   useEffect(() => {
+    setSnapshot(null);
     if (!authKey) return;
     const ac = new AbortController();
     let cancelled = false;

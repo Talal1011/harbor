@@ -1,11 +1,11 @@
 import { fillStyle } from "@/components/slider";
 import { useModalExit } from "@/components/modal-shell";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X } from "./icons";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { captureFocusReturn } from "@/lib/keyboard-navigation";
 import { isBackKey } from "@/lib/keyboard-navigation/geometry";
-import { topMovies, type Meta } from "@/lib/cinemeta";
+import { SETTINGS_SAMPLE_META } from "@/lib/sample-artwork";
 import { CustomHoverOverlay, customHoverPosterProps } from "@/components/pick-card/custom-hover";
 import {
   DEFAULT_CUSTOM,
@@ -39,16 +39,10 @@ export function CustomHoverEditor({
   const [draft, setDraft] = useState<CustomHoverConfig>(() =>
     initial ? { ...DEFAULT_CUSTOM, ...initial } : { id: "", name: "", ...DEFAULT_CUSTOM },
   );
-  const [sample, setSample] = useState<Meta | null>(null);
-  useEffect(() => {
-    let alive = true;
-    topMovies()
-      .then((l) => alive && l[0] && setSample(l[0]))
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const sample = {
+    ...SETTINGS_SAMPLE_META,
+    description: t(SETTINGS_SAMPLE_META.description),
+  };
   useEffect(() => captureFocusReturn(), []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => isBackKey(e) && close();

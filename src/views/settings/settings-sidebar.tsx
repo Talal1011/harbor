@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { icons } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { HarborMark } from "@/components/icons/harbor-mark";
 import uploadGlyph from "@/assets/nav-icons/download.svg?raw";
 import { resizeAvatar } from "./account/avatar-utils";
 import { ProfileAvatar, SubtitleText } from "@/chrome/account-menu/account-menu-parts";
@@ -9,16 +9,85 @@ import { useProfiles } from "@/lib/profiles";
 import { useSettings } from "@/lib/settings";
 import { TOP_GROUPS } from "./groups";
 import { SECTION_ICONS } from "./section-icons";
-import { tabsFor } from "./tab-registry";
+import { SetIcon } from "./set-icon";
+import { tabsFor, type TabEntry } from "./tab-registry";
 import { useNavSearch } from "./nav";
 import { settingsAnchor, type SectionId } from "./shared";
 
 function Glyph({ name, size }: { name: string; size: number }) {
-  const Icon = icons[name as keyof typeof icons] ?? icons.Circle;
-  return <Icon size={size} strokeWidth={2} />;
+  return <SetIcon name={name} size={size} />;
 }
 
 type Band = { section: string; sections: SectionId[] };
+
+const PAGE_LABELS: Record<string, string> = {
+  "player.play": "When you press Play",
+  "player.engine": "Player engine",
+  "player.aspect": "Aspect ratio",
+  "player.onscreen": "On-screen controls",
+  "player.adskip": "Ad skipping",
+  "mpv.quality": "Video quality",
+  "mpv.picture": "Picture adjustments",
+  "mpv.network": "Playback buffering",
+  "anime.smooth": "Motion smoothing",
+  "anime.svp": "SVP interpolation",
+  "language.app": "App language",
+  "language.audio": "Audio languages",
+  "language.discovery": "Discovery languages",
+  "subtitles.languages": "Subtitle languages",
+  "subtitles.sources": "Subtitle sources",
+  "subtitles.sync": "Subtitle timing",
+  "subtitles.look": "Subtitle style",
+  "streaming.services": "Streaming services",
+  "streaming.filters": "Source preferences",
+  "streaming.sorting": "Stream sorting",
+  "streaming.picker": "Source picker",
+  "p2p.engine": "Torrent engine",
+  "p2p.server": "Torrent server",
+  "library.cards": "Poster cards",
+  "library.providers": "Metadata providers",
+  "badges.badges": "Stream badges",
+  "badges.rules": "Badge rules",
+  "badges.packs": "Badge packs",
+  "hotkeys.keys": "Keyboard shortcuts",
+  "hotkeys.behaviour": "Keyboard behavior",
+  "controllers.setup": "Controllers",
+  "controllers.mapping": "Buttons & sticks",
+  "tv.devices": "TV devices",
+  "tv.look": "TV appearance",
+  "tv.watching": "TV playback",
+  "tv.content": "TV content",
+  "storage.overview": "Storage overview",
+  "webhooks.destinations": "Notification destinations",
+  "webhooks.what": "Notification sources",
+  "webhooks.rules": "Notification rules",
+  "relay.status": "Harbor Relay",
+  "relay.manage": "Manage relay",
+  "advanced.system": "Startup & system",
+  "advanced.repair": "Repair & diagnostics",
+};
+
+const BAND_LABELS: Record<string, string> = {
+  SETUP: "Account & setup",
+  WATCHING: "Playback",
+  LANGUAGE: "Languages",
+  CONTENT: "Sources & library",
+  "LOOK & FEEL": "Appearance",
+  DEVICES: "Controls & devices",
+  SYSTEM: "System",
+  HELP: "Help & about",
+};
+
+const BAND_ICONS: Record<string, string> = {
+  SETUP: "AccountSetup",
+  WATCHING: "Play",
+  LANGUAGE: "Languages",
+  CONTENT: "Library",
+  "LOOK & FEEL": "Palette",
+  DEVICES: "InputDevices",
+  SYSTEM: "SlidersHorizontal",
+  HELP: "HelpAbout",
+};
 
 function bands(): Band[] {
   const out: Band[] = [];
@@ -103,21 +172,29 @@ function SectionRow({
   label,
   on,
   onPick,
+  tab,
 }: {
   id: SectionId;
   label: string;
+  tab?: TabEntry;
   on: boolean;
   onPick: (id: SectionId, tab?: string) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={() => onPick(id)}
+      onClick={() => onPick(id, tab?.id)}
       aria-current={on ? "page" : undefined}
       className={`hset-rail-row ${on ? "is-on" : ""}`}
     >
       <span className="hset-rail-chip">
-        <Glyph name={SECTION_ICONS[id]} size={20} />
+        {tab?.icon === "Harbor" ? (
+          <HarborMark className="h-5 w-5" />
+        ) : tab?.img ? (
+          <img src={tab.img} alt="" draggable={false} className="h-5 w-5 rounded-[4px] object-contain" />
+        ) : (
+          <Glyph name={tab?.icon ?? SECTION_ICONS[id]} size={20} />
+        )}
       </span>
       <span className="hset-rail-label">{label}</span>
     </button>
@@ -140,16 +217,29 @@ export function SettingsSidebar({
   onJump?: (section: SectionId, anchor?: string) => void;
 }) {
   const t = useT();
+  const { settings } = useSettings();
+  const native = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
   const trimmed = query.trim().toLowerCase();
   const { matches, optionMatches } = useNavSearch(trimmed);
   const searching = trimmed.length > 0;
+  const activeBand = bands().find((band) => band.sections.includes(active))?.section ?? "SETUP";
+  const [openBands, setOpenBands] = useState(() => new Set([activeBand]));
+  useEffect(() => {
+    setOpenBands((current) => current.has(activeBand) ? current : new Set([...current, activeBand]));
+  }, [activeBand, active, searching]);
+  const toggleBand = (band: string) => setOpenBands((current) => {
+    const next = new Set(current);
+    if (next.has(band)) next.delete(band);
+    else next.add(band);
+    return next;
+  });
 
   if (searching) {
     const sections = matches ?? [];
     const options = optionMatches ?? [];
     const empty = sections.length === 0 && options.length === 0;
     return (
-      <nav className="hset-rail" aria-label={t("Settings")}>
+      <nav id="hset-page-navigation" className="hset-rail" aria-label={t("Settings")}>
         <RailAccount />
         <div className="hset-rail-nav" key="search">
           <div className="hset-rail-band hset-rail-results">
@@ -202,39 +292,55 @@ export function SettingsSidebar({
   }
 
   return (
-    <nav className="hset-rail" aria-label={t("Settings")}>
+    <nav id="hset-page-navigation" className="hset-rail" aria-label={t("Settings")}>
       <RailAccount />
       <div className="hset-rail-nav" key="browse">
         {bands().map((band) => (
-          <div key={band.section} className="hset-rail-band">
-            <h2 className="hset-rail-band-title">{t(band.section)}</h2>
-            {band.sections.map((id) => {
-              const on = id === active;
-              const tabs = on ? tabsFor(id) : [];
-              return (
-                <div key={id} className="hset-rail-item">
-                  <SectionRow id={id} label={t(meta[id].label)} on={on} onPick={onSelect} />
-                  {tabs.length > 0 && (
-                    <div className="hset-rail-kids">
-                      {tabs.map((tab) => (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => onSelect(id, tab.id)}
-                          aria-current={activeTab === tab.id ? "page" : undefined}
-                          className={`hset-rail-kid ${activeTab === tab.id ? "is-on" : ""}`}
-                        >
-                          <span className="hset-rail-kid-chip">
-                            <Glyph name={tab.icon} size={18} />
-                          </span>
-                          <span className="hset-rail-label">{t(tab.label)}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div key={band.section} className="hset-rail-band" data-open={openBands.has(band.section) || undefined}>
+            <button
+              type="button"
+              id={`hset-category-button-${band.section.replaceAll(" ", "-")}`}
+              className="hset-rail-category"
+              aria-expanded={openBands.has(band.section)}
+              aria-controls={`hset-category-${band.section.replaceAll(" ", "-")}`}
+              onClick={() => toggleBand(band.section)}
+            >
+              <span className="hset-category-icon" aria-hidden>
+                <Glyph name={BAND_ICONS[band.section]} size={20} />
+              </span>
+              <span className="hset-category-name">{t(BAND_LABELS[band.section] ?? band.section)}</span>
+              <span className="hset-category-caret" aria-hidden />
+            </button>
+            <div
+              id={`hset-category-${band.section.replaceAll(" ", "-")}`}
+              role="group"
+              aria-labelledby={`hset-category-button-${band.section.replaceAll(" ", "-")}`}
+              className="hset-category-pages"
+              hidden={!openBands.has(band.section)}
+            >
+              {band.sections.map((id) => {
+                const tabs = ((!native && (id === "mpv" || id === "shaders")) ||
+                  (id === "relay" && !settings.togetherRelayUrl))
+                  ? []
+                  : tabsFor(id).filter((tab) => native || id !== "theme" || tab.id !== "window");
+                return (
+                  <div key={id} className="hset-rail-page-group">
+                    {tabs.length > 0 ? tabs.map((tab) => (
+                      <SectionRow
+                        key={tab.id}
+                        id={id}
+                        tab={tab}
+                        label={t(PAGE_LABELS[id + "." + tab.id] ?? tab.label)}
+                        on={id === active && (activeTab ?? tabs[0].id) === tab.id}
+                        onPick={onSelect}
+                      />
+                    )) : (
+                      <SectionRow id={id} label={t(meta[id].label)} on={id === active} onPick={onSelect} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
