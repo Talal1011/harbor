@@ -20,7 +20,6 @@ import { ProviderKeyRow, type KeyEntry, type KeyId } from "./provider-key-row";
 import { PosterServiceMark } from "./poster-mark";
 import type { LibraryKey } from "../library-panel";
 import nytLogo from "@/assets/service-logos/nyt.png";
-import apiSportsLogo from "@/assets/service-logos/apisports.png";
 import geminiLogo from "@/assets/ai-logos/gemini.png";
 
 export type ProviderKeysArgs = {
@@ -57,12 +56,11 @@ export function useProviderKeys({
 
   const [mdblistDraft, setMdblistDraft] = useState(settings.mdblistKey);
   const [nytDraft, setNytDraft] = useState(settings.nytKey);
-  const [sportsDraft, setSportsDraft] = useState(settings.sportsApiKey);
   const [posterSrvDraft, setPosterSrvDraft] = useState(settings.posterBaseUrl);
   const [auddDraft, setAuddDraft] = useState(settings.auddKey);
   const [songAiDraft, setSongAiDraft] = useState(settings.songIdAiKey);
   const [extraSaved, setExtraSaved] = useState<
-    "mdblist" | "postersrv" | "ai" | "audd" | "songai" | "nyt" | "sports" | null
+    "mdblist" | "postersrv" | "ai" | "audd" | "songai" | "nyt" | null
   >(null);
   const [tmdbGuide, setTmdbGuide] = useState(false);
   const [tvdbGuide, setTvdbGuide] = useState(false);
@@ -92,7 +90,7 @@ export function useProviderKeys({
     return () => window.removeEventListener("keydown", onKey);
   }, [keyModal, tmdbGuide, tvdbGuide]);
 
-  const flashExtra = (k: "mdblist" | "postersrv" | "ai" | "audd" | "songai" | "nyt" | "sports") => {
+  const flashExtra = (k: "mdblist" | "postersrv" | "ai" | "audd" | "songai" | "nyt") => {
     setExtraSaved(k);
     if (extraTimerRef.current) window.clearTimeout(extraTimerRef.current);
     extraTimerRef.current = window.setTimeout(() => setExtraSaved(null), 1800);
@@ -349,40 +347,6 @@ export function useProviderKeys({
                 developer.nytimes.com
               </ExtLink>
               . {t("Enable the Books API on your app. Lists refresh weekly.")}
-            </>
-          }
-        />
-      ),
-    },
-    {
-      id: "sports",
-      name: t("API-Sports"),
-      desc: t("Egyptian, Qatari, Emirati and Korean football plus the KHL on the sports page."),
-      value: settings.sportsApiKey,
-      field: (
-        <KeyField
-          label={t("API-Sports · leagues ESPN does not carry")}
-          placeholder={t("API-Sports key")}
-          iconSrc={apiSportsLogo}
-          value={sportsDraft}
-          onChange={setSportsDraft}
-          onSave={() => {
-            update({ sportsApiKey: sportsDraft.trim() });
-            flashExtra("sports");
-          }}
-          saved={extraSaved === "sports"}
-          help={
-            <>
-              {t(
-                "Fills the sports page where ESPN has no feed: Egyptian Premier League, Qatar Stars League, UAE Pro League, K League and the KHL, with lineups and live minutes. Free key at",
-              )}{" "}
-              <ExtLink href="https://dashboard.api-football.com/register">
-                dashboard.api-football.com
-              </ExtLink>
-              .{" "}
-              {t(
-                "One account covers football and hockey. The free plan allows 100 requests a day and Harbor paces itself to stay inside it.",
-              )}
             </>
           }
         />

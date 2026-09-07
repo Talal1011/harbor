@@ -6,6 +6,7 @@ import { settingsAnchor, useSettingsActiveContext } from "./shared";
 import tmdbLogo from "@/assets/addon-logos/tmdb.png";
 import letterboxdLogo from "@/assets/addon-logos/letterboxd.png";
 import mdblistLogo from "@/assets/addon-logos/mdblist.png";
+import metacriticLogo from "@/assets/service-logos/metacritic.png";
 import traktLogo from "@/assets/trakt.svg";
 import simklLogo from "@/assets/simkl.png";
 import { ImdbIcon } from "@/components/icons/imdb-icon";
@@ -65,11 +66,7 @@ function PopcornBadge() {
 }
 
 function MetacriticBadge() {
-  return (
-    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-success text-[15px] font-bold text-white">
-      M
-    </span>
-  );
+  return <img src={metacriticLogo} alt="" className="h-7 w-7 shrink-0 rounded-full object-contain" />;
 }
 
 function LetterboxdBadge() {

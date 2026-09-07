@@ -23,7 +23,7 @@ export function AboutTab() {
 
       <Section
         title={t("About")}
-        subtitle={t("Build identity. Useful when filing a bug report at bugs@harbor.site.")}
+        subtitle={t("Build identity. Useful when filing a bug report.")}
       >
         <AboutRow />
       </Section>
@@ -49,7 +49,6 @@ function AboutRow() {
         }
       />
       <InfoLine label={t("Build")} value={isTauri ? t("Desktop (Tauri 2 / WebView2)") : t("Web")} />
-      <InfoLine label={t("Bug reports")} value="bugs@harbor.site" />
     </>
   );
 }

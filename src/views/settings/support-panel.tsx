@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check, Mail } from "./icons";
+import { ArrowUpRight, Check } from "./icons";
 import type { ReactNode } from "react";
 import elfLogo from "@/assets/elfhosted.svg";
 import stremioLogo from "@/assets/stremio.png";
@@ -164,11 +164,6 @@ export function SupportPanel() {
           title={t("ElfHosted")}
           description={t("For an active ElfHosted subscription.")}
         />
-        <Callout icon={<Mail size={18} strokeWidth={2.2} className="mt-[2px] shrink-0 text-ink-subtle" />}>
-          {t("To get a Charity badge, forward your donation receipt or invoice to")}{" "}
-          <span className="font-semibold text-ink">bugs@harbor.site</span>{" "}
-          {t("with your @handle in the body so we can match it to your account.")}
-        </Callout>
       </Section>
 
       <Section

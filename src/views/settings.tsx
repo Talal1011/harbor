@@ -48,6 +48,7 @@ function glideToTop(el: HTMLElement): void {
 const BasicsPanel = lazy(() => import("./settings/basics-panel").then((m) => ({ default: m.BasicsPanel })));
 const AccountStub = lazy(() => import("./settings/account").then((m) => ({ default: m.AccountStub })));
 const LibraryPanel = lazy(() => import("./settings/library-panel").then((m) => ({ default: m.LibraryPanel })));
+const PluginsPanel = lazy(() => import("./settings/plugins-panel").then((m) => ({ default: m.PluginsPanel })));
 const RelaySection = lazy(() => import("./settings/relay-section").then((m) => ({ default: m.RelaySection })));
 const StreamingSourcesPanel = lazy(() => import("./settings/streaming-sources-panel").then((m) => ({ default: m.StreamingSourcesPanel })));
 const StreamFiltersPanel = lazy(() => import("./settings/stream-filters-panel").then((m) => ({ default: m.StreamFiltersPanel })));
@@ -79,6 +80,7 @@ const SECTION_PRELOAD: Partial<Record<SectionId, () => Promise<unknown>>> = {
   basics: () => import("./settings/basics-panel"),
   account: () => import("./settings/account"),
   library: () => import("./settings/library-panel"),
+  plugins: () => import("./settings/plugins-panel"),
   relay: () => import("./settings/relay-section"),
   streaming: () => import("./settings/streaming-sources-panel"),
   streamFilters: () => import("./settings/stream-filters-panel"),
@@ -127,6 +129,10 @@ const SECTION_META: Record<SectionId, { label: string; sub: string }> = {
   library: {
     label: "Library & metadata",
     sub: "Optional keys that unlock TMDB rails, baked-in poster ratings, fanart, and TVDB episode data.",
+  },
+  plugins: {
+    label: "Plugins",
+    sub: "Small scripts that find streams, manga and books on sites Harbor does not know about, installed from repositories you choose.",
   },
   trakt: {
     label: "Trakt",
@@ -314,6 +320,7 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   );
   const [relayMode, setRelayMode] = useState<RelayMode>("panel");
   const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
+  const [pendingPage, setPendingPage] = useState<{ section: SectionId; tab?: string } | null>(null);
   const [query, setQuery] = useState("");
   const compact = useMediaQuery("(max-width: 899px)");
   const [browseOpen, setBrowseOpen] = useState(false);
@@ -387,6 +394,7 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   const handleNav = (id: SectionId, anchor?: string) => {
     closeBrowse();
     setLanding(null);
+    setPendingPage(null);
     startTransition(() => {
       setActive(id);
       setPendingAnchor(anchor ?? null);
@@ -396,6 +404,7 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   const pendingTab = useRef<string | null>(null);
   const selectFromRail = (id: SectionId, tab?: string) => {
     closeBrowse();
+    setPendingPage(null);
     pendingTab.current = tab ?? null;
     if (id === active) {
       if (tab) subRegRef.current?.onChange(tab);
@@ -403,6 +412,12 @@ export function Settings({ visible = true }: { visible?: boolean }) {
       return;
     }
     handleNav(id);
+  };
+
+  const openPage = (id: SectionId, tab?: string) => {
+    selectFromRail(id, tab);
+    setPendingAnchor(null);
+    setPendingPage({ section: id, tab });
   };
 
   useEffect(() => {
@@ -440,6 +455,15 @@ export function Settings({ visible = true }: { visible?: boolean }) {
       if (subReg.value !== want) subReg.onChange(want);
     }
   }, [subReg]);
+
+  useEffect(() => {
+    if (!pendingPage || active !== pendingPage.section) return;
+    if (pendingPage.tab && subReg?.value !== pendingPage.tab) return;
+    scrollRef.current?.scrollTo({ top: 0 });
+    titleRef.current?.focus({ preventScroll: true });
+    setPendingPage(null);
+  }, [active, pendingPage, subReg?.value]);
+
   const triedTabs = useRef<Set<string>>(new Set());
   const restoreTab = useRef<string | null>(null);
   const pendingAnchorRef = useRef<string | null>(null);
@@ -565,10 +589,9 @@ export function Settings({ visible = true }: { visible?: boolean }) {
   }, [themeLibOpen]);
 
   const chromeHidden = wide || (active === "relay" && relayMode !== "panel");
-  const activeTabs = tabsFor(active).filter((tab) => subReg?.tabs.some((live) => live.id === tab.id));
 
   return (
-    <SettingsActiveContext.Provider value={{ setActive: handleNav }}>
+    <SettingsActiveContext.Provider value={{ setActive: handleNav, openPage }}>
     <PageActionsProvider value={{ reg: pageActions, setReg: setPageActions }}>
     <SubTabsProvider value={{ section: active, reg: subReg, setReg: setSubReg }}>
     <div ref={shellRef} className="harbor-settings-shell flex h-full flex-col bg-canvas">
@@ -602,7 +625,6 @@ export function Settings({ visible = true }: { visible?: boolean }) {
         <SettingsSidebar
           active={active}
           activeTab={subReg?.value ?? null}
-          activeTabs={activeTabs}
           meta={SECTION_META}
           query={query}
           onSelect={selectFromRail}
@@ -674,6 +696,8 @@ export function Settings({ visible = true }: { visible?: boolean }) {
           {active === "streamFilters" && <StreamFiltersPanel />}
 
           {active === "p2p" && <P2PPanel />}
+
+          {active === "plugins" && <PluginsPanel />}
 
           {active === "language" && <LanguagePanel />}
           {active === "subtitles" && <SubtitlesPanel />}

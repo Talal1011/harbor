@@ -183,6 +183,7 @@ export type Settings = {
   heroTrailers: boolean;
   heroTrailerAudio: boolean;
   navIconAnimations: boolean;
+  bigPicturePlayerUi: "tenFoot" | "desktop";
   screensaver: boolean;
   screensaverStyle: "ambient" | "catBoat";
   screensaverDelayMin: number;
@@ -513,6 +514,10 @@ export type Settings = {
   topbarAppearance: "transparent" | "glass" | "filled";
   dragAnywhere: boolean;
   resumeDetailScroll: boolean;
+  pluginsEnabled: boolean;
+  pluginsGroupByRepo: boolean;
+  pluginsAutoCheck: boolean;
+  pluginsBackground: boolean;
   cwPerProfile: boolean;
   closeToTray: boolean;
   trayAlwaysOnTop: boolean;

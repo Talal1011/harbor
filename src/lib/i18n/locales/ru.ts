@@ -1,3 +1,5 @@
+import ebookSources from "./ru/ebook-sources";
+import settingsRefinements from "./ru/settings-refinements";
 import gap from "./ru/gap";
 import experimentalUpdates from "./ru/experimental-updates";
 import coverage from "./ru/coverage";
@@ -40,8 +42,11 @@ import surfaces2 from "./ru/surfaces2";
 import surfaces3 from "./ru/surfaces3";
 import surfaces4 from "./ru/surfaces4";
 import surfaces5 from "./ru/surfaces5";
+import plugins from "./ru/plugins";
+import brands from "./ru/brands";
 
 const ru: Record<string, string> = {
+  ...ebookSources,
   ...coverage,
   ...uiFallback,
   ...gap,
@@ -83,6 +88,9 @@ const ru: Record<string, string> = {
   ...surfaces4,
   ...surfaces5,
   ...experimentalUpdates,
+  ...settingsRefinements,
+  ...plugins,
+  ...brands,
 };
 
 export default ru;

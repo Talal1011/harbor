@@ -238,9 +238,7 @@ function ArtPreview({ caption, children }: { caption: string; children: ReactNod
   return (
     <span className="flex flex-col gap-2.5">
       <span className="harbor-settings-label">{caption}</span>
-      <span className="grid h-[112px] place-items-center overflow-hidden rounded-[10px] bg-canvas">
-        <span className="block scale-[2.2]">{children}</span>
-      </span>
+      {children}
     </span>
   );
 }
@@ -257,8 +255,8 @@ function NativeTitleBarRow() {
       onChange={(useNativeTitleBar) => update({ useNativeTitleBar })}
       leading={<AppWindow size={18} strokeWidth={2} />}
       preview={
-        <ArtPreview caption={t("Live preview")}>
-          <TitleBarArt native={on} on={on} />
+        <ArtPreview caption={t("Use the native window title bar")}>
+          <TitleBarArt />
         </ArtPreview>
       }
     />
@@ -283,8 +281,8 @@ function HybridBarRow() {
       onChange={(hybridTitleBar) => update({ hybridTitleBar })}
       leading={<PanelTopDashed size={18} strokeWidth={2} />}
       preview={
-        <ArtPreview caption={t("Live preview")}>
-          <HybridBarArt on={on} />
+        <ArtPreview caption={t("Native-style hybrid bar")}>
+          <HybridBarArt />
         </ArtPreview>
       }
     />
@@ -322,8 +320,7 @@ function TopbarAppearanceRow() {
       tip={t("Choose how Watch Together and the minimize, maximize, and close buttons look. Liquid glass replaces the clean transparent controls.")}
       desc={lockedNote ?? t("How Watch Together and the window buttons are drawn.")}
     >
-      <div inert={nativeOn} className="flex w-full flex-wrap items-center gap-4">
-        <WindowControlArt style={settings.topbarAppearance} on={!nativeOn} />
+      <div inert={nativeOn} className="flex w-full flex-col items-start gap-4">
         <Segmented
           value={settings.topbarAppearance}
           options={[
@@ -338,6 +335,7 @@ function TopbarAppearanceRow() {
             })
           }
         />
+        <WindowControlArt style={settings.topbarAppearance} />
       </div>
     </SettingRow>
   );

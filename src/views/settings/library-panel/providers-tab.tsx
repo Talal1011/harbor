@@ -34,7 +34,6 @@ export function ProvidersTab(props: ProviderKeysArgs) {
           {keyRow("rpdb")}
           {keyRow("postersrv")}
           {keyRow("nyt")}
-          {keyRow("sports")}
         </SettingGroup>
       </Section>
 

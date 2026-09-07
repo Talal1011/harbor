@@ -1,3 +1,5 @@
+import ebookSources from "./pt/ebook-sources";
+import settingsRefinements from "./pt/settings-refinements";
 import experimentalUpdates from "./pt/experimental-updates";
 import coverage from "./pt/coverage";
 import chrome from "./pt/chrome";
@@ -35,8 +37,11 @@ import wiringSweep from "./pt/wiring-sweep";
 import wiringSweep2 from "./pt/wiring-sweep-2";
 import wiringSweep3 from "./pt/wiring-sweep-3";
 import wiringSweep4 from "./pt/wiring-sweep-4";
+import plugins from "./pt/plugins";
+import brands from "./pt/brands";
 
 const pt: Record<string, string> = {
+  ...ebookSources,
   ...coverage,
   ...chrome,
   ...common,
@@ -73,6 +78,9 @@ const pt: Record<string, string> = {
   ...wiringSweep3,
   ...wiringSweep4,
   ...experimentalUpdates,
+  ...settingsRefinements,
+  ...plugins,
+  ...brands,
 };
 
 export default pt;

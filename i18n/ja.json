@@ -1819,7 +1819,7 @@
   "Build a theme": "テーマを作成",
   "Build a Theme": "テーマを作成",
   "Build from source": "ソースからビルド",
-  "Build identity. Useful when filing a bug report at bugs@harbor.site.": "ビルド情報です。bugs@harbor.siteへの不具合報告時に役立ちます。",
+  "Build identity. Useful when filing a bug report.": "ビルド情報です。不具合報告時に役立ちます。",
   "Build one in the studio or import a theme file first, then come back to share it.": "まずスタジオで作成するかテーマファイルをインポートしてから、共有に戻ってください。",
   "Build or import the updated theme first, then come back to push it as a new version.": "先に更新版のテーマを作成またはインポートしてから、ここに戻って新しいバージョンとして公開してください。",
   "Build your own": "自分で作成",

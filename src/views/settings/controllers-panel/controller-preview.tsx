@@ -46,17 +46,6 @@ export function ControllerPreview({ enabled }: { enabled: boolean }) {
     return () => window.clearTimeout(id);
   }, [testing, exitHeld]);
 
-  const hint = !enabled
-    ? t("Turn on controller support to light up your inputs here.")
-    : !connected
-      ? t("Connect a controller: every press and stick move shows up here, live.")
-      : testing
-        ? `${t("Test mode: your controller only moves this diagram. Press Esc to stop.")} ${t(
-            "On the pad, hold {button} to stop.",
-            { button: layout === "ps" ? "Circle" : "B" },
-          )}`
-        : t("Press buttons and move the sticks. This mirrors your controller in real time.");
-
   return (
     <SSection
       label={t("Live preview")}
@@ -102,13 +91,13 @@ export function ControllerPreview({ enabled }: { enabled: boolean }) {
         >
           <ControllerSvg layout={layout} />
         </div>
-        <p
-          className={`mx-auto max-w-[66ch] text-center text-[15.5px] font-normal leading-[22px] ${
-            testing ? "text-accent" : "text-ink-muted"
-          }`}
-        >
-          {hint}
-        </p>
+        {testing && (
+          <p className="mx-auto text-center text-[13.5px] leading-[20px] text-accent">
+            {`${t("Press Esc to stop.")} ${t("On the pad, hold {button} to stop.", {
+              button: layout === "ps" ? "Circle" : "B",
+            })}`}
+          </p>
+        )}
       </div>
     </SSection>
   );

@@ -17,7 +17,7 @@ import { SEEK_STEP_OPTIONS } from "@/lib/seek-step";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
 import { Dropdown } from "@/components/dropdown";
-import { Section, ToggleRow } from "./shared";
+import { Section, ToggleRow, Segmented} from "./shared";
 import { ModalButton, ROW_DESC, SettingRow, SettingsModal } from "./kit";
 import { SSection } from "./ui";
 import { usePageActions } from "./page-actions";
@@ -244,6 +244,21 @@ export function HotkeysPanel() {
               value={settings.bigPictureButton}
               onChange={(bigPictureButton) => update({ bigPictureButton })}
             />
+            <SettingRow
+              label={t("Player controls in Big Picture")}
+              desc={t("Ten-foot uses large controls built for a remote across the room. Desktop keeps the same player you use in the normal window, which is quicker with a mouse and keyboard.")}
+            >
+              <Segmented
+                value={settings.bigPicturePlayerUi}
+                options={[
+                  { value: "tenFoot", label: t("Ten-foot") },
+                  { value: "desktop", label: t("Desktop") },
+                ]}
+                onChange={(v) =>
+                  update({ bigPicturePlayerUi: v as typeof settings.bigPicturePlayerUi })
+                }
+              />
+            </SettingRow>
           </Section>
 
           <Section

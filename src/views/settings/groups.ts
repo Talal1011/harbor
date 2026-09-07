@@ -45,6 +45,13 @@ export const TOP_GROUPS: TopGroup[] = [
     children: ["streaming", "streamFilters", "p2p", "library"],
   },
   {
+    id: "plugins",
+    section: "PLUGINS",
+    label: "Plugins",
+    sub: "Small scripts that find streams, manga and books on sites Harbor does not know about, installed from repositories you choose.",
+    children: ["plugins"],
+  },
+  {
     id: "look",
     section: "LOOK & FEEL",
     label: "Appearance",
@@ -74,7 +81,7 @@ export const TOP_GROUPS: TopGroup[] = [
   },
   {
     id: "updates",
-    section: "SYSTEM",
+    section: "UPDATES",
     label: "Updates & backup",
     sub: "Install updates, try beta builds, and keep a copy of your setup.",
     children: ["updates"],

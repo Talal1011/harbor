@@ -2711,6 +2711,11 @@ fn position_embedded_mpv_child(app: &AppHandle, css: MpvGeometry) -> Result<(), 
     }
 
     let found = state.mpv_hwnds;
+    // A silent no-op here looks identical to a video that is playing but hidden, so say when
+    // there was nothing to position at all.
+    if found.is_empty() {
+        eprintln!("[harbor::mpv] no mpv child window to position");
+    }
     if let Some(&first) = found.first() {
         for &leftover in found.iter().skip(1) {
             let target = HWND(leftover as *mut _);

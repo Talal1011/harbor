@@ -12,6 +12,7 @@ import { settingsAnchor, type SectionId } from "./shared";
 import { TOP_GROUPS } from "./groups";
 import { markSectionSeen, useSettingsNew } from "./settings-new";
 import { useExperimentalAccess } from "@/lib/updater/experimental-access";
+import { useStreamPluginCount } from "@/lib/plugins";
 
 type IconProps = { size?: number; strokeWidth?: number };
 
@@ -175,6 +176,14 @@ function IconFilters(p: IconProps) {
   return (
     <IconBase {...p}>
       <path d="M4 5.5h16l-6.1 7.2v5.2l-3.8 1.9v-7.1z" />
+    </IconBase>
+  );
+}
+
+function IconPlugins(p: IconProps) {
+  return (
+    <IconBase {...p}>
+      <path d="M14 7.5V5.6a1.6 1.6 0 0 1 3.2 0v1.9h1.4A1.9 1.9 0 0 1 20.5 9.4v1.6h-1.8a1.7 1.7 0 0 0 0 3.4h1.8v1.8a1.9 1.9 0 0 1-1.9 1.9h-1.8v-1.6a1.7 1.7 0 0 0-3.4 0v1.6H9.4a1.9 1.9 0 0 1-1.9-1.9v-1.8H5.9a1.6 1.6 0 0 1 0-3.2h1.6V9.4A1.9 1.9 0 0 1 9.4 7.5H14z" />
     </IconBase>
   );
 }
@@ -549,7 +558,6 @@ const NAV_GROUPS: Array<{ heading: string | null; items: NavItem[] }> = [
           "torbox",
           "torrentio",
           "mediafusion",
-          "scrapers",
           "addons",
           "iptv",
           "m3u",
@@ -610,6 +618,30 @@ const NAV_GROUPS: Array<{ heading: string | null; items: NavItem[] }> = [
           "remux",
           "scrub freely",
           "webdav",
+        ],
+      },
+      {
+        id: "plugins",
+        label: "Plugins",
+        Icon: IconPlugins,
+        keywords: [
+          "plugin",
+          "plugins",
+          "provider",
+          "providers",
+          "repository",
+          "repositories",
+          "repo",
+          "scraper",
+          "scrapers",
+          "script",
+          "scripts",
+          "extension",
+          "extensions",
+          "manga sources",
+          "book sources",
+          "stream sources",
+          "manifest",
         ],
       },
       {
@@ -1054,6 +1086,99 @@ export type SettingsOption = {
 const NAV_ITEM_BY_ID = new Map(NAV_GROUPS.flatMap((g) => g.items).map((i) => [i.id, i] as const));
 
 const SETTINGS_OPTIONS: SettingsOption[] = [
+  {
+    label: "Player controls in Big Picture",
+    section: "hotkeys",
+    anchorTitle: "Player controls in Big Picture",
+    keywords: [
+      "big picture player",
+      "ten foot player",
+      "tenfoot controls",
+      "normal player in big picture",
+      "desktop player ui",
+      "use the normal player",
+      "same player as desktop",
+      "big picture controls too big",
+      "couch player",
+      "remote controls",
+      "player ui",
+      "playback controls size",
+    ],
+  },
+  {
+    label: "Use plugins",
+    section: "plugins",
+    anchorTitle: "Use plugins",
+    keywords: [
+      "plugins",
+      "plugin",
+      "enable plugins",
+      "turn off plugins",
+      "pause plugins",
+      "group by repository",
+      "background checks",
+      "provider scripts",
+      "scrapers",
+    ],
+  },
+  {
+    label: "Installed plugins",
+    section: "plugins",
+    anchorTitle: "Installed plugins",
+    keywords: [
+      "installed plugins",
+      "plugin list",
+      "manga sources",
+      "book sources",
+      "stream sources",
+      "remove plugin",
+      "update plugin",
+      "plugin settings",
+      "check it works",
+      "test provider",
+    ],
+  },
+  {
+    label: "Add a repository",
+    section: "plugins",
+    anchorTitle: "Add a repository",
+    keywords: [
+      "add repository",
+      "add repo",
+      "repository link",
+      "manifest.json",
+      "github link",
+      "import repo",
+      "plugin repo",
+      "extension repo",
+      "mangayomi",
+    ],
+  },
+  {
+    label: "Your repositories",
+    section: "plugins",
+    anchorTitle: "Your repositories",
+    keywords: [
+      "repositories",
+      "repos",
+      "remove repository",
+      "refresh repository",
+      "update all plugins",
+      "install plugin",
+    ],
+  },
+  {
+    label: "Check repositories daily",
+    section: "plugins",
+    anchorTitle: "Checking for updates",
+    keywords: [
+      "plugin updates",
+      "check for plugin updates",
+      "daily check",
+      "auto update plugins",
+      "newer version",
+    ],
+  },
   {
     label: "Screensaver style",
     section: "theme",
@@ -2501,7 +2626,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "Content filters (hide anime / manga / live tv / sports / adult)",
+    label: "Content filters",
     section: "library",
     anchorTitle: "Content filters",
     keywords: [
@@ -2509,7 +2634,6 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
       "hide anime",
       "hide manga",
       "hide live tv",
-      "hide sports",
       "hide adult",
       "age",
       "filter",
@@ -4145,13 +4269,13 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Show torrent name",
     section: "streaming",
-    anchorTitle: "Torrent name",
+    anchorTitle: "Picker details",
     keywords: ["torrent name", "filename", "release name", "raw title", "release filename"],
   },
   {
     label: "Show full descriptions",
     section: "streaming",
-    anchorTitle: "Stream descriptions",
+    anchorTitle: "Picker details",
     keywords: [
       "full description",
       "aiostreams",
@@ -6639,9 +6763,9 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     keywords: ["actual behavior", "what went wrong", "actual result", "instead"],
   },
   {
-    label: "Screenshots and recordings",
+    label: "Attachments",
     section: "bug",
-    anchorTitle: "Screenshots and recordings",
+    anchorTitle: "Attachments",
     keywords: [
       "attach screenshot",
       "screen recording",
@@ -6670,15 +6794,15 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     ],
   },
   {
-    label: "Credit (optional)",
+    label: "Contact & credit",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: ["reporter name", "github username", "contact", "anonymous report", "display name"],
   },
   {
     label: "Credit me in the release notes if this report leads to a fix.",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: ["release notes credit", "attribution consent", "credit reporter", "name in notes"],
   },
   {
@@ -7689,7 +7813,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Move Refresh next to Back",
     section: "streaming",
-    anchorTitle: "Refresh button",
+    anchorTitle: "Picker details",
     keywords: [
       "refresh button",
       "refresh position",
@@ -8836,7 +8960,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Contact email or Discord",
     section: "bug",
-    anchorTitle: "Credit (optional)",
+    anchorTitle: "Contact & credit",
     keywords: [
       "email",
       "discord",
@@ -9403,26 +9527,6 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
       "ebook",
       "books api",
       "reading list",
-    ],
-  },
-  {
-    label: "API-Sports \u00b7 leagues ESPN does not carry",
-    section: "library",
-    anchorTitle: "Metadata providers",
-    keywords: [
-      "api sports",
-      "apisports",
-      "api-football",
-      "sports key",
-      "football",
-      "soccer",
-      "egyptian premier league",
-      "qatar stars league",
-      "uae pro league",
-      "k league",
-      "khl",
-      "hockey",
-      "missing leagues",
     ],
   },
   {
@@ -10215,6 +10319,7 @@ export function SettingsNav({
   setQuery?: (v: string) => void;
 }) {
   const { settings } = useSettings();
+  const pluginCount = useStreamPluginCount();
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const t = useT();
   const isNew = useSettingsNew();
@@ -10282,6 +10387,7 @@ export function SettingsNav({
       ? String(settings.customStreamFilters.length)
       : null,
     p2p: null,
+    plugins: pluginCount > 0 ? String(pluginCount) : null,
     language: null,
     subtitles: settings.subtitleAutoSync ? "sync" : null,
     player: settings.playerEngine === "auto" ? null : settings.playerEngine,

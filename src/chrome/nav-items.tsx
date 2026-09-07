@@ -29,7 +29,6 @@ import { LiveTvIcon } from "@/components/icons/live-tv-icon";
 import { MoviesIcon } from "@/components/icons/movies-icon";
 import { PlaylistVodIcon } from "@/components/icons/playlist-vod-icon";
 import { SettingsIcon } from "@/components/icons/settings-icon";
-import { SportsIcon } from "@/components/icons/sports-icon";
 import { TvIcon } from "@/components/icons/tv-icon";
 import { DownloadsNavIcon } from "@/chrome/downloads-nav-icon";
 import type { LockableTab } from "@/lib/parental";
@@ -60,7 +59,6 @@ export type NavItemId =
   | "manga"
   | "ebook"
   | "live"
-  | "sports"
   | "vod"
   | "calendar"
   | "library"
@@ -74,7 +72,7 @@ export type NavItem = {
   label: string;
   render: (active: boolean, hovered?: boolean) => ReactNode;
   view: View;
-  hideKey?: "anime" | "liveTv" | "sports" | "manga";
+  hideKey?: "anime" | "liveTv" | "manga";
   parentalKey?: LockableTab;
   pinGated?: boolean;
 };
@@ -155,14 +153,6 @@ const NAV_ITEMS_ALL: NavItem[] = [
     parentalKey: "liveTv",
   },
   {
-    id: "sports",
-    label: "nav.sports",
-    render: (active) => <SportsIcon active={active} />,
-    view: "sports",
-    hideKey: "sports",
-    parentalKey: "sports",
-  },
-  {
     id: "vod",
     label: "nav.playlists",
     render: (active, hovered) => <NavLottie data={lotPlaylists} hovered={hovered} fallback={<PlaylistVodIcon active={active} />} />,
@@ -210,7 +200,7 @@ const NAV_ITEMS_ALL: NavItem[] = [
   },
 ];
 
-export const NAV_ITEMS: NavItem[] = NAV_ITEMS_ALL.filter((i) => i.id !== "sports");
+export const NAV_ITEMS: NavItem[] = NAV_ITEMS_ALL;
 
 export function applyNavCustomization(items: NavItem[], cfg: NavCustomization): NavItem[] {
   const shown = items

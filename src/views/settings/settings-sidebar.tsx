@@ -10,7 +10,7 @@ import { useSettings } from "@/lib/settings";
 import { TOP_GROUPS } from "./groups";
 import { SECTION_ICONS } from "./section-icons";
 import { SetIcon } from "./set-icon";
-import type { TabEntry } from "./tab-registry";
+import { tabsFor, type TabEntry } from "./tab-registry";
 import { useNavSearch } from "./nav";
 import { settingsAnchor, type SectionId } from "./shared";
 
@@ -19,6 +19,55 @@ function Glyph({ name, size }: { name: string; size: number }) {
 }
 
 type Band = { section: string; sections: SectionId[] };
+
+const PAGE_LABELS: Record<string, string> = {
+  "player.play": "When you press Play",
+  "player.engine": "Player engine",
+  "player.aspect": "Aspect ratio",
+  "player.onscreen": "On-screen controls",
+  "player.adskip": "Ad skipping",
+  "mpv.quality": "Video quality",
+  "mpv.picture": "Picture adjustments",
+  "mpv.network": "Playback buffering",
+  "anime.smooth": "Motion smoothing",
+  "anime.svp": "SVP interpolation",
+  "language.app": "App language",
+  "language.audio": "Audio languages",
+  "language.discovery": "Discovery languages",
+  "subtitles.languages": "Subtitle languages",
+  "subtitles.sources": "Subtitle sources",
+  "subtitles.sync": "Subtitle timing",
+  "subtitles.look": "Subtitle style",
+  "streaming.services": "Streaming services",
+  "streaming.filters": "Source preferences",
+  "streaming.sorting": "Stream sorting",
+  "streaming.picker": "Source picker",
+  "p2p.engine": "Torrent engine",
+  "p2p.server": "Torrent server",
+  "plugins.plugins": "Installed plugins",
+  "plugins.repositories": "Plugin repositories",
+  "library.cards": "Poster cards",
+  "library.providers": "Metadata providers",
+  "badges.badges": "Stream badges",
+  "badges.rules": "Badge rules",
+  "badges.packs": "Badge packs",
+  "hotkeys.keys": "Keyboard shortcuts",
+  "hotkeys.behaviour": "Keyboard behavior",
+  "controllers.setup": "Controllers",
+  "controllers.mapping": "Buttons & sticks",
+  "tv.devices": "TV devices",
+  "tv.look": "TV appearance",
+  "tv.watching": "TV playback",
+  "tv.content": "TV content",
+  "storage.overview": "Storage overview",
+  "webhooks.destinations": "Notification destinations",
+  "webhooks.what": "Notification sources",
+  "webhooks.rules": "Notification rules",
+  "relay.status": "Harbor Relay",
+  "relay.manage": "Manage relay",
+  "advanced.system": "Startup & system",
+  "advanced.repair": "Repair & diagnostics",
+};
 
 const BAND_LABELS: Record<string, string> = {
   SETUP: "Account & setup",
@@ -29,18 +78,26 @@ const BAND_LABELS: Record<string, string> = {
   DEVICES: "Controls & devices",
   SYSTEM: "System",
   HELP: "Help & about",
+  PLUGINS: "Plugins",
+  UPDATES: "Updates & backup",
 };
 
 const BAND_ICONS: Record<string, string> = {
-  SETUP: "Users",
+  SETUP: "AccountSetup",
   WATCHING: "Play",
   LANGUAGE: "Languages",
   CONTENT: "Library",
   "LOOK & FEEL": "Palette",
-  DEVICES: "Gamepad2",
+  DEVICES: "InputDevices",
   SYSTEM: "SlidersHorizontal",
-  HELP: "Heart",
+  HELP: "HelpAbout",
+  PLUGINS: "Puzzle",
+  UPDATES: "ArrowUpCircle",
 };
+
+function flatPage(band: Band): SectionId | null {
+  return band.sections.length === 1 && tabsFor(band.sections[0]).length === 0 ? band.sections[0] : null;
+}
 
 function bands(): Band[] {
   const out: Band[] = [];
@@ -125,21 +182,29 @@ function SectionRow({
   label,
   on,
   onPick,
+  tab,
 }: {
   id: SectionId;
   label: string;
+  tab?: TabEntry;
   on: boolean;
   onPick: (id: SectionId, tab?: string) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={() => onPick(id)}
+      onClick={() => onPick(id, tab?.id)}
       aria-current={on ? "page" : undefined}
       className={`hset-rail-row ${on ? "is-on" : ""}`}
     >
       <span className="hset-rail-chip">
-        <Glyph name={SECTION_ICONS[id]} size={20} />
+        {tab?.icon === "Harbor" ? (
+          <HarborMark className="h-5 w-5" />
+        ) : tab?.img ? (
+          <img src={tab.img} alt="" draggable={false} className="h-5 w-5 rounded-[4px] object-contain" />
+        ) : (
+          <Glyph name={tab?.icon ?? SECTION_ICONS[id]} size={20} />
+        )}
       </span>
       <span className="hset-rail-label">{label}</span>
     </button>
@@ -149,7 +214,6 @@ function SectionRow({
 export function SettingsSidebar({
   active,
   activeTab,
-  activeTabs,
   meta,
   query = "",
   onSelect,
@@ -157,19 +221,28 @@ export function SettingsSidebar({
 }: {
   active: SectionId;
   activeTab: string | null;
-  activeTabs: TabEntry[];
   meta: Record<SectionId, { label: string; sub: string }>;
   query?: string;
   onSelect: (section: SectionId, tab?: string) => void;
   onJump?: (section: SectionId, anchor?: string) => void;
 }) {
   const t = useT();
+  const { settings } = useSettings();
+  const native = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
   const trimmed = query.trim().toLowerCase();
   const { matches, optionMatches } = useNavSearch(trimmed);
   const searching = trimmed.length > 0;
   const activeBand = bands().find((band) => band.sections.includes(active))?.section ?? "SETUP";
-  const [openBand, setOpenBand] = useState<string | null>(activeBand);
-  useEffect(() => setOpenBand(activeBand), [activeBand, active, searching]);
+  const [openBands, setOpenBands] = useState(() => new Set([activeBand]));
+  useEffect(() => {
+    setOpenBands((current) => current.has(activeBand) ? current : new Set([...current, activeBand]));
+  }, [activeBand, active, searching]);
+  const toggleBand = (band: string) => setOpenBands((current) => {
+    const next = new Set(current);
+    if (next.has(band)) next.delete(band);
+    else next.add(band);
+    return next;
+  });
 
   if (searching) {
     const sections = matches ?? [];
@@ -232,14 +305,35 @@ export function SettingsSidebar({
     <nav id="hset-page-navigation" className="hset-rail" aria-label={t("Settings")}>
       <RailAccount />
       <div className="hset-rail-nav" key="browse">
-        {bands().map((band) => (
-          <div key={band.section} className="hset-rail-band">
+        {bands().map((band) => {
+          const flat = flatPage(band);
+          if (flat) {
+            const on = flat === active;
+            return (
+              <div key={band.section} className="hset-rail-band" data-open={on || undefined}>
+                <button
+                  type="button"
+                  className={`hset-rail-category is-flat ${on ? "is-on" : ""}`}
+                  aria-current={on ? "page" : undefined}
+                  onClick={() => onSelect(flat)}
+                >
+                  <span className="hset-category-icon" aria-hidden>
+                    <Glyph name={BAND_ICONS[band.section] ?? SECTION_ICONS[flat]} size={20} />
+                  </span>
+                  <span className="hset-category-name">{t(BAND_LABELS[band.section] ?? meta[flat].label)}</span>
+                </button>
+              </div>
+            );
+          }
+          return (
+          <div key={band.section} className="hset-rail-band" data-open={openBands.has(band.section) || undefined}>
             <button
               type="button"
-              className={`hset-rail-category ${activeBand === band.section ? "is-current" : ""}`}
-              aria-expanded={openBand === band.section}
+              id={`hset-category-button-${band.section.replaceAll(" ", "-")}`}
+              className="hset-rail-category"
+              aria-expanded={openBands.has(band.section)}
               aria-controls={`hset-category-${band.section.replaceAll(" ", "-")}`}
-              onClick={() => setOpenBand(openBand === band.section ? null : band.section)}
+              onClick={() => toggleBand(band.section)}
             >
               <span className="hset-category-icon" aria-hidden>
                 <Glyph name={BAND_ICONS[band.section]} size={20} />
@@ -247,48 +341,39 @@ export function SettingsSidebar({
               <span className="hset-category-name">{t(BAND_LABELS[band.section] ?? band.section)}</span>
               <span className="hset-category-caret" aria-hidden />
             </button>
-            <div id={`hset-category-${band.section.replaceAll(" ", "-")}`} className="hset-category-pages" hidden={openBand !== band.section}>
-            {band.sections.map((id) => {
-              const on = id === active;
-              const tabs = on ? activeTabs : [];
-              return (
-                <div key={id} className="hset-rail-item">
-                  <SectionRow id={id} label={t(meta[id].label)} on={on} onPick={onSelect} />
-                  {tabs.length > 0 && (
-                    <div className="hset-rail-kids">
-                      {tabs.map((tab) => (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => onSelect(id, tab.id)}
-                          aria-current={activeTab === tab.id ? "page" : undefined}
-                          className={`hset-rail-kid ${activeTab === tab.id ? "is-on" : ""}`}
-                        >
-                          <span className="hset-rail-kid-chip">
-                            {tab.icon === "Harbor" ? (
-                              <HarborMark className="h-[18px] w-[18px]" />
-                            ) : tab.img ? (
-                              <img
-                                src={tab.img}
-                                alt=""
-                                draggable={false}
-                                className="h-[18px] w-[18px] rounded-[4px] object-contain"
-                              />
-                            ) : (
-                              <Glyph name={tab.icon} size={18} />
-                            )}
-                          </span>
-                          <span className="hset-rail-label">{t(tab.label)}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            <div
+              id={`hset-category-${band.section.replaceAll(" ", "-")}`}
+              role="group"
+              aria-labelledby={`hset-category-button-${band.section.replaceAll(" ", "-")}`}
+              className="hset-category-pages"
+              hidden={!openBands.has(band.section)}
+            >
+              {band.sections.map((id) => {
+                const tabs = ((!native && (id === "mpv" || id === "shaders" || id === "plugins")) ||
+                  (id === "relay" && !settings.togetherRelayUrl))
+                  ? []
+                  : tabsFor(id).filter((tab) => native || id !== "theme" || tab.id !== "window");
+                return (
+                  <div key={id} className="hset-rail-page-group">
+                    {tabs.length > 0 ? tabs.map((tab) => (
+                      <SectionRow
+                        key={tab.id}
+                        id={id}
+                        tab={tab}
+                        label={t(PAGE_LABELS[id + "." + tab.id] ?? tab.label)}
+                        on={id === active && (activeTab ?? tabs[0].id) === tab.id}
+                        onPick={onSelect}
+                      />
+                    )) : (
+                      <SectionRow id={id} label={t(meta[id].label)} on={id === active} onPick={onSelect} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </nav>
   );

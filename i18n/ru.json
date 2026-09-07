@@ -1822,7 +1822,7 @@
   "Build a theme": "Создать тему",
   "Build a Theme": "Создать тему",
   "Build from source": "Собрать из исходников",
-  "Build identity. Useful when filing a bug report at bugs@harbor.site.": "Данные сборки. Пригодятся при отправке отчёта об ошибке на bugs@harbor.site.",
+  "Build identity. Useful when filing a bug report.": "Данные сборки. Пригодятся при отправке отчёта об ошибке.",
   "Build one in the studio or import a theme file first, then come back to share it.": "Сначала создайте тему в студии или импортируйте файл темы, а затем вернитесь, чтобы опубликовать её.",
   "Build or import the updated theme first, then come back to push it as a new version.": "Сначала создайте или импортируйте обновлённую тему, затем вернитесь, чтобы опубликовать её как новую версию.",
   "Build your own": "Создайте свою",

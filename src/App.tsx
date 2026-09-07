@@ -166,6 +166,7 @@ const importCatalogs = () => import("@/views/catalogs");
 const importAward = () => import("@/views/award");
 const importAnimeAward = () => import("@/views/anime-award");
 const importFilter = () => import("@/views/filter");
+const importBrands = () => import("@/views/brands");
 const importGrid = () => import("@/views/grid");
 const importPerson = () => import("@/views/person");
 const importPeople = () => import("@/views/people");
@@ -182,10 +183,9 @@ const importShows = () => import("@/views/shows");
 const importLibrary = () => import("@/views/library");
 const importCommunityCollections = () => import("@/views/collections/community-hub");
 const importLive = () => import("@/views/live");
-const importVod = () => import("@/views/playlist-vod");
-const importSports = () => import("@/views/sports");
-const importDownloads = () => import("@/views/downloads");
 const importMatchDetail = () => import("@/views/live/match-detail-view");
+const importVod = () => import("@/views/playlist-vod");
+const importDownloads = () => import("@/views/downloads");
 const importOnboarding = () => import("@/components/onboarding");
 
 const AnimeView = lazy(() => importAnime().then((m) => ({ default: m.AnimeView })));
@@ -198,6 +198,7 @@ const Catalogs = lazy(() => importCatalogs().then((m) => ({ default: m.Catalogs 
 const AwardView = lazy(() => importAward().then((m) => ({ default: m.AwardView })));
 const AnimeAwardView = lazy(() => importAnimeAward().then((m) => ({ default: m.AnimeAwardView })));
 const FilterView = lazy(() => importFilter().then((m) => ({ default: m.FilterView })));
+const BrandsView = lazy(() => importBrands().then((m) => ({ default: m.BrandsView })));
 const GridView = lazy(() => importGrid().then((m) => ({ default: m.GridView })));
 const PersonView = lazy(() => importPerson().then((m) => ({ default: m.PersonView })));
 const PeopleView = lazy(() => importPeople().then((m) => ({ default: m.PeopleView })));
@@ -240,7 +241,6 @@ const MatchDetailView = lazy(() =>
   importMatchDetail().then((m) => ({ default: m.MatchDetailView })),
 );
 const PlaylistVodView = lazy(() => importVod().then((m) => ({ default: m.PlaylistVodView })));
-const SportsView = lazy(() => importSports().then((m) => ({ default: m.SportsView })));
 const DownloadsView = lazy(() => importDownloads().then((m) => ({ default: m.DownloadsView })));
 const MangaView = lazy(() => import("@/views/manga").then((m) => ({ default: m.MangaView })));
 const EBookView = lazy(() => import("@/views/ebook").then((m) => ({ default: m.EBookView })));
@@ -279,13 +279,11 @@ function useViewPreloader(tmdbKey: string) {
       void importMovies();
       void importShows();
       void importLive();
-      void importSports();
       void importAnime();
       void importQueue();
       void importAward();
       void importAnimeAward();
       void importService();
-      void importMatchDetail();
       void importOnboarding();
       void importCatalogs();
       void importLibrary();
@@ -351,7 +349,7 @@ function useIdleEvict(active: boolean, pin = false): boolean {
 
 export function App({ onReady }: { onReady?: () => void }) {
   return (
-    <SettingsProvider>
+    <SettingsProvider syncTorrentEnginePolicy>
       <ProfilesProvider>
         <ParentalProvider>
           <TraktProvider>
@@ -774,6 +772,7 @@ function Shell({ onReady }: { onReady?: () => void }) {
     collectionId,
     addonCollectionMeta,
     filter,
+    brands,
     grid,
     awardType,
     animeAwardSource,
@@ -1324,6 +1323,7 @@ function Shell({ onReady }: { onReady?: () => void }) {
   );
   const detailTop = topKind === "meta";
   const filterTop = topKind === "filter";
+  const brandsTop = topKind === "brands";
   const gridTop = topKind === "grid";
   const awardTop = topKind === "award";
   const animeAwardTop = topKind === "anime-award";
@@ -1343,13 +1343,12 @@ function Shell({ onReady }: { onReady?: () => void }) {
   const libraryTop = topKind === "library";
   const collectionsHubTop = topKind === "collections-hub";
   const liveTop = topKind === "live";
+  const matchDetailTop = topKind === "match-detail";
   const vodTop = topKind === "vod";
-  const sportsTop = topKind === "sports";
   const downloadsTop = topKind === "downloads";
   const mangaTop = topKind === "manga";
   const ebookTop = topKind === "ebook";
   const peopleTop = topKind === "people";
-  const matchDetailTop = topKind === "match-detail";
 
   const [immersive, setImmersive] = useState(false);
   useEffect(() => {
@@ -1427,6 +1426,7 @@ function Shell({ onReady }: { onReady?: () => void }) {
   const { matchDetailGame } = useView();
   const matchDetailAlive = useKeepAlive(matchDetailTop, !!matchDetailGame);
   const filterAlive = useKeepAlive(filterTop, !!filter);
+  const brandsAlive = useKeepAlive(brandsTop, !!brands);
   const gridAlive = useKeepAlive(gridTop, !!grid, stackKinds.includes("grid"));
   const awardAlive = useKeepAlive(awardTop, awardTop);
   const animeAwardAlive = useKeepAlive(animeAwardTop, animeAwardTop && !!animeAwardSource);
@@ -1438,7 +1438,6 @@ function Shell({ onReady }: { onReady?: () => void }) {
   const collectionsHubAlive = useIdleEvict(collectionsHubTop);
   const liveAlive = useIdleEvict(liveTop);
   const vodAlive = useIdleEvict(vodTop);
-  const sportsAlive = useIdleEvict(sportsTop);
   const downloadsAlive = useIdleEvict(downloadsTop);
   const mangaAlive = useIdleEvict(mangaTop);
   const ebookAlive = useIdleEvict(ebookTop);
@@ -1597,13 +1596,6 @@ function Shell({ onReady }: { onReady?: () => void }) {
           <div {...layerProps(vodTop)}>
             <Suspense fallback={null}>
               <PlaylistVodView active={vodTop} />
-            </Suspense>
-          </div>
-        )}
-        {sportsAlive && (
-          <div className={parkLayer(sportsTop)}>
-            <Suspense fallback={null}>
-              <SportsView active={sportsTop} />
             </Suspense>
           </div>
         )}
@@ -1774,17 +1766,24 @@ function Shell({ onReady }: { onReady?: () => void }) {
             </Suspense>
           </div>
         )}
-        {matchDetailAlive && matchDetailGame && (
-          <div {...layerProps(matchDetailTop)}>
-            <Suspense fallback={null}>
-              <MatchDetailView key={`match-${matchDetailGame.id}`} game={matchDetailGame} />
-            </Suspense>
-          </div>
-        )}
         {filterAlive && filter && (
           <div {...layerProps(filterTop)}>
             <Suspense fallback={null}>
               <FilterView key={filterReactKey(filter)} filter={filter} />
+            </Suspense>
+          </div>
+        )}
+        {brandsAlive && brands && (
+          <div className={layer(brandsTop)}>
+            <Suspense fallback={null}>
+              <BrandsView key={`brands-${brands}`} brand={brands} />
+            </Suspense>
+          </div>
+        )}
+        {matchDetailAlive && matchDetailGame && (
+          <div className={layer(matchDetailTop)}>
+            <Suspense fallback={null}>
+              <MatchDetailView key={`match-${matchDetailGame.id}`} game={matchDetailGame} />
             </Suspense>
           </div>
         )}

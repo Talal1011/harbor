@@ -20,7 +20,6 @@ import { DiscoverIcon } from "@/components/icons/discover-icon";
 import { LibraryIcon } from "@/components/icons/library-icon";
 import { LiveTvIcon } from "@/components/icons/live-tv-icon";
 import { MoviesIcon } from "@/components/icons/movies-icon";
-import { SportsIcon } from "@/components/icons/sports-icon";
 import { TvIcon } from "@/components/icons/tv-icon";
 import {
   anyTabLocked,
@@ -151,6 +150,12 @@ export function EditorView({
   const [subView, setSubView] = useState<SubView>({ kind: "main" });
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (document.activeElement === document.body) {
+      document.querySelector<HTMLElement>("[data-profile-picker]")?.focus({ preventScroll: true });
+    }
+  }, [subView.kind]);
 
   useEffect(() => {
     if (subView.kind === "main") return;
@@ -395,6 +400,7 @@ export function EditorView({
   if (subView.kind === "pin-set") {
     return (
       <PinEntry
+        key={subView.kind}
         title={
           editing ? t("Set a PIN for {name}", { name: trimmed || editing.name }) : t("Set a PIN")
         }
@@ -418,6 +424,7 @@ export function EditorView({
     const targetHash = editing.passwordHash;
     return (
       <PinEntry
+        key={subView.kind}
         title={t("Enter current PIN")}
         subtitle={t("Confirm your current PIN, then pick a new one.")}
         mode="verify"
@@ -434,6 +441,7 @@ export function EditorView({
     const targetHash = editing.passwordHash;
     return (
       <PinEntry
+        key={subView.kind}
         title={t("Enter current PIN")}
         subtitle={t("Confirm your current PIN to remove the lock.")}
         mode="verify"
@@ -1102,7 +1110,11 @@ function SecurityRow({
   const lockedCount = lockedTabs ? Object.values(lockedTabs).filter(Boolean).length : 0;
   const pinLabel = locked ? t("PIN on") : t("PIN off");
   const tabsLabel =
-    lockedCount === 0 ? t("no tab locks") : t("{n} tabs locked", { n: lockedCount });
+    lockedCount === 0
+      ? t("no tab locks")
+      : locked
+        ? t("{n} tabs locked", { n: lockedCount })
+        : t("Locks only activate once a PIN is set.");
   return (
     <button
       type="button"
@@ -1112,12 +1124,12 @@ function SecurityRow({
       <div className="flex items-center gap-3">
         <span
           className={`flex h-9 w-9 items-center justify-center rounded-full ring-1 ${
-            locked || lockedCount > 0
+            locked
               ? "bg-emerald-400/15 text-emerald-200 ring-emerald-400/30"
               : "bg-canvas/60 text-ink-muted ring-edge-soft"
           }`}
         >
-          {locked || lockedCount > 0 ? (
+          {locked ? (
             <Lock size={14} strokeWidth={2.4} />
           ) : (
             <Unlock size={14} strokeWidth={2.2} />
@@ -1244,7 +1256,7 @@ function SecurityView({
           <div className="flex items-center gap-3">
             <span
               className={`flex h-9 w-9 items-center justify-center rounded-full ring-1 ${
-                lockedCount > 0
+                locked && lockedCount > 0
                   ? "bg-amber-300/15 text-amber-200 ring-amber-300/30"
                   : "bg-canvas/60 text-ink-muted ring-edge-soft"
               }`}
@@ -1256,7 +1268,9 @@ function SecurityView({
               <span className="text-[14px] text-ink-subtle">
                 {lockedCount === 0
                   ? t("No locks. All sidebar tabs open without a PIN.")
-                  : t("{n} tabs require this profile's PIN.", { n: lockedCount })}
+                  : locked
+                    ? t("{n} tabs require this profile's PIN.", { n: lockedCount })
+                    : t("Locks only activate once a PIN is set.")}
               </span>
             </div>
           </div>
@@ -1391,8 +1405,6 @@ function TabIcon({ iconKey }: { iconKey: LockableTabMeta["iconKey"] }) {
       return <TvIcon active={false} />;
     case "anime":
       return <AnimeIcon active={false} />;
-    case "sports":
-      return <SportsIcon active={false} />;
     case "liveTv":
       return <LiveTvIcon active={false} />;
     case "calendar":
@@ -1446,6 +1458,7 @@ function TabsView({
             key={tab.key}
             type="button"
             onClick={() => toggle(tab.key)}
+            aria-pressed={tabs[tab.key]}
             className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-start transition-colors ${
               tabs[tab.key]
                 ? "border-ink/40 bg-canvas/60"
@@ -1475,7 +1488,7 @@ function TabsView({
       </div>
       <div className="flex items-center justify-between gap-3">
         <span className="text-[15px] text-ink-subtle">
-          {count === 0 ? t("No tabs selected") : t("{n} tabs locked", { n: count })}
+          {count === 0 ? t("No tabs selected") : t("{n} selected", { n: count })}
         </span>
         <button
           type="button"

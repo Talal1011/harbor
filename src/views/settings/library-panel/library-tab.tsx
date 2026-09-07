@@ -37,7 +37,7 @@ export function LibraryTab() {
     update({ localMinFileSizeMb: Math.max(0, Math.round(v)) });
 
   const pushHideContent = (
-    key: "anime" | "sports" | "liveTv" | "adult" | "manga",
+    key: "anime" | "liveTv" | "adult" | "manga",
     value: boolean,
   ) => {
     const next = { ...settings.hideContent, [key]: value };
