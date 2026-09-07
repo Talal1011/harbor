@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, Check, ChevronDown, Download, Globe, LayoutGrid, List, Loader2, Pause, Server, Tv } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  ChevronDown,
+  Download,
+  Globe,
+  LayoutGrid,
+  List,
+  Loader2,
+  Pause,
+  Server,
+  Tv,
+} from "lucide-react";
 import { Play } from "@/components/icons/play-filled";
 import { Search } from "@/components/icons/search-icon";
 import { t, useT } from "@/lib/i18n";
@@ -534,7 +546,8 @@ export function ChapterList({
   }
 
   const volumeSizes = new Map<string, number>();
-  for (const c of ordered) if (c.volume) volumeSizes.set(c.volume, (volumeSizes.get(c.volume) ?? 0) + 1);
+  for (const c of ordered)
+    if (c.volume) volumeSizes.set(c.volume, (volumeSizes.get(c.volume) ?? 0) + 1);
   const volumeCount = volumeSizes.size;
 
   return (
@@ -850,6 +863,6 @@ export function ChapterList({
           })}
         </div>
       )}
-      </section>
+    </section>
   );
 }

@@ -81,7 +81,11 @@ export async function searchAnilistMangaEntries(title: string): Promise<MangaCan
     .filter((c) => !!c.title && !!c.id);
 }
 
-function buildReleaseDate(d: { year: number | null; month: number | null; day: number | null }): string | undefined {
+function buildReleaseDate(d: {
+  year: number | null;
+  month: number | null;
+  day: number | null;
+}): string | undefined {
   if (!d?.year) return undefined;
   const month = d.month ?? 1;
   const day = d.day ?? 1;

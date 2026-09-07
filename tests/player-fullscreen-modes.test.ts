@@ -18,7 +18,7 @@ function body(source: string, signature: string): string {
 
 const stateSource = read("../src/lib/fullscreen-state.ts");
 const hookSource = read("../src/views/player/hooks/use-fullscreen.ts");
-const settingsSource = read("../src/views/settings/player-panel/play-mode-section.tsx");
+const settingsSource = read("../src/views/settings/quality-panel/window-options.tsx");
 
 test("fullscreen state offers three distinct window modes", () => {
   assert.match(

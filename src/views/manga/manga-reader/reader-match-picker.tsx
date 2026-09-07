@@ -13,9 +13,7 @@ const TRACKER_LABEL: Record<MangaTracker, string> = {
 };
 
 function searchCandidates(tracker: MangaTracker, title: string): Promise<MangaCandidate[]> {
-  return tracker === "anilist"
-    ? searchAnilistMangaEntries(title)
-    : searchMalMangaEntries(title);
+  return tracker === "anilist" ? searchAnilistMangaEntries(title) : searchMalMangaEntries(title);
 }
 
 export function ReaderMatchPicker({
@@ -77,21 +75,18 @@ export function ReaderMatchPicker({
     markDone(active);
   };
 
-  const load = useCallback(
-    async (q: string) => {
-      const tracker = activeRef.current;
-      setBusy(true);
-      try {
-        const res = await searchCandidates(tracker, q);
-        if (activeRef.current === tracker) setHits(res);
-      } catch {
-        if (activeRef.current === tracker) setHits([]);
-      } finally {
-        if (activeRef.current === tracker) setBusy(false);
-      }
-    },
-    [],
-  );
+  const load = useCallback(async (q: string) => {
+    const tracker = activeRef.current;
+    setBusy(true);
+    try {
+      const res = await searchCandidates(tracker, q);
+      if (activeRef.current === tracker) setHits(res);
+    } catch {
+      if (activeRef.current === tracker) setHits([]);
+    } finally {
+      if (activeRef.current === tracker) setBusy(false);
+    }
+  }, []);
 
   useEffect(() => {
     const id = window.setTimeout(() => setDebounced(query.trim() || title), 350);
@@ -120,7 +115,11 @@ export function ReaderMatchPicker({
 
   return (
     <>
-      <div aria-hidden onClick={dismiss} className="animate-fade-in fixed inset-0 z-[97] bg-black/45 backdrop-blur-[2px]" />
+      <div
+        aria-hidden
+        onClick={dismiss}
+        className="animate-fade-in fixed inset-0 z-[97] bg-black/45 backdrop-blur-[2px]"
+      />
       <div className="animate-fade-in fixed inset-0 z-[98] grid place-items-center px-4">
         <div className="pointer-events-auto flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-edge-soft bg-raised/95 shadow-[0_24px_60px_-16px_rgba(0,0,0,0.75)] backdrop-blur-2xl">
           <div className="flex items-start justify-between gap-3 border-b border-edge-soft px-4 py-3">
@@ -178,7 +177,9 @@ export function ReaderMatchPicker({
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !busy) void load(query);
               }}
-              placeholder={t("Search title on {tracker}", { tracker: TRACKER_LABEL[searchTracker] })}
+              placeholder={t("Search title on {tracker}", {
+                tracker: TRACKER_LABEL[searchTracker],
+              })}
               className="h-8 min-w-0 flex-1 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-ink-subtle"
             />
             {busy ? (
@@ -208,7 +209,9 @@ export function ReaderMatchPicker({
               <span className="min-w-0 flex-1">
                 <span className="block text-[13.5px] font-semibold text-ink">{t("None")}</span>
                 <span className="mt-0.5 block truncate text-[11.5px] leading-relaxed text-ink-subtle">
-                  {t("Select this if you don't want to sync to {tracker}", { tracker: TRACKER_LABEL[active] })}
+                  {t("Select this if you don't want to sync to {tracker}", {
+                    tracker: TRACKER_LABEL[active],
+                  })}
                 </span>
               </span>
             </button>
@@ -234,18 +237,35 @@ export function ReaderMatchPicker({
                   >
                     <span className="flex h-14 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-canvas ring-1 ring-edge-soft">
                       {h.cover ? (
-                        <CoverImg src={h.cover} alt="" loading="lazy" draggable={false} className="h-full w-full object-cover" />
+                        <CoverImg
+                          src={h.cover}
+                          alt=""
+                          loading="lazy"
+                          draggable={false}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <span className="text-[10px] text-ink-subtle">—</span>
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13.5px] font-semibold text-ink">{h.title}</span>
+                      <span className="block truncate text-[13.5px] font-semibold text-ink">
+                        {h.title}
+                      </span>
                       <span className="mt-0.5 block truncate text-[11.5px] text-ink-subtle">
-                        {[h.type, h.score != null ? t("★ {n}", { n: h.score }) : null, h.chapters ? t("Ch. {n}", { n: h.chapters }) : null, h.releaseDate].filter(Boolean).join(" · ")}
+                        {[
+                          h.type,
+                          h.score != null ? t("★ {n}", { n: h.score }) : null,
+                          h.chapters ? t("Ch. {n}", { n: h.chapters }) : null,
+                          h.releaseDate,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
                     </span>
-                    {linkingId === h.id && <Loader2 size={14} className="shrink-0 animate-spin text-accent" />}
+                    {linkingId === h.id && (
+                      <Loader2 size={14} className="shrink-0 animate-spin text-accent" />
+                    )}
                   </button>
                 ))}
               </div>

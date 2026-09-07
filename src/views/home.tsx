@@ -113,7 +113,8 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
   const { authKey, user } = useAuth();
   const { activeProfile, profiles } = useProfiles();
   const { settings, update } = useSettings();
-  const hideSharedCw = settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
+  const hideSharedCw =
+    settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
   const heroFull = settings.heroFull;
   const contentDrag = useContentDrag();
   const t = useT();
@@ -646,7 +647,17 @@ export function Home({ active = true, onReady }: { active?: boolean; onReady?: (
       if (root) seenRoot.add(root);
     }
     return [...byId.values()].sort((a, b) => cwSortKey(b) - cwSortKey(a));
-  }, [items, externalCw, localCwItems, cwVersion, cwRootVersion, settings.animeOnlyInAnimeRoom, settings.hideContent.anime, hideSharedCw, animeDetectVer]);
+  }, [
+    items,
+    externalCw,
+    localCwItems,
+    cwVersion,
+    cwRootVersion,
+    settings.animeOnlyInAnimeRoom,
+    settings.hideContent.anime,
+    hideSharedCw,
+    animeDetectVer,
+  ]);
   useEffect(() => {
     let cancelled = false;
     const ids = [...localCwItems, ...externalCw].filter((i) => isCwMember(i)).map((i) => i._id);

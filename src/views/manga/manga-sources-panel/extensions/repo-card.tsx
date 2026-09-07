@@ -1,6 +1,19 @@
-import { AlertCircle, ArrowUpCircle, Loader2, PackageOpen, RefreshCw, ServerCog, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowUpCircle,
+  Loader2,
+  PackageOpen,
+  RefreshCw,
+  ServerCog,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { browseRepo, installPlugin, installedPluginsSync, type PluginRepo } from "@/lib/manga/plugins";
+import {
+  browseRepo,
+  installPlugin,
+  installedPluginsSync,
+  type PluginRepo,
+} from "@/lib/manga/plugins";
 import type { ForeignRepoKind } from "@/lib/manga/plugins/types";
 import { CARD } from "../shared";
 import { PluginRow } from "./plugin-row";
@@ -10,17 +23,23 @@ import { useT } from "@/lib/i18n";
 function foreignMessage(kind: ForeignRepoKind, count: number, t: (s: string) => string): string {
   switch (kind) {
     case "tachiyomi":
-      return t(
-        "This is a Tachiyomi / Mihon repo. Those are Android (APK) extensions, so Harbor can't run them directly. To use these sources on desktop, run a Suwayomi server and connect Harbor to it from the Servers section.",
-      ) + ` (${count})`;
+      return (
+        t(
+          "This is a Tachiyomi / Mihon repo. Those are Android (APK) extensions, so Harbor can't run them directly. To use these sources on desktop, run a Suwayomi server and connect Harbor to it from the Servers section.",
+        ) + ` (${count})`
+      );
     case "mangayomi":
-      return t(
-        "This is a Mangayomi repo. Native import isn't supported yet. For the largest catalog today, run a Suwayomi server and connect Harbor to it from the Servers section.",
-      ) + ` (${count})`;
+      return (
+        t(
+          "This is a Mangayomi repo. Native import isn't supported yet. For the largest catalog today, run a Suwayomi server and connect Harbor to it from the Servers section.",
+        ) + ` (${count})`
+      );
     case "paperback":
-      return t(
-        "This is a Paperback (iOS) repo, which Harbor can't use. For desktop sources, connect a Suwayomi server from the Servers section.",
-      ) + ` (${count})`;
+      return (
+        t(
+          "This is a Paperback (iOS) repo, which Harbor can't use. For desktop sources, connect a Suwayomi server from the Servers section.",
+        ) + ` (${count})`
+      );
     default:
       return t(
         "This doesn't look like a Harbor plugin repo. Harbor expects a JSON file shaped { name, plugins: [ ... ] }.",
@@ -43,7 +62,9 @@ export function RepoCard({ url, onRemove }: { url: string; onRemove: () => void 
   const [attempt, setAttempt] = useState(0);
   const [removing, setRemoving] = useState(false);
   const [updateBusy, setUpdateBusy] = useState(false);
-  const [updateProgress, setUpdateProgress] = useState<{ done: number; total: number } | null>(null);
+  const [updateProgress, setUpdateProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
   const [tick, setTick] = useState(0);
 
   useEffect(() => {

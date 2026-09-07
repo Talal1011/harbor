@@ -1,7 +1,8 @@
-const coverage: Record<string, string> = {
+const coverage: Record<string, string> = {
   "Sound descriptions": "Descrizioni sonore",
   "Hide sound effects and speaker names": "Nascondi effetti sonori e nomi dei personaggi",
-  "Removes bracketed descriptions like [door creaks] and shouted speaker labels like JOHN: while subtitles play, so a release that only ships an SDH track still reads as plain dialogue. Song lyrics, ordinary parentheses and non-Latin scripts are left alone. Skipped on forced and picture-based tracks.": "Rimuove le descrizioni tra parentesi quadre come [la porta cigola] e i nomi dei personaggi in maiuscolo come JOHN: mentre scorrono i sottotitoli, così una versione che include solo una traccia SDH resta leggibile come dialogo normale. Testi delle canzoni, parentesi tonde normali e alfabeti non latini restano intatti. Non si applica alle tracce forzate e a quelle basate su immagini.",
+  "Removes bracketed descriptions like [door creaks] and shouted speaker labels like JOHN: while subtitles play, so a release that only ships an SDH track still reads as plain dialogue. Song lyrics, ordinary parentheses and non-Latin scripts are left alone. Skipped on forced and picture-based tracks.":
+    "Rimuove le descrizioni tra parentesi quadre come [la porta cigola] e i nomi dei personaggi in maiuscolo come JOHN: mentre scorrono i sottotitoli, così una versione che include solo una traccia SDH resta leggibile come dialogo normale. Testi delle canzoni, parentesi tonde normali e alfabeti non latini restano intatti. Non si applica alle tracce forzate e a quelle basate su immagini.",
   " (you)": " (tu)",
   '"Compound" interest is calculated on:': "Gli interessi composti si calcolano su:",
   "1 week": "1 settimana",
@@ -74,7 +75,8 @@ const coverage: Record<string, string> = {
   "All-time bests": "Il meglio di sempre",
   "All-time body of work, not who is trending. Trending and Top on TMDB are the live tabs.":
     "Conta l'intera carriera, non chi è di tendenza. Di tendenza e Top su TMDB sono le schede aggiornate in tempo reale.",
-  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.": "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
+  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.":
+    "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
   "An agreement between landlord and tenant": "Un contratto tra locatore e conduttore",
   "An unexpected error occurred": "Si è verificato un errore imprevisto",
   "And for the naughty ones: browsing or rating an adult addon never shows on Discord.":

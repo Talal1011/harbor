@@ -31,7 +31,12 @@ export function needsImageProxy(url: string): boolean {
   if (!url.startsWith("http://")) return false;
   try {
     const host = new URL(url).hostname.toLowerCase();
-    return !(host === "localhost" || host === "127.0.0.1" || host === "::1" || host.endsWith(".localhost"));
+    return !(
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1" ||
+      host.endsWith(".localhost")
+    );
   } catch {
     return false;
   }

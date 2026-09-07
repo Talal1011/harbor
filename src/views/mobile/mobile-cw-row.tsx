@@ -92,9 +92,10 @@ export function useMobileCw(limit = 14): LibraryItem[] {
   const { authKey } = useAuth();
   const { settings } = useSettings();
   const { activeProfile, profiles } = useProfiles();
-  const hideSharedCw = settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
+  const hideSharedCw =
+    settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
   const hideAnime = useHideAnime();
-  const externalCw = useExternalCw(!cwPerProfile && settings.externalContinueWatching);
+  const externalCw = useExternalCw(!settings.cwPerProfile && settings.externalContinueWatching);
   const [items, setItems] = useState<LibraryItem[]>(() =>
     authKey && cloudKey === authKey ? cloudCache : [],
   );

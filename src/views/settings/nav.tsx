@@ -4446,7 +4446,16 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
     label: "Auto-confirm peer-to-peer streaming",
     section: "p2p",
     anchorTitle: "Power tools & diagnostics",
-    keywords: ["auto confirm", "consent prompt", "skip prompt", "p2p prompt", "uncached torrents", "p2p confirm", "skip torrent warning", "dont ask torrent"],
+    keywords: [
+      "auto confirm",
+      "consent prompt",
+      "skip prompt",
+      "p2p prompt",
+      "uncached torrents",
+      "p2p confirm",
+      "skip torrent warning",
+      "dont ask torrent",
+    ],
   },
   {
     label: "Copy diagnostics",

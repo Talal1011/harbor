@@ -2,7 +2,12 @@
 import assert from "node:assert/strict";
 // @ts-expect-error Node test types are intentionally outside the browser-only tsconfig.
 import test from "node:test";
-import { chapterGroupKey, chapterNumberKey, chapterSourceIdFromId, resolveReaderChapters } from "../src/lib/manga/chapter-identity.ts";
+import {
+  chapterGroupKey,
+  chapterNumberKey,
+  chapterSourceIdFromId,
+  resolveReaderChapters,
+} from "../src/lib/manga/chapter-identity.ts";
 
 test("chapterNumberKey extracts clean numbers", () => {
   assert.equal(chapterNumberKey("5"), "5");
@@ -76,7 +81,10 @@ test("resolveReaderChapters holds the preferred source across chapters", () => {
     { id: "p3::c1", chapter: "1", language: "en", publishAt: "2024-01-06T00:00:00Z" },
   ];
   const out = resolveReaderChapters(chapters, { sourceId: "p3" });
-  assert.deepEqual(out.map((c) => c.id), ["p3::c0", "p3::c1"]);
+  assert.deepEqual(
+    out.map((c) => c.id),
+    ["p3::c0", "p3::c1"],
+  );
 });
 
 test("resolveReaderChapters falls back to newest when preferred source lacks a chapter", () => {
@@ -87,7 +95,10 @@ test("resolveReaderChapters falls back to newest when preferred source lacks a c
     { id: "p2::c1", chapter: "1", language: "en", publishAt: "2024-01-05T00:00:00Z" },
   ];
   const out = resolveReaderChapters(chapters, { sourceId: "p3" });
-  assert.deepEqual(out.map((c) => c.id), ["p3::c0", "p2::c1"]);
+  assert.deepEqual(
+    out.map((c) => c.id),
+    ["p3::c0", "p2::c1"],
+  );
 });
 
 test("resolveReaderChapters picks newest per group without a preference", () => {
@@ -98,7 +109,10 @@ test("resolveReaderChapters picks newest per group without a preference", () => 
     { id: "p3::c1", chapter: "1", language: "en", publishAt: "2024-01-06T00:00:00Z" },
   ];
   const out = resolveReaderChapters(chapters);
-  assert.deepEqual(out.map((c) => c.id), ["p2::c0", "p3::c1"]);
+  assert.deepEqual(
+    out.map((c) => c.id),
+    ["p2::c0", "p3::c1"],
+  );
 });
 
 test("resolveReaderChapters sorts ascending by chapter number", () => {
@@ -109,7 +123,10 @@ test("resolveReaderChapters sorts ascending by chapter number", () => {
     { id: "p1::c2", chapter: "2", language: "en" },
   ];
   const out = resolveReaderChapters(chapters);
-  assert.deepEqual(out.map((c) => c.id), ["p1::c1", "p1::c2", "p1::c3", "p1::c10"]);
+  assert.deepEqual(
+    out.map((c) => c.id),
+    ["p1::c1", "p1::c2", "p1::c3", "p1::c10"],
+  );
 });
 
 test("resolveReaderChapters handles non-numeric labels via title fallback", () => {
@@ -118,5 +135,8 @@ test("resolveReaderChapters handles non-numeric labels via title fallback", () =
     { id: "p1::c1", chapter: "1", language: "en" },
   ];
   const out = resolveReaderChapters(chapters);
-  assert.deepEqual(out.map((c) => c.id), ["p1::c1", "p1::extra"]);
+  assert.deepEqual(
+    out.map((c) => c.id),
+    ["p1::c1", "p1::extra"],
+  );
 });

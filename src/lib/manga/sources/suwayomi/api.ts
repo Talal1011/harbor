@@ -36,10 +36,7 @@ import {
   type ExtensionRepo,
 } from "./graphql";
 import { normalizeExtensionRepoUrl } from "./base-url";
-import {
-  notifySuwayomiSourcesChanged,
-  subscribeSuwayomiSourcesChanged,
-} from "./source-events";
+import { notifySuwayomiSourcesChanged, subscribeSuwayomiSourcesChanged } from "./source-events";
 
 export type { ExtensionRepo } from "./graphql";
 

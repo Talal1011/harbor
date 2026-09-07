@@ -34,10 +34,7 @@ export function ReaderProgressMeter({
       }`}
     >
       <div className="relative h-[3px] w-full bg-edge-soft/60">
-        <div
-          className="absolute inset-y-0 start-0 bg-accent"
-          style={{ width: `${pct}%` }}
-        />
+        <div className="absolute inset-y-0 start-0 bg-accent" style={{ width: `${pct}%` }} />
         <div
           aria-hidden="true"
           className="absolute inset-y-0 w-[2px] bg-ink/45"

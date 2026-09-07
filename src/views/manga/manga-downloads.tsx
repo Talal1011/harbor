@@ -222,7 +222,9 @@ function LocationCard() {
   const custom = useMangaDownloadDir();
   const [fallback, setFallback] = useState("");
   useEffect(() => {
-    defaultMangaDownloadDir().then(setFallback).catch(() => {});
+    defaultMangaDownloadDir()
+      .then(setFallback)
+      .catch(() => {});
   }, []);
   const shown = custom || fallback;
 
@@ -320,7 +322,9 @@ export function MangaDownloadsView({
           {t("Back")}
         </button>
         <div className="flex items-baseline gap-3">
-          <h1 className="font-display text-[32px] font-medium tracking-tight text-ink">{t("Downloads")}</h1>
+          <h1 className="font-display text-[32px] font-medium tracking-tight text-ink">
+            {t("Downloads")}
+          </h1>
           {totalChapters > 0 && (
             <span className="text-[15px] text-ink-subtle">
               {totalChapters === 1

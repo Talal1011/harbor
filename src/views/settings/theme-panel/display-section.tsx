@@ -1,7 +1,23 @@
 import { fillStyle, SliderReset } from "@/components/slider";
 import { DEFAULT } from "@/lib/settings/defaults";
 import { Dropdown } from "@/components/dropdown";
-import { Droplet, Hourglass, MousePointer2, Moon, Palette, Sailboat, Play, Sparkles, Text, Tv, Type, Volume1, Volume2, Waves, ZoomIn } from "../icons";
+import {
+  Droplet,
+  Hourglass,
+  MousePointer2,
+  Moon,
+  Palette,
+  Sailboat,
+  Play,
+  Sparkles,
+  Text,
+  Tv,
+  Type,
+  Volume1,
+  Volume2,
+  Waves,
+  ZoomIn,
+} from "../icons";
 import type { ReactNode } from "react";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
@@ -46,7 +62,9 @@ export function AmbienceSection() {
           />
           <SettingRow
             label={t("Screensaver style")}
-            desc={t("Cinematic drifts through backdrops from what's trending. Cat and boat plays a hand drawn illustration instead.")}
+            desc={t(
+              "Cinematic drifts through backdrops from what's trending. Cat and boat plays a hand drawn illustration instead.",
+            )}
             icon={<Sailboat size={18} strokeWidth={2} />}
           >
             <Dropdown
@@ -155,7 +173,6 @@ export function DisplaySection() {
   const glassOpacity = Number.isFinite(settings.experimentalLiquidGlassOpacity)
     ? settings.experimentalLiquidGlassOpacity
     : 25;
-  const { poster: previewPoster } = useSampleArtwork();
   return (
     <>
       <PosterCardSection />

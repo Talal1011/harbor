@@ -10,11 +10,7 @@ import {
   subscribeCommunity,
   type CommunitySource,
 } from "./community";
-import {
-  installedPluginsSync,
-  loadInstalledPlugins,
-  subscribePlugins,
-} from "./plugins/store";
+import { installedPluginsSync, loadInstalledPlugins, subscribePlugins } from "./plugins/store";
 import { pluginProvider } from "./plugins/runtime";
 import { warmPlugins } from "./plugins/lifecycle";
 import { loadRepos } from "./plugins/repos";
@@ -53,7 +49,6 @@ const CUSTOM_KEY = "harbor.manga.sources.v1";
 const ACTIVE_KEY = "harbor.manga.activesource.v2";
 const RESOLVED_KEY = "harbor.manga.resolved.v1";
 const MIGRATED_KEY = "harbor.manga.communityMigrated.v1";
-
 
 const listeners = new Set<() => void>();
 subscribeCommunity(() => notify());
@@ -111,12 +106,7 @@ function readCustom(): MangaSource[] {
     if (!Array.isArray(arr)) return [];
     return arr
       .filter((s) => s && typeof s.id === "string" && typeof s.baseUrl === "string")
-      .filter(
-        (s) =>
-          s.kind === "suwayomi" ||
-          s.kind === "local" ||
-          s.kind === "html",
-      )
+      .filter((s) => s.kind === "suwayomi" || s.kind === "local" || s.kind === "html")
       .map((s) => {
         const config = s.kind === "html" ? (s.config as HtmlSourceConfig) : undefined;
         return {
@@ -252,7 +242,12 @@ export function listMangaSources(): MangaSource[] {
   if (subs.length >= 2) {
     // A Suwayomi server hosts many sources, so "All" pairs whole servers here, not sources.
     const allServers = subs.every((s) => s.kind === "suwayomi");
-    out.push({ id: "all", name: allServers ? "All Servers" : "All Sources", baseUrl: "", builtin: true });
+    out.push({
+      id: "all",
+      name: allServers ? "All Servers" : "All Sources",
+      baseUrl: "",
+      builtin: true,
+    });
   }
   out.push(...subs);
   return out;
@@ -457,9 +452,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function fetchCatalogOnce(): Promise<boolean> {
-  const bail = new Promise<CommunitySource[]>((r) =>
-    window.setTimeout(() => r([]), BOOT_TIMEOUT),
-  );
+  const bail = new Promise<CommunitySource[]>((r) => window.setTimeout(() => r([]), BOOT_TIMEOUT));
   try {
     const list = await Promise.race([refreshCommunityCatalog(), bail]);
     return list.length > 0;
@@ -542,7 +535,9 @@ function migrateCommunitySources(): void {
       continue;
     }
     if (d.kind === "builtin" || d.builtin === true) continue;
-    const url = String(d.baseUrl ?? "").trim().replace(/\/+$/, "");
+    const url = String(d.baseUrl ?? "")
+      .trim()
+      .replace(/\/+$/, "");
     if (!/^https?:\/\/.+/i.test(url)) continue;
     seen.add(id);
     additions.push({

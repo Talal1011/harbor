@@ -119,17 +119,20 @@ export function MangaReader({
     },
     [pid, titleKey],
   );
-  const enqueueMatchWith = useCallback((trackers: MangaTracker[]) => {
-    setMatchQueue((q) => {
-      const next = [...q];
-      for (const tracker of trackers) {
-        if (!next.some((r) => r.tracker === tracker)) {
-          next.push({ tracker, title: manga.title, chapter: 0 });
+  const enqueueMatchWith = useCallback(
+    (trackers: MangaTracker[]) => {
+      setMatchQueue((q) => {
+        const next = [...q];
+        for (const tracker of trackers) {
+          if (!next.some((r) => r.tracker === tracker)) {
+            next.push({ tracker, title: manga.title, chapter: 0 });
+          }
         }
-      }
-      return next;
-    });
-  }, [manga.title]);
+        return next;
+      });
+    },
+    [manga.title],
+  );
   const enqueueMatch = useCallback(
     (trackers: MangaTracker[]) => {
       enqueueMatchWith(trackers.filter((tr) => !hasStoredDecision(tr)));
@@ -145,7 +148,8 @@ export function MangaReader({
   // scanlator copy, its group is kept for the whole read session so
   // consecutive chapters stay on the same provider.
   const pickedGroup = useMemo(
-    () => (index >= 0 && index < chapters.length ? chapters[index]?.group ?? undefined : undefined),
+    () =>
+      index >= 0 && index < chapters.length ? (chapters[index]?.group ?? undefined) : undefined,
     // Captured on mount only - the index changes as the user navigates, but
     // the intended provider is the one that was picked when the reader opened.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,9 +161,7 @@ export function MangaReader({
   );
   const readingOrder = useMemo(() => {
     const idToIdx = new Map(chapters.map((c, i) => [c.id, i]));
-    return collapsed
-      .map((c) => idToIdx.get(c.id))
-      .filter((i): i is number => i != null);
+    return collapsed.map((c) => idToIdx.get(c.id)).filter((i): i is number => i != null);
   }, [chapters, collapsed]);
   const orderPos = useMemo(() => {
     const current = chapters[index];
@@ -481,7 +483,8 @@ export function MangaReader({
 
   useEffect(() => {
     return subscribeMangaMatchRequest((req) => {
-      if (!manga.title || normalizeMatchTitle(req.title) !== normalizeMatchTitle(manga.title)) return;
+      if (!manga.title || normalizeMatchTitle(req.title) !== normalizeMatchTitle(manga.title))
+        return;
       enqueueMatchWith([req.tracker]);
     });
   }, [manga.title]);
@@ -929,22 +932,18 @@ export function MangaReader({
         </button>
       )}
 
-      {!disableMangaPersistence &&
-        controlsVisible &&
-        !loading &&
-        !failed &&
-        effMode === "long" && (
-          <button
-            type="button"
-            onClick={() => patchPrefs({ enablePageDownload: !prefs.enablePageDownload })}
-            onMouseDown={(e) => e.preventDefault()}
-            className={`absolute end-6 top-[124px] z-[92] grid h-11 w-11 place-items-center rounded-full bg-canvas/85 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.5)] backdrop-blur-md transition duration-150 hover:text-accent active:scale-90 ${prefs.enablePageDownload ? "text-accent" : "text-ink-muted"}`}
-            aria-label={t("Download page")}
-            aria-pressed={prefs.enablePageDownload}
-          >
-            <Download size={19} />
-          </button>
-        )}
+      {!disableMangaPersistence && controlsVisible && !loading && !failed && effMode === "long" && (
+        <button
+          type="button"
+          onClick={() => patchPrefs({ enablePageDownload: !prefs.enablePageDownload })}
+          onMouseDown={(e) => e.preventDefault()}
+          className={`absolute end-6 top-[124px] z-[92] grid h-11 w-11 place-items-center rounded-full bg-canvas/85 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.5)] backdrop-blur-md transition duration-150 hover:text-accent active:scale-90 ${prefs.enablePageDownload ? "text-accent" : "text-ink-muted"}`}
+          aria-label={t("Download page")}
+          aria-pressed={prefs.enablePageDownload}
+        >
+          <Download size={19} />
+        </button>
+      )}
 
       {bookmarksOpen && (
         <BookmarksPanel
@@ -975,12 +974,14 @@ export function MangaReader({
         />
       )}
 
-      {!loading && !failed && !book && <ReaderProgressMeter
-        currentPage={currentPage}
-        totalPages={total}
-        chapterNumber={chapter.chapter}
-        visible={!controlsVisible}
-      />}
+      {!loading && !failed && !book && (
+        <ReaderProgressMeter
+          currentPage={currentPage}
+          totalPages={total}
+          chapterNumber={chapter.chapter}
+          visible={!controlsVisible}
+        />
+      )}
 
       {!book && (
         <div className="absolute inset-x-0 bottom-0 z-40">

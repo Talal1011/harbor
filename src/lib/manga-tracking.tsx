@@ -11,11 +11,7 @@ import {
 } from "@/lib/manga/tracking-anilist";
 import { malMangaAuthed, pushMalManga } from "@/lib/manga/tracking-mal";
 import { emitMangaSync, type MangaPushResult, type MangaTracker } from "@/lib/manga/sync";
-import {
-  getMangaMatchEntry,
-  getMangaMatchTitle,
-  normalizeTitle,
-} from "@/lib/manga-match";
+import { getMangaMatchEntry, getMangaMatchTitle, normalizeTitle } from "@/lib/manga-match";
 import { getMangaReading, subscribeMangaReading } from "@/lib/manga-reading-state";
 import { useProfiles } from "@/lib/profiles";
 

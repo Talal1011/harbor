@@ -122,7 +122,8 @@ const sweep: Record<string, string> = {
   "All times": "كل الأوقات",
   "All video": "كل الفيديو",
   "All-time bests": "الأفضل على الإطلاق",
-  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.": "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
+  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.":
+    "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
   "Always re-encode when casting": "أعد الترميز دائمًا عند البث",
   "Always stream P2P": "البث عبر P2P دائمًا",
   Amber: "كهرماني",

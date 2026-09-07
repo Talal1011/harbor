@@ -6,11 +6,7 @@ import {
   aggregateSubProviders,
   ensureMangaSources,
 } from "./sources";
-import {
-  routeById,
-  streamAll,
-  streamAggregateChapters,
-} from "./sources/aggregate";
+import { routeById, streamAll, streamAggregateChapters } from "./sources/aggregate";
 import { suwayomiSourcesRevision } from "./sources/suwayomi/source-events";
 import { mangaLibraryRevision } from "./library-events";
 import { loadMangaLangFilter, mangaLangFilterRevision } from "./lang-filter";

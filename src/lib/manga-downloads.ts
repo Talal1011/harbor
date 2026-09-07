@@ -182,9 +182,7 @@ function writeMeta(m: Record<string, MangaDownloadMetaRec>): void {
    downloads cannot lose each other's updates. Each mutation runs through a
    single promise chain, so any number of overlapping downloads persist. */
 let manifestMutex: Promise<void> = Promise.resolve();
-function mutateManifest(
-  fn: (m: Record<string, string[]>) => void,
-): Promise<void> {
+function mutateManifest(fn: (m: Record<string, string[]>) => void): Promise<void> {
   const next = manifestMutex.then(() => {
     const m = readManifest();
     fn(m);
@@ -410,9 +408,7 @@ export function listActiveMangaDownloadGroups(): MangaDownloadGroup[] {
   for (const [chapterId, rec] of runtime) {
     if (rec.status !== "downloading" && rec.status !== "paused" && rec.status !== "error") continue;
     const key = rec.mangaId ?? "in-progress";
-    const label = rec.chapter == null
-      ? "Oneshot"
-      : `Chapter ${rec.chapter}`;
+    const label = rec.chapter == null ? "Oneshot" : `Chapter ${rec.chapter}`;
     let group = groups.get(key);
     if (!group) {
       group = {
@@ -695,7 +691,11 @@ async function downloadChapterWithControl(
     const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
 
     const base = getMangaDownloadDir() || (await defaultMangaDownloadDir());
-    const dir = await join(base, mangaDirName(info?.title, mangaId), chapterDirName(info, chapterId));
+    const dir = await join(
+      base,
+      mangaDirName(info?.title, mangaId),
+      chapterDirName(info, chapterId),
+    );
     await mkdir(dir, { recursive: true });
 
     const fetchBytes = async (url: string): Promise<Uint8Array> => {
@@ -825,8 +825,21 @@ export async function downloadMangaPage(
       try {
         const { invoke } = await import("@tauri-apps/api/core");
         const resp = (await invoke("harbor_fetch", {
-          args: { url: pageUrl, method: "GET", headers: fetchHeaders, responseType: "base64", timeoutMs: 30000, allowLocalNetwork: isSuwayomiServerUrl(pageUrl) },
-        })) as { status: number; ok: boolean; body: string; ContentType?: string; headers?: Record<string, string> };
+          args: {
+            url: pageUrl,
+            method: "GET",
+            headers: fetchHeaders,
+            responseType: "base64",
+            timeoutMs: 30000,
+            allowLocalNetwork: isSuwayomiServerUrl(pageUrl),
+          },
+        })) as {
+          status: number;
+          ok: boolean;
+          body: string;
+          ContentType?: string;
+          headers?: Record<string, string>;
+        };
         if (resp.ok && typeof resp.body === "string" && resp.body) {
           const bin = atob(resp.body.trim());
           bytes = new Uint8Array(bin.length);

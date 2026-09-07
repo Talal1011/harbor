@@ -83,9 +83,16 @@ function titleVariants(candidate: string, altTitles?: string[]): string[] {
 // must not be silently synced. It passes on an exact normalized match against
 // the primary or any alternate title (synonym / translated name), or when every
 // meaningful word of the query appears in one of those titles.
-export function isConfidentTitleMatch(query: string, candidate: string, altTitles?: string[]): boolean {
+export function isConfidentTitleMatch(
+  query: string,
+  candidate: string,
+  altTitles?: string[],
+): boolean {
   const variants = titleVariants(candidate, altTitles);
-  const qt = query.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2);
+  const qt = query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 2);
   if (qt.length === 0) return false;
   for (const v of variants) {
     const vq = normalizeTitle(v);
@@ -134,11 +141,7 @@ export function setMangaMatch(
   }
 }
 
-export function setMangaMatchDismissed(
-  pid: string,
-  tracker: MangaTracker,
-  titleKey: string,
-): void {
+export function setMangaMatchDismissed(pid: string, tracker: MangaTracker, titleKey: string): void {
   try {
     const map = readMap(pid, tracker);
     map[titleKey] = { id: null, confirmed: true };

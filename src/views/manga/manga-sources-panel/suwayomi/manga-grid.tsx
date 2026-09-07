@@ -114,9 +114,7 @@ export function MangaGrid({
       onClick={() => onOpen?.(m)}
       className="group flex w-full flex-col gap-2 text-start"
     >
-      <div
-        className="transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0.24,1)] group-hover:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
-      >
+      <div className="transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0.24,1)] group-hover:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
         <Cover item={m} />
       </div>
       <p className="line-clamp-2 text-[13px] font-medium leading-snug text-ink">{m.title}</p>

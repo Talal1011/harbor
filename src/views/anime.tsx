@@ -1,5 +1,13 @@
 import { RotateCcw, SlidersHorizontal } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { AnimeGenrePicker } from "@/components/anime-genre-picker";
 import { preloadAnimeGenreArt } from "@/lib/anime-genre-art-map";
 import { AnimeHero, AnimeHeroSkeleton } from "@/components/anime-hero";
@@ -11,7 +19,13 @@ import { Row, ScrollRootContext } from "@/components/row";
 import { AnimeRankCard } from "@/components/top-rank-card";
 import { useAuth } from "@/lib/auth";
 import { anyProfileSharesStremioWith, useProfiles } from "@/lib/profiles";
-import { createAddonCatalogFetcher, isCollectionCatalog, loadAddonRows, normalizeName, type AddonRow } from "@/lib/addons";
+import {
+  createAddonCatalogFetcher,
+  isCollectionCatalog,
+  loadAddonRows,
+  normalizeName,
+  type AddonRow,
+} from "@/lib/addons";
 import type { Meta } from "@/lib/cinemeta";
 import { awardFranchiseKey, uniqueWinnerFranchisesAcrossSources } from "@/lib/anime-awards";
 import { publishResumeStates } from "@/lib/hover-preview/store";
@@ -74,11 +88,34 @@ import { useCollectionRowsForPage } from "@/lib/page-collection-rows";
 import { useContentDrag } from "@/lib/window-drag";
 import { isAdultAnime } from "@/lib/addons-store/adult-filter";
 import { absorbCloudAnimeCw } from "@/lib/anime-cw-absorb";
-import { ANIME_CLOUD_ID, isAnimeCwItem, isCwMember, library, type LibraryItem } from "@/lib/stremio";
-import { clearLocalCw, listLocalCw, localCwEntry, localCwVersion, subscribeLocalCw } from "@/lib/local-cw";
-import { dismissManualWatched, manualWatchedLibraryItems, manualWatchedVersion, subscribeManualWatched } from "@/lib/manual-watched";
+import {
+  ANIME_CLOUD_ID,
+  isAnimeCwItem,
+  isCwMember,
+  library,
+  type LibraryItem,
+} from "@/lib/stremio";
+import {
+  clearLocalCw,
+  listLocalCw,
+  localCwEntry,
+  localCwVersion,
+  subscribeLocalCw,
+} from "@/lib/local-cw";
+import {
+  dismissManualWatched,
+  manualWatchedLibraryItems,
+  manualWatchedVersion,
+  subscribeManualWatched,
+} from "@/lib/manual-watched";
 import { fetchSimklPlaybackItems } from "@/lib/simkl/playback";
-import { loadSimklWatchedMap, loadSimklStatusMap, simklWatchedForId, statusForId, type WatchlistStatus } from "@/lib/simkl/list-status";
+import {
+  loadSimklWatchedMap,
+  loadSimklStatusMap,
+  simklWatchedForId,
+  statusForId,
+  type WatchlistStatus,
+} from "@/lib/simkl/list-status";
 import { loadAnilistWatchedMap } from "@/lib/anilist/watched-map";
 import { useSimkl } from "@/lib/simkl/provider";
 import { useScrollMemory, useView } from "@/lib/view";
@@ -180,7 +217,9 @@ export function AnimeView({ active = true }: { active?: boolean }) {
 
   const filterSig = `${settings.animeExcludeOrigins.join(",")}|${settings.animeHideWatchedPicks}`;
   const [heroSeed, setHeroSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff));
-  const [hero, setHero] = useState<HeroBuilt>(() => readCachedHero(filterSig) ?? { metas: [], trending: {} });
+  const [hero, setHero] = useState<HeroBuilt>(
+    () => readCachedHero(filterSig) ?? { metas: [], trending: {} },
+  );
   const [malExtra, setMalExtra] = useState<MalHeroItem[]>([]);
   const heroBuildRef = useRef(0);
   const heroResolvedRef = useRef(false);
@@ -298,8 +337,12 @@ export function AnimeView({ active = true }: { active?: boolean }) {
   const [libItems, setLibItems] = useState<LibraryItem[]>([]);
   const [simklCw, setSimklCw] = useState<LibraryItem[]>([]);
   const [simklWatchedMap, setSimklWatchedMap] = useState<Map<string, Set<string>>>(() => new Map());
-  const [simklStatusMap, setSimklStatusMap] = useState<Map<string, WatchlistStatus>>(() => new Map());
-  const [anilistWatchedMap, setAnilistWatchedMap] = useState<Map<string, Set<string>>>(() => new Map());
+  const [simklStatusMap, setSimklStatusMap] = useState<Map<string, WatchlistStatus>>(
+    () => new Map(),
+  );
+  const [anilistWatchedMap, setAnilistWatchedMap] = useState<Map<string, Set<string>>>(
+    () => new Map(),
+  );
   const [addonRows, setAddonRows] = useState<AddonRow[]>([]);
   useEffect(() => {
     if (!authKey) {
@@ -397,10 +440,23 @@ export function AnimeView({ active = true }: { active?: boolean }) {
         return true;
       })
       .slice(0, 20);
-  }, [localAnimeCw, libItems, simklCw, cwVersion, animeDetectVer, cwRootVersion, hideSharedCw, localCwVer]);
+  }, [
+    localAnimeCw,
+    libItems,
+    simklCw,
+    cwVersion,
+    animeDetectVer,
+    cwRootVersion,
+    hideSharedCw,
+    localCwVer,
+  ]);
 
   useEffect(() => {
-    const ids = [...localAnimeCw, ...libItems.filter((i) => !ANIME_CLOUD_ID.test(i._id)), ...simklCw]
+    const ids = [
+      ...localAnimeCw,
+      ...libItems.filter((i) => !ANIME_CLOUD_ID.test(i._id)),
+      ...simklCw,
+    ]
       .filter((i) => isCwMember(i) && (i.local || isAnimeCwItem(i)))
       .map((i) => i._id);
     if (ids.length === 0) return;
@@ -473,7 +529,9 @@ export function AnimeView({ active = true }: { active?: boolean }) {
     settings.animeCwEnd,
   );
 
-  const cwSig = cwItems.map((i) => `${i._id}:${i.state?.season ?? ""}:${i.state?.episode ?? ""}`).join("|");
+  const cwSig = cwItems
+    .map((i) => `${i._id}:${i.state?.season ?? ""}:${i.state?.episode ?? ""}`)
+    .join("|");
   const [cwReady, setCwReady] = useState(false);
   useEffect(() => {
     if (cwReady) return;
@@ -734,9 +792,7 @@ export function AnimeView({ active = true }: { active?: boolean }) {
       if (seen.has(key)) continue;
       seen.add(key);
       out.push(
-        settings.hideContent.adult
-          ? { ...r, metas: r.metas.filter((m) => !isAdultAnime(m)) }
-          : r,
+        settings.hideContent.adult ? { ...r, metas: r.metas.filter((m) => !isAdultAnime(m)) } : r,
       );
     }
     return out;
@@ -809,10 +865,7 @@ export function AnimeView({ active = true }: { active?: boolean }) {
   }, []);
 
   return (
-    <main
-      ref={scrollCb}
-      className="flex-1 overflow-y-auto overflow-x-hidden px-12 pt-28 pb-14"
-    >
+    <main ref={scrollCb} className="flex-1 overflow-y-auto overflow-x-hidden px-12 pt-28 pb-14">
       <ScrollRootContext.Provider value={scrollEl}>
         <div {...contentDrag} className="flex flex-col gap-12">
           {announcement ? (
@@ -880,7 +933,8 @@ export function AnimeView({ active = true }: { active?: boolean }) {
           </div>
           {(() => {
             const rd: { key: string; name: string; node: ReactNode }[] = [];
-            const nameOf = (key: string, fallback: string) => settings.animeRows.renamed[key] ?? fallback;
+            const nameOf = (key: string, fallback: string) =>
+              settings.animeRows.renamed[key] ?? fallback;
             if (cwItems.length > 0) {
               const nm = nameOf("continueWatching", t("Continue Watching"));
               rd.push({
@@ -908,10 +962,26 @@ export function AnimeView({ active = true }: { active?: boolean }) {
                 ),
               });
             }
-            rd.push({ key: "yourMalLists", name: nameOf("yourMalLists", t("Your MAL Lists")), node: <MalRows /> });
-            rd.push({ key: "yourAnilistLists", name: nameOf("yourAnilistLists", t("Your Lists")), node: <AnilistRows /> });
-            rd.push({ key: "anilistTrending", name: nameOf("anilistTrending", t("Trending")), node: <AnilistTrendingRow /> });
-            rd.push({ key: "anilistTop100", name: nameOf("anilistTop100", t("Top 100")), node: <AnilistTopRow /> });
+            rd.push({
+              key: "yourMalLists",
+              name: nameOf("yourMalLists", t("Your MAL Lists")),
+              node: <MalRows />,
+            });
+            rd.push({
+              key: "yourAnilistLists",
+              name: nameOf("yourAnilistLists", t("Your Lists")),
+              node: <AnilistRows />,
+            });
+            rd.push({
+              key: "anilistTrending",
+              name: nameOf("anilistTrending", t("Trending")),
+              node: <AnilistTrendingRow />,
+            });
+            rd.push({
+              key: "anilistTop100",
+              name: nameOf("anilistTop100", t("Top 100")),
+              node: <AnilistTopRow />,
+            });
             if (awardWinnerMetas.length > 0) {
               const nm = nameOf("awards", t("Award Winning Anime"));
               rd.push({
@@ -981,7 +1051,11 @@ export function AnimeView({ active = true }: { active?: boolean }) {
                     onViewAll={
                       row.more && row.metas.length > 0
                         ? () => {
-                            const collection = isCollectionCatalog({ type: row.type, id: row.more?.id, name: row.name });
+                            const collection = isCollectionCatalog({
+                              type: row.type,
+                              id: row.more?.id,
+                              name: row.name,
+                            });
                             const origin = row.metas[0]?.addonOrigin;
                             const map =
                               collection || origin
@@ -1042,11 +1116,21 @@ export function AnimeView({ active = true }: { active?: boolean }) {
                       hidden={rowHidden}
                       canMoveUp={idx > 0}
                       canMoveDown={idx >= 0 && idx < orderKeys.length - 1}
-                      onMoveUp={() => update({ animeRows: animeMoveRow(settings.animeRows, rd, d.key, -1) })}
-                      onMoveDown={() => update({ animeRows: animeMoveRow(settings.animeRows, rd, d.key, 1) })}
-                      onToggleHidden={() => update({ animeRows: animeToggleHidden(settings.animeRows, d.key) })}
-                      onRename={(label) => update({ animeRows: animeRenameRow(settings.animeRows, d.key, label) })}
-                      onResetName={() => update({ animeRows: animeRenameRow(settings.animeRows, d.key, "") })}
+                      onMoveUp={() =>
+                        update({ animeRows: animeMoveRow(settings.animeRows, rd, d.key, -1) })
+                      }
+                      onMoveDown={() =>
+                        update({ animeRows: animeMoveRow(settings.animeRows, rd, d.key, 1) })
+                      }
+                      onToggleHidden={() =>
+                        update({ animeRows: animeToggleHidden(settings.animeRows, d.key) })
+                      }
+                      onRename={(label) =>
+                        update({ animeRows: animeRenameRow(settings.animeRows, d.key, label) })
+                      }
+                      onResetName={() =>
+                        update({ animeRows: animeRenameRow(settings.animeRows, d.key, "") })
+                      }
                       isRenamed={d.key in settings.animeRows.renamed}
                     />
                   )}
@@ -1061,9 +1145,7 @@ export function AnimeView({ active = true }: { active?: boolean }) {
       {showPicker && (
         <AnimeGenrePicker
           initial={favoriteGenres}
-          onSave={(g) =>
-            update({ animeFavoriteGenres: g, animePicksDismissedAt: Date.now() })
-          }
+          onSave={(g) => update({ animeFavoriteGenres: g, animePicksDismissedAt: Date.now() })}
           onClose={() => {
             setShowPicker(false);
             update({ animePicksDismissedAt: Date.now() });
@@ -1073,5 +1155,3 @@ export function AnimeView({ active = true }: { active?: boolean }) {
     </main>
   );
 }
-
-

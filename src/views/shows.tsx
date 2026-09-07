@@ -17,7 +17,14 @@ import { listPager } from "@/lib/list-pager";
 import { CATALOG_REQUEST_TIMEOUT_MS, upsertOrdered, withTimeout } from "@/lib/progressive-rows";
 import { hasPageRowChanges, resetPageRows, usePageRows } from "@/lib/page-rows";
 import { useSettings } from "@/lib/settings";
-import { ANIME_CLOUD_ID, cwSortKey, isAnimeCwItem, isCwMember, library, type LibraryItem } from "@/lib/stremio";
+import {
+  ANIME_CLOUD_ID,
+  cwSortKey,
+  isAnimeCwItem,
+  isCwMember,
+  library,
+  type LibraryItem,
+} from "@/lib/stremio";
 import { localCwEntry, localCwVersion, subscribeLocalCw } from "@/lib/local-cw";
 import { clearLocalCw } from "@/lib/local-cw";
 import {
@@ -49,7 +56,8 @@ export function Shows({ active = true }: { active?: boolean }) {
   const { settings } = useSettings();
   const { authKey } = useAuth();
   const { activeProfile, profiles } = useProfiles();
-  const hideSharedCw = settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
+  const hideSharedCw =
+    settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
   const cwVersion = useCwDismissVersion();
   const t = useT();
   const pageRows = usePageRows("shows");
@@ -77,7 +85,9 @@ export function Shows({ active = true }: { active?: boolean }) {
       setItems([]);
       return;
     }
-    library(authKey).then(setItems).catch(() => {});
+    library(authKey)
+      .then(setItems)
+      .catch(() => {});
   }, [authKey]);
 
   useEffect(() => {
@@ -170,7 +180,13 @@ export function Shows({ active = true }: { active?: boolean }) {
   const continueWatching = useMemo(
     () =>
       items
-        .filter((i) => i.type === "series" && !ANIME_CLOUD_ID.test(i._id) && isCwMember(i) && !isCwDismissed(i))
+        .filter(
+          (i) =>
+            i.type === "series" &&
+            !ANIME_CLOUD_ID.test(i._id) &&
+            isCwMember(i) &&
+            !isCwDismissed(i),
+        )
         .filter((i) => !hideSharedCw || localCwEntry(i._id) !== null)
         .map((i) => ({ i, k: cwSortKey(i) }))
         .sort((a, b) => b.k - a.k)
@@ -235,10 +251,7 @@ export function Shows({ active = true }: { active?: boolean }) {
   }, []);
 
   const shownHero = useHideAnimeMetas(hero);
-  const trendingMetas = useMemo(
-    () => rows.find((r) => r.key === "trending")?.metas ?? [],
-    [rows],
-  );
+  const trendingMetas = useMemo(() => rows.find((r) => r.key === "trending")?.metas ?? [], [rows]);
   const shownTrending = useHideAnimeMetas(trendingMetas);
   const top10 = useMemo(() => shownTrending.slice(0, 10), [shownTrending]);
 
@@ -273,10 +286,7 @@ export function Shows({ active = true }: { active?: boolean }) {
         })),
     [showCollections],
   );
-  const allRestRows = useMemo(
-    () => [...collectionRows, ...restRows],
-    [collectionRows, restRows],
-  );
+  const allRestRows = useMemo(() => [...collectionRows, ...restRows], [collectionRows, restRows]);
   const catalogRows = useMemo<ShowRow[]>(() => {
     if (top10.length < 10) return allRestRows;
     const trending = rows.find((r) => r.key === "trending");
@@ -312,7 +322,12 @@ export function Shows({ active = true }: { active?: boolean }) {
           </div>
           {!settings.tmdbKey && <TmdbNudge />}
           {cwItems.length > 0 && (
-            <Row title={t("Pick up where you left off")} min={260} shape="landscape" scrollKey="shows:cw">
+            <Row
+              title={t("Pick up where you left off")}
+              min={260}
+              shape="landscape"
+              scrollKey="shows:cw"
+            >
               {cwItems.map((it) => (
                 <ContinueCard
                   key={it._id}
@@ -354,9 +369,7 @@ function PageMast() {
       <h1 className="font-display text-[44px] font-medium leading-[1.05] tracking-tight text-ink">
         {t(copy.title)}
       </h1>
-      <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">
-        {t(copy.subtitle)}
-      </p>
+      <p className="max-w-2xl text-[15px] leading-relaxed text-ink-muted">{t(copy.subtitle)}</p>
     </header>
   );
 }

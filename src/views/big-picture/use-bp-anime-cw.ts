@@ -18,7 +18,13 @@ import {
 import { useSettings } from "@/lib/settings";
 import { fetchSimklPlaybackItems } from "@/lib/simkl/playback";
 import { useSimkl } from "@/lib/simkl/provider";
-import { ANIME_CLOUD_ID, isAnimeCwItem, isCwMember, library, type LibraryItem } from "@/lib/stremio";
+import {
+  ANIME_CLOUD_ID,
+  isAnimeCwItem,
+  isCwMember,
+  library,
+  type LibraryItem,
+} from "@/lib/stremio";
 
 const CW_CAP = 20;
 // Each root is a walk of up to eight sequential kitsu calls, and the pool this
@@ -67,7 +73,8 @@ export function useBpAnimeCwBase(): BpAnimeCwBase {
   const { authKey } = useAuth();
   const { settings } = useSettings();
   const { activeProfile, profiles } = useProfiles();
-  const hideSharedCw = settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
+  const hideSharedCw =
+    settings.cwPerProfile && anyProfileSharesStremioWith(activeProfile, profiles);
   const { isConnected: simklConnected } = useSimkl();
   const cwVersion = useCwDismissVersion();
   const animeDetectVer = useDetectedAnimeVersion();
@@ -203,7 +210,9 @@ export function useBpAnimeCwBase(): BpAnimeCwBase {
     return [...libItems.filter((i) => !overrideIds.has(i._id)), ...usable];
   }, [libItems, manualWatchedVer]);
 
-  const sig = raw.map((i) => `${i._id}:${i.state?.season ?? ""}:${i.state?.episode ?? ""}`).join("|");
+  const sig = raw
+    .map((i) => `${i._id}:${i.state?.season ?? ""}:${i.state?.episode ?? ""}`)
+    .join("|");
   const [ready, setReady] = useState(false);
   useEffect(() => {
     if (ready) return;

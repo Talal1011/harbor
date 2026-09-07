@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDownUp, ArrowUp, Check, ChevronDown, Info, Maximize2, Minimize2, Settings2, Volume2, VolumeX, X } from "lucide-react";
+import {
+  ArrowDownUp,
+  ArrowUp,
+  Check,
+  ChevronDown,
+  Info,
+  Maximize2,
+  Minimize2,
+  Settings2,
+  Volume2,
+  VolumeX,
+  X,
+} from "lucide-react";
 import { Tooltip } from "@/views/detail/tooltip";
 import { t, useT } from "@/lib/i18n";
 import { listMangaSources } from "@/lib/manga/sources";
@@ -97,7 +109,10 @@ export function ReaderBar({
       </Tooltip>
 
       {flipSound != null && onToggleFlipSound && (
-        <Tooltip label={flipSound ? t("Mute page-turn sound") : t("Unmute page-turn sound")} side="bottom">
+        <Tooltip
+          label={flipSound ? t("Mute page-turn sound") : t("Unmute page-turn sound")}
+          side="bottom"
+        >
           <button
             type="button"
             onClick={onToggleFlipSound}
@@ -214,8 +229,7 @@ function ChapterMenu({
     return entries;
   }, [chapters]);
   const multiSource = sourceInfo.length > 1;
-  const effSource =
-    multiSource && sourceInfo.some((s) => s.id === srcFilter) ? srcFilter : "all";
+  const effSource = multiSource && sourceInfo.some((s) => s.id === srcFilter) ? srcFilter : "all";
 
   const num = (c: MangaChapter) => parseFloat(c.chapter ?? "") || 0;
   const rows = chapters
@@ -294,7 +308,9 @@ function ChapterMenu({
                   />
                   <span className="truncate">{chapterLabel(c)}</span>
                   {c.group && (
-                    <span className="ms-auto shrink-0 truncate text-[10px] text-ink-subtle">{c.group}</span>
+                    <span className="ms-auto shrink-0 truncate text-[10px] text-ink-subtle">
+                      {c.group}
+                    </span>
                   )}
                 </button>
               );

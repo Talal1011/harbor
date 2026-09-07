@@ -1,10 +1,6 @@
 import { Check, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  subscribeMangaSync,
-  type MangaSyncError,
-  type MangaSyncEvent,
-} from "@/lib/manga/sync";
+import { subscribeMangaSync, type MangaSyncError, type MangaSyncEvent } from "@/lib/manga/sync";
 import { useT } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
 import { syncToastWrapClass } from "@/lib/sync-toast-position";

@@ -85,13 +85,37 @@ export function CursorSection() {
         "The pointer your right stick moves around Harbor. Pick a shape or use your own image.",
       )}
     >
-        <ToggleRow
-          label={t("Show cursor")}
-          sub={t("When off, the right stick no longer shows a cursor on screen. Focus navigation still works.")}
-          value={enabled}
-          onChange={(v) => update({ controllerCursorEnabled: v })}
-        />
+      <ToggleRow
+        label={t("Show cursor")}
+        sub={t(
+          "When off, the right stick no longer shows a cursor on screen. Focus navigation still works.",
+        )}
+        value={enabled}
+        onChange={(v) => update({ controllerCursorEnabled: v })}
+      />
 
+      <SettingRow
+        label={t("Hide after idle")}
+        desc={t(
+          "The cursor fades away when you stop moving the stick. Move it again to bring it back.",
+        )}
+      >
+        <div className="flex w-[216px] shrink-0 items-center gap-3">
+          <input
+            type="range"
+            min={IDLE_MS_MIN}
+            max={IDLE_MS_MAX}
+            step={IDLE_MS_STEP}
+            value={hideMs}
+            onChange={(e) => update({ controllerCursorHideMs: parseInt(e.target.value, 10) })}
+            className="harbor-slider min-w-0 flex-1"
+            style={fillStyle(hideMs, IDLE_MS_MIN, IDLE_MS_MAX)}
+          />
+          <span className="w-[56px] shrink-0 text-end text-[12.5px] font-semibold tabular-nums text-ink">
+            {t("{n} s", { n: hideSec })}
+          </span>
+        </div>
+      </SettingRow>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
         {tiles.map((id) => {
           const on = current === id;
@@ -100,7 +124,7 @@ export function CursorSection() {
             <button
               key={id}
               type="button"
-              onClick={() => empty ? openPicker() : update({ controllerCursor: id })}
+              onClick={() => (empty ? openPicker() : update({ controllerCursor: id }))}
               aria-pressed={on}
               className={`flex min-h-[104px] flex-col items-center justify-center gap-2 rounded-[10px] border bg-elevated px-3 py-4 transition-colors duration-150 ${
                 on ? "border-accent text-ink" : "border-edge-soft text-ink-muted hover:border-edge"

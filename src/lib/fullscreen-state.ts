@@ -40,7 +40,9 @@ export function consumeMarathonReenter(): boolean {
 }
 
 function isTauri(): boolean {
-  return typeof window !== "undefined" && ("__TAURI__" in window || "__TAURI_INTERNALS__" in window);
+  return (
+    typeof window !== "undefined" && ("__TAURI__" in window || "__TAURI_INTERNALS__" in window)
+  );
 }
 
 function emit(): void {
@@ -94,9 +96,8 @@ async function enterBorderless(): Promise<boolean> {
     return true;
   }
   try {
-    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } = await import(
-      "@tauri-apps/api/window"
-    );
+    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } =
+      await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
     const monitor = await currentMonitor().catch(() => null);
     if (!monitor) return false;
@@ -132,9 +133,8 @@ async function enterBorderless(): Promise<boolean> {
 async function reassertBorderless(): Promise<void> {
   if (!borderlessActive) return;
   try {
-    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } = await import(
-      "@tauri-apps/api/window"
-    );
+    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } =
+      await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
     const monitor = await currentMonitor().catch(() => null);
     if (!monitor) return;
@@ -166,16 +166,20 @@ async function exitBorderless(): Promise<boolean> {
   borderlessSaved = null;
   borderlessActive = false;
   try {
-    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } = await import(
-      "@tauri-apps/api/window"
-    );
+    const { currentMonitor, getCurrentWindow, PhysicalPosition, PhysicalSize } =
+      await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
     await win.setDecorations(loadStoredSettings().useNativeTitleBar === true).catch(() => {});
     if (!saved) return true;
     if (saved.maximized) {
       return setMaximized(true);
     }
-    if (saved.w === undefined || saved.h === undefined || saved.x === undefined || saved.y === undefined) {
+    if (
+      saved.w === undefined ||
+      saved.h === undefined ||
+      saved.x === undefined ||
+      saved.y === undefined
+    ) {
       return true;
     }
     await win.setSize(new PhysicalSize(saved.w, saved.h)).catch(() => {});
@@ -272,7 +276,9 @@ async function osWindowFullscreen(): Promise<boolean> {
   if (!isTauri()) return false;
   try {
     const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    return await getCurrentWindow().isFullscreen().catch(() => false);
+    return await getCurrentWindow()
+      .isFullscreen()
+      .catch(() => false);
   } catch {
     return false;
   }

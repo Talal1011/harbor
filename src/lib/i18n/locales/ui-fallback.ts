@@ -59,7 +59,8 @@ const uiFallback: Record<string, string> = {
   "Aggregator addons": "Aggregator addons",
   "All listed rules": "All listed rules",
   "All selected": "All selected",
-  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.": "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
+  "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.":
+    "Linking your Discord account also joins you to Harbor's Discord server, so the bot can send your Backup keys privately.",
   "Also joins Harbor's Discord server.": "Also joins Harbor's Discord server.",
   "Always use for {league}": "Always use for {league}",
   "An accent line down the side, with each line revealed as it arrives.":
