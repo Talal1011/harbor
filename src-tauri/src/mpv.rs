@@ -783,7 +783,13 @@ pub async fn mpv_start(
             let dvr = base.join("mpv-cache");
             let _ = std::fs::create_dir_all(&dvr);
             if let Some(s) = dvr.to_str() {
-                let _ = mpv.set_property("cache-dir", s);
+                // mpv renamed this to demuxer-cache-dir; the old name is
+                // rejected (M_PROPERTY_UNKNOWN) on 0.41, which leaves
+                // cache-on-disk enabled with no directory and logs
+                // "Failed to create file cache" on every load.
+                if mpv.set_property("demuxer-cache-dir", s).is_err() {
+                    let _ = mpv.set_property("cache-dir", s);
+                }
             }
         }
         let _ = mpv.set_property("cache-on-disk", "yes");
