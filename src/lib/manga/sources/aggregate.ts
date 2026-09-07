@@ -1,4 +1,4 @@
-import type { MangaChapter, MangaProvider, MangaSummary, MangaTag } from "@/lib/manga/types";
+import type { MangaChapter, MangaProvider, MangaSummary, MangaTag, SearchAllOpts } from "@/lib/manga/types";
 import { aggregateSubProviders } from "@/lib/manga/sources";
 
 const SEP = "::";
@@ -165,7 +165,7 @@ function pickSameTitle(hits: MangaSummary[], title: string): MangaSummary | null
   );
 }
 
-async function mergeSearchLists(query: string): Promise<MangaSummary[]> {
+async function mergeSearchLists(query: string, opts?: SearchAllOpts): Promise<MangaSummary[]> {
   const providers = aggregateSubProviders();
   if (!providers.length) return [];
 
@@ -178,14 +178,14 @@ async function mergeSearchLists(query: string): Promise<MangaSummary[]> {
 
   const requests = providers.map((provider, index) =>
     withTimeout(
-      (provider.searchAll?.(query) ?? provider.search(query, 0)).then((items) =>
+      (provider.searchAll?.(query, opts) ?? provider.search(query, 0)).then((items) =>
         items.map((item) => ({ ...item, id: prefixId(provider.id, item.id) })),
       ),
       [] as MangaSummary[],
       30_000,
     ).then((items) => {
       lists.set(index, items);
-      if (!exactFound && pickSameTitle(items, query)) {
+      if (!opts?.exhaustive && !exactFound && pickSameTitle(items, query)) {
         exactFound = true;
         releaseExact();
       }

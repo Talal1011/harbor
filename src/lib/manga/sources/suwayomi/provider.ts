@@ -1,4 +1,4 @@
-import type { MangaChapter, MangaProvider, MangaSummary, MangaTag } from "@/lib/manga/types";
+import type { MangaChapter, MangaProvider, MangaSummary, MangaTag, SearchAllOpts } from "@/lib/manga/types";
 import {
   cursorKey,
   decodeChapterId,
@@ -195,10 +195,14 @@ export function makeSuwayomiProvider(baseUrl: string, basicAuth?: string): Manga
     return (await library()).filter((m) => m.title.toLowerCase().includes(lower));
   }
 
-  async function searchAll(query: string): Promise<MangaSummary[]> {
+  async function searchAll(query: string, opts?: SearchAllOpts): Promise<MangaSummary[]> {
     const q = query.trim();
     if (!q) return [];
-    const sources = await loadSources(client, await pickTransport(client));
+    const exhaustive = opts?.exhaustive === true;
+    const filter = loadMangaLangFilter(server.base);
+    const sources = (await loadSources(client, await pickTransport(client))).filter((s) =>
+      langFilterMatches(filter, s.lang),
+    );
     if (!sources.length) return [];
 
     const unique = new Map<string, MangaSummary>();
@@ -216,7 +220,7 @@ export function makeSuwayomiProvider(baseUrl: string, basicAuth?: string): Manga
         const requestClient = makeClient(server, 0);
         const items = await browse(source.id, "search", 0, q, requestClient).catch(() => []);
         for (const item of items) unique.set(item.id, item);
-        if (items.some((item) => isStrongSearchMatch(item, q))) {
+        if (!exhaustive && items.some((item) => isStrongSearchMatch(item, q))) {
           exactFound = true;
           releaseExact();
         }
