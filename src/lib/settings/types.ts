@@ -580,6 +580,7 @@ export type Settings = {
   webhooks: {
     discordUrl: string;
     telegramUrl: string;
+    desktopEnabled: boolean;
     notifyMovies: boolean;
     notifyTv: boolean;
     notifyAnime: boolean;
@@ -626,7 +627,7 @@ export type Settings = {
     name: string;
     enabled: boolean;
     trigger: WebhookTrigger;
-    channels: { discord: boolean; telegram: boolean };
+    channels: { discord: boolean; telegram: boolean; desktop: boolean };
   }>;
   downloadDir: string;
   downloadCreateFolders: boolean;
