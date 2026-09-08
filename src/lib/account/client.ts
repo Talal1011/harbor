@@ -1,5 +1,6 @@
 import { authToken, refreshToken } from "@/lib/theme-auth";
 import { HARBOR_API_BASE } from "@/lib/config/endpoints";
+import { safeFetch } from "@/lib/safe-fetch";
 
 const API = `${HARBOR_API_BASE}/themes/api`;
 
@@ -35,9 +36,9 @@ export async function getJson<T>(
   opts?: { bearer?: boolean; signal?: AbortSignal },
 ): Promise<T> {
   const bearer = opts?.bearer ?? false;
-  let r = await fetch(url(path), { headers: headers(bearer, false), signal: opts?.signal });
+  let r = await safeFetch(url(path), { headers: headers(bearer, false), signal: opts?.signal });
   if (r.status === 401 && bearer && (await refreshToken())) {
-    r = await fetch(url(path), { headers: headers(true, false), signal: opts?.signal });
+    r = await safeFetch(url(path), { headers: headers(true, false), signal: opts?.signal });
   }
   return unwrap<T>(r);
 }
@@ -49,7 +50,7 @@ export async function postJson<T>(
 ): Promise<T> {
   const bearer = opts?.bearer ?? false;
   const send = () =>
-    fetch(url(path), {
+    safeFetch(url(path), {
       method: "POST",
       headers: headers(bearer, true),
       body: JSON.stringify(body),

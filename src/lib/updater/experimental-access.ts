@@ -47,7 +47,15 @@ export async function verifyExperimentalAccess(): Promise<ExperimentalAccessVeri
     if (!response.user) return "denied";
     applyServerUser(response.user);
     return hasExperimentalAccess(response.user) ? "allowed" : "denied";
-  } catch {
+  } catch (error) {
+    // Rejected credentials must never fall back to cached account badges.
+    if (
+      error &&
+      typeof error === "object" &&
+      "status" in error &&
+      (error.status === 401 || error.status === 403)
+    )
+      return "denied";
     return "unavailable";
   } finally {
     clearTimeout(timer);
