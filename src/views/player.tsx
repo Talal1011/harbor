@@ -420,23 +420,29 @@ export function PlayerView({ src }: { src: PlayerSrc }) {
         : { ...src, url: liveUrl, historyUrl: liveHistoryUrl, streamRef: liveStreamRef },
     [src, liveUrl, liveHistoryUrl, liveStreamRef],
   );
-  const { resolvedImdbId, subAssNative, captureExitSnapshot, download, subDropToast } =
-    usePlayerMedia({
-      src: activeMediaSrc,
-      snap,
-      engine,
-      settings,
-      authKey,
-      bridgeRef,
-      bridgeReady,
-      bridgeKey,
-      svpActive,
-      videoMountRef,
-      toggleFullscreen,
-      castActiveRef: cast.castActiveRef,
-      season,
-      episode,
-    });
+  const {
+    resolvedImdbId,
+    subAssNative,
+    captureExitSnapshot,
+    download,
+    subDropToast,
+    suspendAutoSyncForManualTiming,
+  } = usePlayerMedia({
+    src: activeMediaSrc,
+    snap,
+    engine,
+    settings,
+    authKey,
+    bridgeRef,
+    bridgeReady,
+    bridgeKey,
+    svpActive,
+    videoMountRef,
+    toggleFullscreen,
+    castActiveRef: cast.castActiveRef,
+    season,
+    episode,
+  });
 
   const contentAdvisory = useContentAdvisory(
     settings.contentAdvisoryToast,
@@ -717,8 +723,9 @@ export function PlayerView({ src }: { src: PlayerSrc }) {
     };
   }, [showSyncToast, t]);
   const handleEnterSync = useCallback(() => {
+    suspendAutoSyncForManualTiming();
     void textSync.enter(src.url, src.headers);
-  }, [textSync.enter, src.url, src.headers]);
+  }, [textSync.enter, src.url, src.headers, suspendAutoSyncForManualTiming]);
 
   const volumeIndicatorTimerRef = useRef<number | null>(null);
   const [volumeIndicator, setVolumeIndicator] = useState<VolumeIndicatorState>({

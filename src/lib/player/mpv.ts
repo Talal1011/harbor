@@ -90,6 +90,8 @@ type MpvEvent =
 
 type ExternalSubtitleMetadata = {
   url: string;
+  lang?: string;
+  title?: string;
   cues?: SubCue[];
   originalUrl?: string;
   downloadAuth?: SubtitleLoadMetadata["downloadAuth"];
@@ -364,6 +366,7 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
       mpvUrl = mpvUrl.replace(/\\/g, "/");
       const externalMetadata: ExternalSubtitleMetadata = {
         url: originalUrl,
+        lang: subtitle.lang,
         cues: preparedCues,
         originalUrl,
         format: preparedFormat,
@@ -628,13 +631,14 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
           const info: TrackInfo = {
             id,
             label,
-            lang,
+            // A prepared file can lose (or mis-detect) the provider's language.
+            lang: extMeta?.lang || lang,
             kind: type === "audio" ? "audio" : "subtitle",
             selected,
             codec,
             channels,
             channelCount,
-            title,
+            title: extMeta?.title || title,
             external,
             prepared: extMeta?.prepared,
             autoSelectionEligible: extMeta?.autoSelectionEligible,
@@ -1137,6 +1141,8 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
       try {
         const externalMetadata: ExternalSubtitleMetadata = {
           url: metadata?.originalUrl ?? url,
+          lang,
+          title,
           cues: preparedCues,
           originalUrl: metadata?.originalUrl ?? url,
           downloadAuth: metadata?.downloadAuth,

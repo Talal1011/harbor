@@ -352,6 +352,7 @@ export function usePlayerMedia(params: {
 
   return {
     resolvedImdbId,
+    suspendAutoSyncForManualTiming: autoSync.suspendForManualTiming,
     subtitleSearchActive,
     subAssNative: suppressHtmlSubs,
     captureExitSnapshot,
