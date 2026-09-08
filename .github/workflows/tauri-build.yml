@@ -6,6 +6,13 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+
+env:
+  HARBOR_CHANNEL: beta
+  HARBOR_BUILD_ID: 7395f2ee
+
 jobs:
   build:
     name: ${{ matrix.platform.name }} (${{ matrix.platform.target }})
@@ -194,6 +201,19 @@ jobs:
             exit 1
           fi
           python3 scripts/macos-bundle-libmpv.py verify-app --app "$APP_PATH"
+
+      - name: Archive verified macOS app for local updater signing
+        if: contains(matrix.platform.runner, 'macos')
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE="src-tauri/target/${{ matrix.platform.target }}/release/bundle"
+          APP_PATH="$(find "$BUNDLE" -type d -name 'Harbor.app' -print -quit)"
+          test -n "$APP_PATH"
+          VERSION="$(node -p "JSON.parse(require('fs').readFileSync('src-tauri/tauri.conf.json')).version")"
+          ARCH="${{ matrix.platform.target }}"
+          ARCH="${ARCH%%-*}"
+          tar -czf "$BUNDLE/Harbor_${VERSION}_${ARCH}.app.tar.gz" -C "$(dirname "$APP_PATH")" Harbor.app
 
       - name: Upload artifacts
         if: success()
