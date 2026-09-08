@@ -107,8 +107,11 @@ test("experimental verification requires server badges and fails closed on rejec
   for (const [response, expected] of [
     [json({ user: { badges: [{ name: "dev" }] } }), "allowed"],
     [json({ user: { badges: [] } }), "denied"],
-    [json({}), "denied"],
-    [json({}, 401), "denied"],
+    [json({}), "unavailable"],
+    [json(null), "unavailable"],
+    [json({ user: {} }), "unavailable"],
+    [json({ user: { badges: "admin" } }), "unavailable"],
+    [json({}, 401), "unauthenticated"],
     [json({}, 403), "denied"],
     [json({}, 503), "unavailable"],
     [new TypeError("Network unavailable"), "unavailable"],

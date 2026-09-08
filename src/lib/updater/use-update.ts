@@ -187,6 +187,16 @@ async function verifyExperimentalAction(
   selected: UpdateChannel,
 ): Promise<boolean> {
   const access = await verifyExperimentalAccess();
+  if (access === "unauthenticated") {
+    if (!currentRequest(request, selected)) return false;
+    // Keep consent, but never fetch or install a build with rejected credentials.
+    // A fresh sign-in can retry the same check without silently changing feeds.
+    set({
+      status: "error",
+      error: t("Sign in to your Harbor account again, then check experimental builds."),
+    });
+    return false;
+  }
   if (access === "denied") {
     revokeExperimentalAccess();
     return false;

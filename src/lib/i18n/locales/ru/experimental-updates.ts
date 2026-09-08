@@ -1,4 +1,6 @@
 export default {
+  "Sign in to your Harbor account again, then check experimental builds.":
+    "Войдите в аккаунт Harbor снова, затем проверьте экспериментальные сборки.",
   "Return to beta": "Вернуться к бета-версии",
   "Replace this experimental installation with a tested beta. Compatible settings and watch progress stay in place. Beta updates resume after a successful restart.":
     "Замените экспериментальную сборку проверенной бета-версией. Совместимые настройки и прогресс просмотра сохраняются. Бета-обновления возобновятся после успешного перезапуска.",

@@ -1,4 +1,6 @@
 export default {
+  "Sign in to your Harbor account again, then check experimental builds.":
+    "سجّل الدخول إلى حساب Harbor مجددًا، ثم تحقّق من الإصدارات التجريبية المبكرة.",
   "Return to beta": "العودة إلى بيتا",
   "Replace this experimental installation with a tested beta. Compatible settings and watch progress stay in place. Beta updates resume after a successful restart.":
     "استبدل هذا الإصدار التجريبي المبكر بإصدار بيتا مختبَر. تبقى الإعدادات المتوافقة وتقدم المشاهدة كما هما. تُستأنف تحديثات بيتا بعد إعادة التشغيل بنجاح.",

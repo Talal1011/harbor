@@ -12,7 +12,11 @@ export const EXPERIMENTAL_ACCESS_BADGES = ["tester", "moderator", "admin", "dev"
 
 const ALLOWED_BADGES = new Set<string>(EXPERIMENTAL_ACCESS_BADGES);
 
-export type ExperimentalAccessVerification = "allowed" | "denied" | "unavailable";
+export type ExperimentalAccessVerification =
+  | "allowed"
+  | "denied"
+  | "unauthenticated"
+  | "unavailable";
 
 export function hasExperimentalAccess(author: Pick<Author, "badges"> | null | undefined): boolean {
   return (
@@ -36,7 +40,7 @@ export function useExperimentalAccess(): boolean {
 }
 
 export async function verifyExperimentalAccess(): Promise<ExperimentalAccessVerification> {
-  if (!currentAuthor()) return "denied";
+  if (!currentAuthor()) return "unauthenticated";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
@@ -44,7 +48,7 @@ export async function verifyExperimentalAccess(): Promise<ExperimentalAccessVeri
       bearer: true,
       signal: controller.signal,
     });
-    if (!response.user) return "denied";
+    if (!response?.user || !Array.isArray(response.user.badges)) return "unavailable";
     applyServerUser(response.user);
     return hasExperimentalAccess(response.user) ? "allowed" : "denied";
   } catch (error) {
@@ -55,7 +59,7 @@ export async function verifyExperimentalAccess(): Promise<ExperimentalAccessVeri
       "status" in error &&
       (error.status === 401 || error.status === 403)
     )
-      return "denied";
+      return error.status === 401 ? "unauthenticated" : "denied";
     return "unavailable";
   } finally {
     clearTimeout(timer);

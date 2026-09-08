@@ -130,7 +130,7 @@ function harness(
     backup: 0,
   };
   const config = {
-    access: "allowed" as "allowed" | "denied" | "unavailable",
+    access: "allowed" as "allowed" | "denied" | "unauthenticated" | "unavailable",
     writable: true,
     raw: manifest() as unknown,
     status: 200,
@@ -304,6 +304,41 @@ function harness(
   );
   return { updater, channel, betaReturn, localStorage, recovery, config, calls };
 }
+
+test("expired sign-in blocks experimental actions without silently dropping consent and recovers on sign-in", async () => {
+  const h = harness({ beta: true });
+  assert.equal(h.updater.setExperimentalUpdates(true), true);
+  h.config.access = "unauthenticated";
+  await h.updater.checkForUpdate(true);
+  assert.equal(h.channel.selectedUpdateChannel(), "experimental");
+  assert.equal(h.updater.useUpdate().status, "error");
+  assert.match(h.updater.useUpdate().error!, /Sign in/);
+  await h.updater.downloadUpdate();
+  await h.updater.installUpdate();
+  assert.equal(h.calls.fetchUrls.length, 0);
+  assert.equal(h.calls.stage + h.calls.download + h.calls.install + h.calls.launch, 0);
+  h.config.access = "allowed";
+  await h.updater.checkForUpdate(true);
+  assert.equal(h.updater.useUpdate().status, "available");
+  assert.equal(h.channel.selectedUpdateChannel(), "experimental");
+  assert.equal(h.calls.stage + h.calls.download + h.calls.install + h.calls.launch, 0);
+});
+
+test("expired sign-in at download and install cannot launch experimental binaries", async () => {
+  for (const action of ["download", "install"]) {
+    const h = harness();
+    h.updater.setExperimentalUpdates(true);
+    await h.updater.checkForUpdate();
+    if (action === "install") await h.updater.downloadUpdate();
+    h.config.access = "unauthenticated";
+    if (action === "download") await h.updater.downloadUpdate();
+    await h.updater.installUpdate();
+    assert.equal(h.updater.useUpdate().status, "error");
+    assert.match(h.updater.useUpdate().error!, /Sign in/);
+    assert.equal(h.calls.launch + h.calls.install, 0);
+    assert.equal(h.calls.stage, action === "install" ? 1 : 0);
+  }
+});
 
 test("experimental access recognizes only the approved Harbor account badges", () => {
   let author: { badges?: Array<{ name: string }> } | null = null;
