@@ -4,6 +4,8 @@ An early look at changes being prepared for Harbor’s next beta. This is a deve
 
 ## What’s in this build
 
+- Installed Experimental changelog in Settings → About and Updates, available offline and after downloading an update.
+- Clickable X-Ray results: open an actor’s movies and TV shows inside the player, then use Back/Close to return.
 - Full Edge TTS voice discovery for ebooks (#1409).
 - Broader TV navigation, settings focus and home search improvements (#1408).
 - Updated regression tests and UI fallback coverage (#1407).
@@ -17,6 +19,9 @@ An early look at changes being prepared for Harbor’s next beta. This is a deve
 ## What to test
 
 Record your operating system, installed version and result for each applicable check. A passing automated test does not replace these checks on the packaged app.
+
+- **Installed changelog:** In Settings → About or Updates, choose “View experimental changelog”. Check headings, lists and scrolling. Close with Escape/Back and verify focus returns. Restart Harbor and repeat offline, signed out, and with no new update available. The displayed notes must still identify Experimental 0.0.4, not another feed version. Check notes also remain in an update card after downloading.
+- **X-Ray actor results:** Enable X-Ray, play a title and select a recognized actor. Confirm the actor identity, Movies and Shows sections; open a title, go Back, then Close. Repeat from the compact rail, In scene and Cast tabs. Use mouse, keyboard Enter/Space and controller activation. Focus alone must not open a result, and navigation must not seek, pause or replace playback. Check missing photos, unavailable TMDB/network, and switching titles. Actual recognition and playback still require packaged-platform smoke tests.
 
 1. **Install and retain data:** Back up settings, library and watch progress. Install the candidate, restart, and confirm your existing data remains. Test Return to beta only against a publisher-approved target; record the exact versions and whether settings survived.
 2. **Subtitles:** With Arabic preferred, add Arabic and English results. Select Arabic, switch to English and back, then reopen the menu. Confirm labels, grouping and displayed text agree. Select Off while results load and confirm subtitles stay off. In Live Try, adjust timing, seek, pause/resume and wait several minutes; confirm the manual offset does not reset or drift. Repeat after changing the video source.
@@ -38,7 +43,11 @@ Thank you for testing and for your continued support. Credits for the requested 
 - Candidate branch: `experimental/0.0.4`; internal updater version: `0.999.4`.
 - All ten requested PR heads are included; #1399, #1400 and #1401 were already present.
 - Subtitle fixes include `45e4a99d` and QA record `bd1b0a8e`.
-- TypeScript passed. Automated suite: 1,124 passed, 22 skipped, no failures.
+- Pre-publication UI follow-up: TypeScript passed. Automated suite: 1,132 passed, 22 skipped, no failures (including eight new changelog/X-Ray regression tests).
 - Scoped format/lint passed. The list-description fallback is English until translated; it is not a claim of full translated coverage.
 - Native packages, updater signatures and platform smoke tests remain separate release gates. No publication or recovery approval is implied by this document.
 - The unconfirmed playback-speed work in the main checkout is not included in this candidate.
+
+The older `bd90f2c1` installers and CI run `34367568625` do not contain these two UI additions. Rebuild and re-sign from this follow-up before uploading, with a new immutable build ID. No beta, stable or legacy feed change is part of this work.
+
+For future experimental releases, add the installed internal-version entry in `src/lib/updater/experimental-notes.ts` together with the version bump. Its exact-version lookup deliberately does not substitute the current feed’s notes for the installed build.

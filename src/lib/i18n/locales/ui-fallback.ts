@@ -1,5 +1,7 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "View experimental changelog": "View experimental changelog",
+  "Report an issue": "Report an issue",
   "A short note about this list": "A short note about this list",
   "Return to beta": "Return to beta",
   "Experimental {version} · Build {buildId}": "Experimental {version} · Build {buildId}",
