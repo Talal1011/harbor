@@ -10228,7 +10228,7 @@ function SearchField({
   onSubmit,
 }: {
   query: string;
-  setQuery: (v: string) => void;
+  setQuery: (q: string) => void;
   onSubmit: () => void;
 }) {
   const t = useT();

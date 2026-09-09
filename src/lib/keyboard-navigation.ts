@@ -355,9 +355,11 @@ function getFocusableInZone(
 }
 
 function getRect(el: HTMLElement) {
-  const cell = el.closest<HTMLElement>("[data-tv-nav-base-width]");
+  const cell = el.closest<HTMLElement>(
+    "[data-tv-nav-cell], [data-tv-nav-base-width], [data-tv-text-field]",
+  );
   const r = cell?.getBoundingClientRect() ?? el.getBoundingClientRect();
-  const baseWidth = cell ? Number(cell.dataset.tvNavBaseWidth) : undefined;
+  const baseWidth = cell?.dataset.tvNavBaseWidth ? Number(cell.dataset.tvNavBaseWidth) : undefined;
   const rtl = cell ? window.getComputedStyle(cell).direction === "rtl" : false;
   return stableCardNavigationRect(r, baseWidth, rtl);
 }

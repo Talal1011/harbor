@@ -23,6 +23,14 @@ const settingsNavSource = readFileSync(
   new URL("../src/views/settings/nav.tsx", import.meta.url),
   "utf8",
 );
+const searchOverlaySource = readFileSync(
+  new URL("../src/components/search/search-overlay.tsx", import.meta.url),
+  "utf8",
+);
+const settingsSidebarSource = readFileSync(
+  new URL("../src/views/settings/settings-sidebar.tsx", import.meta.url),
+  "utf8",
+);
 const themeSource = readFileSync(new URL("../src/lib/theme.ts", import.meta.url), "utf8");
 const globalStylesSource = readFileSync(new URL("../src/index.css", import.meta.url), "utf8");
 
@@ -204,4 +212,28 @@ test("every global search listener uses the shared keyboard eligibility guard", 
   for (const source of [searchHotkeySource, topbarSource, royalTopbarSource]) {
     assert.match(source, /if \(!shouldHandleGlobalKeyboardEvent\(e\)\) return;/);
   }
+});
+
+test("settings sidebar account row and text fields use spatial cell containers for navigation alignment", () => {
+  assert.match(settingsSidebarSource, /<div data-tv-nav-cell className="hset-rail-me">/);
+  assert.match(settingsSidebarSource, /data-harbor-sidebar[\s\S]*?data-tv-nav-zone/);
+  assert.match(navigationSource, /\[data-tv-nav-cell\].*?\[data-tv-text-field\]/);
+});
+
+test("home search overlay disables TV spatial navigation and binds modal close to Escape", () => {
+  assert.match(
+    navigationSource,
+    /const isSearchOverlayAutoText =\s*!!active &&\s*active\.matches\("\[data-tv-text-auto\]"\) &&\s*!!active\.closest\("\[data-search-overlay\]"\);/,
+  );
+  assert.match(
+    navigationSource,
+    /if \(isSearchOverlayAutoText\) {[\s\S]*?if \(isBackKey\(e\)\) {[\s\S]*?runBack\(\);[\s\S]*?}[\s\S]*?return;/,
+  );
+  assert.match(searchOverlaySource, /data-search-overlay="true"/);
+  assert.match(searchOverlaySource, /data-tv-focus-scope/);
+  assert.match(
+    searchOverlaySource,
+    /<TvModalClose onClose=\{handleModalClose\} label=\{t\("Close search"\)\} \/>/,
+  );
+  assert.match(searchOverlaySource, /data-tv-text-auto="true"/);
 });
