@@ -184,6 +184,12 @@ test("delayed hash enrichment may upgrade only the current automatic selection",
   );
 });
 
+test("mpv serializes same-media subtitle selection commits through generation guards", () => {
+  assert.match(mpvSource, /mainSubtitleSelection\.begin\(/);
+  assert.match(mpvSource, /enqueueSubtitleTransition\(async \(\) =>/);
+  assert.match(mpvSource, /if \(requestMediaRevision !== mediaRevision\) return;/);
+});
+
 test("prepared player-source seeds publish eligibility only after each bridge settles its batch", () => {
   assert.match(mpvSource, /const seedBatch = new PreparedSubtitleSeedBatch\(orderedSeeds\)/);
   assert.match(mpvSource, /autoSelectionEligible: false/);

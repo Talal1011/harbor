@@ -1044,6 +1044,14 @@ const uiFallback: Record<string, string> = {
   "{n} seconds": "{n} seconds",
   "{n}x card width": "{n}x card width",
   "{trigger}. Sends to {channels}.": "{trigger}. Sends to {channels}.",
+  "Harbor on Discord": "Harbor on Discord",
+  "Release notes, help from other people using Harbor, and somewhere to send bugs.":
+    "Release notes, help from other people using Harbor, and somewhere to send bugs.",
+  "Player controls in Big Picture": "Player controls in Big Picture",
+  "Ten-foot uses large controls built for a remote across the room. Desktop keeps the same player you use in the normal window, which is quicker with a mouse and keyboard.":
+    "Ten-foot uses large controls built for a remote across the room. Desktop keeps the same player you use in the normal window, which is quicker with a mouse and keyboard.",
+  "Ten-foot": "Ten-foot",
+  Desktop: "Desktop",
 };
 
 export default uiFallback;
