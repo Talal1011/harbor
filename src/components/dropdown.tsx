@@ -24,6 +24,7 @@ export function Dropdown({
   options,
   onChange,
   placeholder,
+  ariaLabel,
   className = "",
   size = "md",
 }: {
@@ -31,6 +32,7 @@ export function Dropdown({
   options: DropdownOption[];
   onChange: (value: string) => void;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
   size?: "sm" | "md";
 }) {
@@ -173,6 +175,7 @@ export function Dropdown({
           if (open) close(holdsFocus());
           else setOpen(true);
         }}
+        aria-label={ariaLabel ? `${ariaLabel}: ${selected?.label ?? placeholder ?? ""}` : undefined}
         aria-haspopup="listbox"
         aria-expanded={open}
         className={`flex w-full items-center justify-between gap-3 rounded-md outline-none transition-colors ${
@@ -197,6 +200,7 @@ export function Dropdown({
           <div
             ref={listRef}
             role="listbox"
+            aria-label={ariaLabel}
             data-dropdown-menu
             data-settings-menu={btnRef.current?.closest(".harbor-settings-shell") ? "" : undefined}
             onKeyDown={onMenuKeyDown}

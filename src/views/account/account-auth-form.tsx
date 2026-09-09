@@ -1,21 +1,14 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { ExternalLink, KeyRound, Loader2, X } from "@/views/settings/icons";
+import { KeyRound, Loader2, X } from "@/views/settings/icons";
 import { ModalShell, useModalExit } from "@/components/modal-shell";
-import { DiscordIcon } from "@/components/discord-icon";
 import { loginIdentity, registerIdentity } from "@/lib/account/identity";
-import {
-  finishDiscordSignup,
-  signInWithDiscord,
-  startDiscordSignup,
-} from "@/lib/account/discord-link";
 import { accountErrorMessage, type AccountErrorMessage } from "@/lib/account/error-messages";
-import { canDiscordAuth } from "@/lib/discord-auth";
 import { PasswordField, TextField } from "./fields";
 import { AccountRecoverForm } from "./account-recover-form";
 import { AccountValueProps } from "./account-value-props";
 import { useT } from "@/lib/i18n";
 import { Section } from "@/views/settings/shared";
-import { ROW_ACTION, ROW_ACTION_PRIMARY } from "@/views/settings/kit";
+import { ROW_ACTION_PRIMARY } from "@/views/settings/kit";
 
 type Mode = "signin" | "register";
 
@@ -25,17 +18,6 @@ const MODES: { id: Mode; label: string; action: string }[] = [
 ];
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,24}$/;
-
-// Errors that mean the Discord state/code itself is dead -- resubmitting
-// with the same discordPending would just fail identically every time, so
-// these clear it and send the user back to redo the Discord round-trip.
-// Anything else (e.g. username_taken) is a fixable input mistake, so
-// discordPending is deliberately left set for those.
-const DISCORD_DEAD_CODES = new Set([
-  "discord_code_invalid",
-  "challenge_invalid",
-  "discord_unreachable",
-]);
 
 function Shell({
   inline,
@@ -105,17 +87,7 @@ export function AccountAuthForm({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [discordBusy, setDiscordBusy] = useState(false);
   const [error, setError] = useState<AccountErrorMessage | null>(null);
-  // Set once Discord confirms identity for a fresh signup, cleared once the
-  // account is actually created. While set, the username/password fields
-  // below finish the Discord signup instead of a plain password one -- see
-  // discord-link.ts's startDiscordSignup/finishDiscordSignup doc comment for
-  // why this needs two steps instead of one.
-  const [discordPending, setDiscordPending] = useState<{ state: string; code: string } | null>(
-    null,
-  );
-  const canDiscord = canDiscordAuth();
 
   const trimmed = username.trim();
   const usernameOk = USERNAME_RE.test(trimmed);
@@ -127,54 +99,20 @@ export function AccountAuthForm({
       : undefined;
 
   const submit = async () => {
-    if (!ready || busy || discordBusy) return;
+    if (!ready || busy) return;
     setBusy(true);
     setError(null);
     try {
-      if (discordPending) {
-        const { recoveryCode } = await finishDiscordSignup(
-          discordPending.state,
-          discordPending.code,
-          trimmed,
-          password,
-        );
-        setDiscordPending(null);
-        if (recoveryCode) onRecovery?.(recoveryCode);
-      } else if (mode === "register") {
+      if (mode === "register") {
         const { recoveryCode } = await registerIdentity(trimmed, password);
         onRecovery?.(recoveryCode);
       } else {
         await loginIdentity(trimmed, password);
       }
     } catch (err) {
-      const code = (err as { code?: string })?.code;
-      if (discordPending && code && DISCORD_DEAD_CODES.has(code)) setDiscordPending(null);
       setError(accountErrorMessage(err));
     } finally {
       setBusy(false);
-    }
-  };
-
-  const runDiscord = async () => {
-    if (busy || discordBusy) return;
-    setDiscordBusy(true);
-    setError(null);
-    try {
-      if (mode === "register") {
-        const { state, code } = await startDiscordSignup();
-        // Discord already confirmed identity here -- whatever was typed
-        // before clicking this button belonged to a different (abandoned)
-        // signup attempt and must not silently carry over.
-        setUsername("");
-        setPassword("");
-        setDiscordPending({ state, code });
-      } else {
-        await signInWithDiscord();
-      }
-    } catch (err) {
-      setError(accountErrorMessage(err));
-    } finally {
-      setDiscordBusy(false);
     }
   };
 
@@ -182,7 +120,7 @@ export function AccountAuthForm({
   const modeIndex = MODES.findIndex((m) => m.id === mode);
 
   useLayoutEffect(() => {
-    if (view !== "auth" || discordPending) return;
+    if (view !== "auth") return;
     const thumb = thumbRef.current;
     const to = modeRefs.current[modeIndex];
     if (!thumb || !to) return;
@@ -205,7 +143,7 @@ export function AccountAuthForm({
       ],
       { duration: 440, easing: "ease-in-out" },
     );
-  }, [modeIndex, view, discordPending]);
+  }, [modeIndex, view]);
 
   if (view === "recover") {
     return (
@@ -224,14 +162,10 @@ export function AccountAuthForm({
     );
   }
 
-  const heading = discordPending
-    ? t("Choose your username")
-    : mode === "register"
-      ? t("Create your Harbor account")
-      : t("Sign in to Harbor");
-  const subtitle = discordPending
-    ? t("Discord confirmed. Pick a username and password to finish.")
-    : mode === "register"
+  const heading =
+    mode === "register" ? t("Create your Harbor account") : t("Sign in to Harbor");
+  const subtitle =
+    mode === "register"
       ? t("One free account for your handle, themes, and sync.")
       : t("Sign in to pick up where you left off.");
 
@@ -259,10 +193,9 @@ export function AccountAuthForm({
       </div>}
 
       <div className={inline ? "flex min-w-0 flex-col gap-6 pt-4" : "flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-6"}>
-        {!inline && !discordPending && mode === "register" && <AccountValueProps />}
+        {!inline && mode === "register" && <AccountValueProps />}
 
-        {!discordPending && (
-          <div
+        <div
             ref={switchRef}
             className="relative flex items-center gap-1 rounded-md bg-canvas p-1"
           >
@@ -291,7 +224,6 @@ export function AccountAuthForm({
               </button>
             ))}
           </div>
-        )}
 
         <form
           onSubmit={(e) => {
@@ -337,74 +269,26 @@ export function AccountAuthForm({
             </p>
           )}
 
-          {(discordPending || mode === "register") && (
+          {mode === "register" && (
             <p className={inline ? "flex items-start gap-2.5 text-[15.5px] leading-[22px] text-ink-muted" : "flex items-start gap-2 rounded-md bg-canvas px-3.5 py-3 text-[14px] leading-[21px] text-ink-muted"}>
               <KeyRound size={13} className="mt-0.5 shrink-0" />
-              {discordPending
-                ? t(
-                    "We'll show a one-time recovery key and send it to you on Discord. Save it: it's the only way back in if you forget your password.",
-                  )
-                : t(
-                    "We'll show a one-time recovery key right after you sign up. Save it: it's the only way back in if you forget your password.",
-                  )}
+              {t(
+                "We'll show a one-time recovery key right after you sign up. Save it: it's the only way back in if you forget your password.",
+              )}
             </p>
           )}
 
           <div className="flex items-center justify-end gap-3">
-            {discordPending && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  setDiscordPending(null);
-                  setError(null);
-                }}
-                className={inline ? ROW_ACTION : "text-[12px] font-medium text-ink-subtle transition-colors hover:text-ink disabled:opacity-40"}
-              >
-                {t("Cancel")}
-              </button>
-            )}
             <button
               type="submit"
-              disabled={!ready || busy || discordBusy}
+              disabled={!ready || busy}
               className={inline ? ROW_ACTION_PRIMARY : "harbor-press-pop flex min-h-11 items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-[15px] font-semibold text-canvas transition-opacity duration-150 hover:opacity-90 disabled:opacity-40"}
             >
               {busy && <Loader2 size={16} className="animate-spin" />}
-              {discordPending ? t("Finish creating my account") : t(active.action)}
+              {t(active.action)}
             </button>
           </div>
         </form>
-
-        {!discordPending && canDiscord && (
-          <>
-            <div className="flex items-center gap-3">
-              <span className="h-px flex-1 bg-edge-soft" />
-              <span className={inline ? "text-[15px] text-ink-muted" : "text-[11px] font-medium uppercase tracking-wide text-ink-subtle"}>
-                {t("or")}
-              </span>
-              <span className="h-px flex-1 bg-edge-soft" />
-            </div>
-            <button
-              type="button"
-              onClick={() => void runDiscord()}
-              disabled={busy || discordBusy}
-              className={inline ? `${ROW_ACTION} justify-center` : "harbor-press-pop flex min-h-11 items-center justify-center gap-2 rounded-md bg-canvas px-4 py-2 text-[15px] font-semibold text-ink transition-colors hover:bg-elevated disabled:opacity-40"}
-            >
-              {discordBusy ? (
-                <>
-                  <Loader2 size={15} className="animate-spin" />
-                  {t("Continue in your browser...")}
-                </>
-              ) : (
-                <>
-                  <DiscordIcon size={16} />
-                  {mode === "register" ? t("Continue with Discord") : t("Sign in with Discord")}
-                  <ExternalLink size={13} />
-                </>
-              )}
-            </button>
-          </>
-        )}
       </div>
     </Shell>
   );

@@ -128,7 +128,7 @@ export function HomeServersTab() {
             message: cause instanceof Error ? cause.message : String(cause),
             at,
           },
-        });
+        }, connection.profileId);
       } finally {
         setSyncingIds((current) => {
           const next = new Set(current);
@@ -147,7 +147,7 @@ export function HomeServersTab() {
           "Connect Jellyfin, Emby, and Plex libraries on this device. Credentials stay in native secret storage. Each server keeps its own refresh schedule, and cached titles stay available while a server is offline.",
         )}
       >
-        {connections.flatMap((connection) => {
+        {connections.map((connection) => {
           const status = !connection.enabled
             ? "inactive"
             : (reachability[connection.id] ?? "checking");
@@ -167,7 +167,14 @@ export function HomeServersTab() {
             ? connection.lastSyncResult.message
             : null;
           const syncing = syncingIds.has(connection.id);
-          return [
+          const legacyDays = connection.refreshInterval === "daily" ? 1
+            : connection.refreshInterval === "three-days" ? 3
+              : connection.refreshInterval === "weekly" ? 7 : null;
+          const refreshInterval = legacyDays == null ? connection.refreshInterval : "custom";
+          const refreshDays = legacyDays ?? connection.refreshEveryDays ?? 1;
+          return (
+            <div key={connection.id} role="group" aria-label={connection.name} className="mb-8">
+              {[
             <SettingRow
               key={connection.id}
               wide
@@ -218,7 +225,7 @@ export function HomeServersTab() {
                 >
                   {connection.enabled ? t("Disable") : t("Enable")}
                 </SButton>
-                <SButton variant="danger" onClick={() => setRemoveTarget(connection)}>
+                <SButton variant="danger" disabled={syncing} onClick={() => setRemoveTarget(connection)}>
                   <Trash2 size={18} />
                   {t("Remove")}
                 </SButton>
@@ -235,6 +242,7 @@ export function HomeServersTab() {
               <div className={DROPDOWN_SLOT}>
                 <Dropdown
                   size="md"
+                  ariaLabel={`${t("Streaming quality")}: ${connection.name}`}
                   value={connection.preferredQuality}
                   onChange={(value) =>
                     updateMediaServerConnection(connection.id, {
@@ -259,10 +267,12 @@ export function HomeServersTab() {
               <div className={DROPDOWN_SLOT}>
                 <Dropdown
                   size="md"
-                  value={connection.refreshInterval}
+                  ariaLabel={`${t("Refresh this library")}: ${connection.name}`}
+                  value={refreshInterval}
                   onChange={(value) =>
                     updateMediaServerConnection(connection.id, {
                       refreshInterval: value as MediaServerRefreshInterval,
+                      ...(value === "custom" ? { refreshEveryDays: refreshDays } : {}),
                     })
                   }
                   options={[
@@ -273,7 +283,7 @@ export function HomeServersTab() {
                 />
               </div>
             </SettingRow>,
-            ...(connection.refreshInterval === "custom"
+            ...(refreshInterval === "custom"
               ? [
                   <SettingRow
                     key={`${connection.id}-days`}
@@ -282,9 +292,10 @@ export function HomeServersTab() {
                   >
                     <div className="flex items-center gap-2.5">
                       <RefreshDaysField
-                        value={connection.refreshEveryDays ?? 1}
+                        value={refreshDays}
                         onChange={(days) =>
                           updateMediaServerConnection(connection.id, {
+                            refreshInterval: "custom",
                             refreshEveryDays: days,
                           })
                         }
@@ -294,7 +305,9 @@ export function HomeServersTab() {
                   </SettingRow>,
                 ]
               : []),
-          ];
+              ]}
+            </div>
+          );
         })}
         <SettingRow
           label={
@@ -328,14 +341,11 @@ export function HomeServersTab() {
             const target = removeTarget;
             const active = document.activeElement;
             const ring = active instanceof HTMLElement && navOwnsFocus(active);
+            await removeMediaServerItems(target.id);
+            removeMediaServerConnection(target.id, target.profileId);
             setRemoveTarget(null);
-            removeMediaServerConnection(target.id);
-            try {
-              await removeMediaServerItems(target.id);
-            } finally {
-              const to = addServer.current?.querySelector("button");
-              if (ring && to) tvFocus(to);
-            }
+            const to = addServer.current?.querySelector("button");
+            if (ring && to) tvFocus(to);
           }}
         />
       )}
@@ -383,13 +393,31 @@ function HomeServerRemoveDialog({
 }: {
   connection: MediaServerConnection;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }) {
   const t = useT();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const pending = useRef(false);
+  const remove = async () => {
+    if (pending.current) return;
+    pending.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await onConfirm();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  };
   return (
     <SettingsModal
       open
       onClose={onCancel}
+      dismissible={!busy}
       width={520}
       title={t("Remove {name}?", { name: connection.name })}
       sub={t(
@@ -397,9 +425,10 @@ function HomeServerRemoveDialog({
       )}
       actions={
         <>
-          <SButton onClick={onCancel}>{t("Cancel")}</SButton>
-          <SButton variant="danger" onClick={onConfirm}>
-            {t("Remove server")}
+          <SButton disabled={busy} onClick={onCancel}>{t("Cancel")}</SButton>
+          <SButton variant="danger" disabled={busy} onClick={() => void remove()}>
+            {busy && <LoaderCircle className="animate-spin" size={18} />}
+            {busy ? t("Removing…") : t("Remove server")}
           </SButton>
         </>
       }
@@ -411,6 +440,7 @@ function HomeServerRemoveDialog({
         </span>
       </div>
       <p className={`max-w-[70ch] ${ROW_DESC}`}>{connection.origin}</p>
+      {error && <div role="alert"><RowNote>{error}</RowNote></div>}
     </SettingsModal>
   );
 }
@@ -672,7 +702,7 @@ function ConnectionEditor({
       if (abort.signal.aborted || plexAbort.current !== abort) return;
       const credential = servers.find((server) => server.available)?.token ?? servers[0]?.token;
       if (credential) setToken(credential);
-      setPlexStatus("ready");
+      setPlexStatus(credential ? "ready" : "idle");
       if (!credential)
         setError(t("Plex sign-in succeeded, but no server credential was returned."));
     } catch (cause) {
@@ -755,7 +785,7 @@ function ConnectionEditor({
                     ? t("Sign in again")
                     : t("Sign in with Plex")}
             </BusyButton>
-            {plexStatus === "waiting" && (
+            {(plexStatus === "opening" || plexStatus === "waiting") && (
               <SButton
                 onClick={() => {
                   plexAbort.current?.abort();
@@ -840,7 +870,7 @@ function ConnectionEditor({
             </FieldBlock>
           </>
         ))}
-      {error && <RowNote>{error}</RowNote>}
+      {error && <div role="alert"><RowNote>{error}</RowNote></div>}
     </SettingsModal>
   );
 }
