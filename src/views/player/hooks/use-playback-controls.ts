@@ -13,6 +13,7 @@ import {
 import { hasImportedSubTitle } from "@/lib/player/imported-subs";
 import type { RoomCommand } from "@/lib/together/protocol";
 import { cacheSelectedSubtitle } from "@/lib/subtitles/selected-subtitle-cache";
+import { notifyMediaSeeked } from "@/lib/media-session";
 
 const SEEK_ACCUM_WINDOW_MS = 700;
 
@@ -208,6 +209,7 @@ export function usePlaybackControls(params: {
       return;
     }
     bridgeRef.current?.seek(target, "keyframes");
+    notifyMediaSeeked(target);
   };
 
   const seekTo = useCallback(
@@ -225,6 +227,7 @@ export function usePlaybackControls(params: {
         return;
       }
       bridgeRef.current?.seek(target, "keyframes");
+      notifyMediaSeeked(target);
     },
     [castDevice, canControl, inRoom, isHost, sendCommand, seekCast, bridgeRef],
   );
