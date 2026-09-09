@@ -132,6 +132,7 @@ export function memoryControlsHarness() {
       useRef: (value: unknown) => refs[refIndex++] ?? (refs[refIndex - 1] = { current: value }),
     },
     "@/lib/player/playback-clock": {},
+    "@/lib/media-session": { notifyMediaSeeked() {} },
     "@/lib/player-prefs": { writePlayerPrefs() {} },
     "@/lib/subtitles/subtitle-memory": {
       ...memory,

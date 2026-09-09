@@ -28,10 +28,17 @@ export function updateMediaControls(
 ): void {
   if (!isTauri()) return;
   const art = artUrl ?? null;
-  const dur = typeof durationSec === "number" && Number.isFinite(durationSec) && durationSec > 0 ? Math.round(durationSec) : null;
-  const vol = typeof volume === "number" && Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : null;
+  const dur =
+    typeof durationSec === "number" && Number.isFinite(durationSec) && durationSec > 0
+      ? Math.round(durationSec)
+      : null;
+  const vol =
+    typeof volume === "number" && Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : null;
   const volKey = vol != null ? Math.round(vol * 100) : "";
-  const pos = typeof positionSec === "number" && Number.isFinite(positionSec) && positionSec >= 0 ? positionSec : null;
+  const pos =
+    typeof positionSec === "number" && Number.isFinite(positionSec) && positionSec >= 0
+      ? positionSec
+      : null;
 
   const now = Date.now();
   const state = `${playing ? 1 : 0}|${title}|${subtitle}|${art ?? ""}|${dur ?? 0}|${volKey}`;

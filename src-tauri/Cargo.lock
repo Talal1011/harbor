@@ -2137,7 +2137,7 @@ dependencies = [
 
 [[package]]
 name = "harbor"
-version = "0.999.3"
+version = "0.999.4"
 dependencies = [
  "axum",
  "base64 0.22.1",

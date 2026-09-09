@@ -1,6 +1,6 @@
 {
   "name": "harbor",
-  "version": "0.999.3",
+  "version": "0.999.4",
   "private": true,
   "license": "MIT",
   "type": "module",

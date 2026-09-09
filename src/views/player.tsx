@@ -979,8 +979,17 @@ export function PlayerView({ src }: { src: PlayerSrc }) {
     const unsub = subscribePlaybackClock(() => {
       const livePos = getPlaybackPosition();
       const currentSnap = snapRef.current;
-      const playingNow = currentSnap.status === "playing" && (currentSnap.firstFrameReady || livePos > 0.3);
-      updateMediaControls(playingNow, src.meta.name, subtitle, artUrl, currentSnap.durationSec, livePos, vol);
+      const playingNow =
+        currentSnap.status === "playing" && (currentSnap.firstFrameReady || livePos > 0.3);
+      updateMediaControls(
+        playingNow,
+        src.meta.name,
+        subtitle,
+        artUrl,
+        currentSnap.durationSec,
+        livePos,
+        vol,
+      );
     });
     return () => unsub();
   }, [

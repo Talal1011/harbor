@@ -682,6 +682,8 @@ pub fn media_controls_update(
 ) {
     #[cfg(windows)]
     win::update(playing, &title, &subtitle);
+    #[cfg(windows)]
+    let _ = (art_url, duration_sec, position_sec, volume);
     #[cfg(target_os = "linux")]
     linux::update(
         playing,
