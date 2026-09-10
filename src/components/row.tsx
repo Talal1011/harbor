@@ -12,6 +12,7 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ThreeLiquidGlassSurface } from "@/components/ThreeLiquidGlassSurface";
+import { NavChevron } from "./nav-arrow";
 import { useT, useUiLanguage, isRtl as checkRtl } from "@/lib/i18n";
 import { useSettings } from "@/lib/settings";
 import { useView } from "@/lib/view";
@@ -858,14 +859,12 @@ function EdgeArrow({
     ? "opacity-0"
     : always
       ? "opacity-100"
-      : `opacity-0 ${enter} scale-[0.6] group-hover/row:opacity-100 group-hover/row:translate-x-0 group-hover/row:scale-100 group-focus-visible/row:opacity-100 group-focus-visible/row:translate-x-0 group-focus-visible/row:scale-100`;
+      : `opacity-0 ${enter} scale-[0.6] group-hover/edge:opacity-100 group-hover/edge:translate-x-0 group-hover/edge:scale-100 group-focus-visible/edge:opacity-100 group-focus-visible/edge:translate-x-0 group-focus-visible/edge:scale-100`;
   return (
     <div
-      className={`pointer-events-none absolute inset-y-0 z-30 flex w-16 items-center ${
-        side === "left"
-          ? "start-0 justify-start bg-gradient-to-r rtl:bg-gradient-to-l from-canvas via-canvas/70 to-transparent"
-          : "end-0 justify-end bg-gradient-to-l rtl:bg-gradient-to-r from-canvas via-canvas/70 to-transparent"
-      } transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}
+      className={`pointer-events-none absolute inset-y-0 z-30 flex w-16 -translate-y-[7%] items-center ${
+        side === "left" ? "start-[-40px] justify-start" : "end-[-40px] justify-end"
+      }`}
     >
       <button
         type="button"
@@ -873,13 +872,15 @@ function EdgeArrow({
         aria-label={label}
         tabIndex={visible ? 0 : -1}
         data-tv-skip="true"
-        className={`pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-elevated/90 text-ink shadow-lg ring-1 ring-white/5 backdrop-blur transition-all duration-200 hover:scale-105 hover:bg-elevated active:scale-95 ${chev}`}
+        className={`group/edge grid h-full w-full place-items-center ${
+          visible ? "pointer-events-auto" : "pointer-events-none"
+        }`}
       >
-        {side === "left" ? (
-          <ChevronLeft size={22} strokeWidth={2.2} className="dir-icon" />
-        ) : (
-          <ChevronRight size={22} strokeWidth={2.2} className="dir-icon" />
-        )}
+        <span
+          className={`grid place-items-center text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)] transition-all duration-[320ms] ease-[cubic-bezier(0.34,1.45,0.5,1)] group-active/edge:scale-90 ${chev}`}
+        >
+          <NavChevron dir={side} size={54} />
+        </span>
       </button>
     </div>
   );
