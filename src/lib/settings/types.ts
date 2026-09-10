@@ -525,6 +525,7 @@ export type Settings = {
   pauseUnfocused: boolean;
   cwSnapshotRetentionDays: number;
   cwSnapshotFullQuality: boolean;
+  cwPreferEpisodeStill: boolean;
   streamFilterLevel: "strict" | "balanced" | "off";
   blockTrackers: boolean;
   homeRows: {
