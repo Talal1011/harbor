@@ -30,7 +30,9 @@ export function StartupDefaults() {
         wide
         icon={<Clock size={18} strokeWidth={2} />}
         label={t("Who's watching")}
-        desc={t("Choose when Harbor asks you to pick a profile. Timed prompts appear when you return to Harbor.")}
+        desc={t(
+          "Choose when Harbor asks you to pick a profile. Timed prompts appear when you return to Harbor.",
+        )}
       >
         <Segmented<Interval>
           value={interval}
@@ -42,7 +44,9 @@ export function StartupDefaults() {
       <SettingRow
         icon={<UserCheck size={18} strokeWidth={2} />}
         label={t("Start as")}
-        desc={t("Open this profile at launch. Timed prompts can still appear later. Profiles with a PIN cannot be a default.")}
+        desc={t(
+          "Open this profile at launch. Timed prompts can still appear later. Profiles with a PIN cannot be a default.",
+        )}
       >
         <div className="w-[280px] max-w-full">
           <Dropdown
@@ -50,7 +54,9 @@ export function StartupDefaults() {
             onChange={(v) => update({ defaultProfileId: v })}
             options={[
               { value: "", label: t("No default profile") },
-              ...profiles.filter((p) => !p.passwordHash).map((p) => ({ value: p.id, label: p.name })),
+              ...profiles
+                .filter((p) => !p.passwordHash)
+                .map((p) => ({ value: p.id, label: p.name })),
             ]}
           />
         </div>

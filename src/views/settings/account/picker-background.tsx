@@ -21,14 +21,14 @@ export function PickerBackground() {
   return (
     <BackgroundPicker
       imageData={image}
-      dim={dim}
+      dim={dim / 100}
       onImageChange={(data) => {
         setImage(data);
         void savePickerBg(data);
       }}
       onDimChange={(next) => {
-        setDim(next);
-        void savePickerBgDim(next);
+        setDim(next * 100);
+        void savePickerBgDim(next * 100);
       }}
     />
   );

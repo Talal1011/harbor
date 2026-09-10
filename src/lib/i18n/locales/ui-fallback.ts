@@ -1,5 +1,6 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "Highest rated on IMDb": "Highest rated on IMDb",
   "Prefer episode still artwork": "Prefer episode still artwork",
   "Show the detail page's episode still on the card instead of your saved frame. The saved frame is kept as a fallback when no still exists.":
     "Show the detail page's episode still on the card instead of your saved frame. The saved frame is kept as a fallback when no still exists.",
