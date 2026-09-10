@@ -201,10 +201,6 @@ export function loadStoredSettings(rawKey: string = STORAGE_KEY): Settings {
       parsed.stremioDeeplinkInstall = true;
       parsed._stremioDeeplinkOnByDefault = true;
     }
-    if (!parsed._contentAdvisoryOnByDefaultV1) {
-      parsed.contentAdvisoryToast = true;
-      parsed._contentAdvisoryOnByDefaultV1 = true;
-    }
     if (parsed.contentAdvisoryTheme !== "monochrome" && parsed.contentAdvisoryTheme !== "colored") {
       parsed.contentAdvisoryTheme = "colored";
     }

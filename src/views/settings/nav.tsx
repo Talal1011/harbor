@@ -1124,6 +1124,22 @@ const NAV_ITEM_BY_ID = new Map(NAV_GROUPS.flatMap((g) => g.items).map((i) => [i.
 
 const SETTINGS_OPTIONS: SettingsOption[] = [
   {
+    label: "Who's watching background",
+    section: "account",
+    anchorTitle: "Who's watching",
+    keywords: [
+      "profile picker background",
+      "whos watching wallpaper",
+      "custom background profiles",
+      "upload background",
+      "picker wallpaper",
+      "profile screen image",
+      "background image",
+      "change the profile screen",
+      "dim the background",
+    ],
+  },
+  {
     label: "Player controls in Big Picture",
     section: "hotkeys",
     anchorTitle: "Player controls in Big Picture",

@@ -38,6 +38,7 @@ export type BrandPerson = CastEntry & { titles: number };
 export type BrandTitle = {
   meta: Meta;
   tmdbId: number;
+  imdbId: string | null;
   year: number | null;
   rating: number | null;
   votes: number;
@@ -212,6 +213,8 @@ type RawCredits = {
 
 type RawTitle = {
   id?: number;
+  imdb_id?: string;
+  external_ids?: { imdb_id?: string };
   release_date?: string;
   first_air_date?: string;
   vote_average?: number;
@@ -262,6 +265,7 @@ function toTitle(meta: Meta, tmdbId: number, d: RawTitle, mediaType: "movie" | "
   return {
     meta,
     tmdbId,
+    imdbId: d.imdb_id ?? d.external_ids?.imdb_id ?? null,
     year: yearOf(d.release_date ?? d.first_air_date),
     rating: typeof d.vote_average === "number" && d.vote_average > 0 ? Math.round(d.vote_average * 10) / 10 : null,
     votes: d.vote_count ?? 0,
@@ -329,7 +333,8 @@ export async function tmdbBrandStats(
       wanted.map((tid) =>
         withSlot(() =>
           get<RawTitle>(key, `${mediaType}/${tid}`, {
-            append_to_response: mediaType === "movie" ? "credits" : "aggregate_credits",
+            append_to_response:
+              mediaType === "movie" ? "credits,external_ids" : "aggregate_credits,external_ids",
           }).catch(() => null),
         ),
       ),

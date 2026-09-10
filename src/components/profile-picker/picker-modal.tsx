@@ -1,4 +1,5 @@
 import { ChevronDown, Plus, X } from "@/views/settings/icons";
+import { loadPickerBg } from "@/lib/theme-storage";
 import { KawaiiBunny } from "./kawaii-bunny";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -56,6 +57,17 @@ export function ProfilePickerModal() {
     };
   }, [pickerView.kind, pickerOpen]);
 
+  const [bg, setBg] = useState<{ image: string | null; dim: number }>({ image: null, dim: 55 });
+  useEffect(() => {
+    let alive = true;
+    void loadPickerBg().then((v) => {
+      if (alive) setBg(v);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   if (!pickerOpen) return null;
 
   const goList = () => setPickerView({ kind: "list" });
@@ -77,13 +89,34 @@ export function ProfilePickerModal() {
     timers.current.push(window.setTimeout(() => selectProfile(id), 680));
   };
 
+
   return createPortal(
     <div
       data-tauri-drag-region
-      className={`fixed inset-0 z-[180] flex items-center justify-center bg-black/85 backdrop-blur-2xl transition-opacity duration-[340ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        exiting ? "opacity-0" : "animate-in fade-in duration-500"
-      }`}
+      className={`fixed inset-0 z-[180] flex items-center justify-center transition-opacity duration-[340ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        bg.image ? "bg-black" : "bg-black/85 backdrop-blur-2xl"
+      } ${exiting ? "opacity-0" : "animate-in fade-in duration-500"}`}
     >
+      {bg.image && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `url(${bg.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `linear-gradient(to bottom, rgb(0 0 0 / ${bg.dim / 100 + 0.14}) 0%, rgb(0 0 0 / ${bg.dim / 100}) 38%, rgb(0 0 0 / ${Math.min(0.94, bg.dim / 100 + 0.22)}) 100%)`,
+            }}
+          />
+        </>
+      )}
       <div
         ref={dialogRef}
         role="dialog"

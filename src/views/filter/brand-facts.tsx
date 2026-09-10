@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useCinemetaRating } from "@/lib/providers/cinemeta-rating";
 import { MOVIE_GENRES, TV_GENRES } from "@/lib/feed/tags";
 import { useT, useUiLanguage } from "@/lib/i18n";
 import {
@@ -90,11 +91,11 @@ export function BrandFacts({ filter, details, stats }: { filter: Branded; detail
     }
   }, [uiLang]);
   const tv = filter.mediaType === "tv";
+  const acclaimedImdb = useCinemetaRating(stats?.mostAcclaimed?.imdbId ?? undefined);
   const genreTable = tv ? TV_GENRES : MOVIE_GENRES;
 
   const facts: Fact[] = [];
   if (stats) {
-    if (stats.rating !== null) facts.push({ key: "rating", value: `★ ${stats.rating.toFixed(1)}`, label: t("Average rating") });
     if (stats.first?.year) {
       facts.push({ key: "first", value: String(stats.first.year), label: tv ? t("First aired") : t("First release"), title: stats.first });
     }
@@ -116,9 +117,14 @@ export function BrandFacts({ filter, details, stats }: { filter: Branded; detail
       facts.push({ key: "onair", value: String(stats.onAir), label: t("Still on air"), sub: t("of {n} top shows", { n: stats.titles.length }) });
     }
     if (stats.mostAcclaimed) {
-      facts.push({ key: "acclaimed", value: `★ ${(stats.mostAcclaimed.rating ?? 0).toFixed(1)}`, label: t("Most acclaimed"), title: stats.mostAcclaimed });
+      const score = acclaimedImdb ?? (stats.mostAcclaimed.rating ?? 0).toFixed(1);
+      facts.push({
+        key: "acclaimed",
+        value: `★ ${score}`,
+        label: acclaimedImdb ? t("Highest rated on IMDb") : t("Most acclaimed"),
+        title: stats.mostAcclaimed,
+      });
     }
-    if (stats.avgRuntime) facts.push({ key: "runtime", value: t("{n} min", { n: stats.avgRuntime }), label: tv ? t("Average episode") : t("Average runtime") });
   }
 
   const chips: React.ReactNode[] = [];

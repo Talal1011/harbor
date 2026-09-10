@@ -1,6 +1,7 @@
 import { Dropdown } from "@/components/dropdown";
 import { Clock, UserCheck } from "../icons";
 import { useProfiles } from "@/lib/profiles";
+import { PickerBackground } from "./picker-background";
 import { useSettings } from "@/lib/settings";
 import { useT } from "@/lib/i18n";
 import { Segmented } from "../shared";
@@ -37,6 +38,7 @@ export function StartupDefaults() {
           onChange={(v) => update({ profilePromptInterval: v })}
         />
       </SettingRow>
+      <PickerBackground />
       <SettingRow
         icon={<UserCheck size={18} strokeWidth={2} />}
         label={t("Start as")}
