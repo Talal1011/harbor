@@ -132,7 +132,8 @@ export const ContinueCard = memo(function ContinueCard({
 
   const candidates = useMemo(() => {
     const thumb = upNext ? undefined : snapshot;
-    const still = upNext || !settings.cwPreferEpisodeStill ? undefined : hiResStill(epStill ?? undefined);
+    const still =
+      upNext || !settings.cwPreferEpisodeStill ? undefined : hiResStill(epStill ?? undefined);
     const seen = new Set<string>();
     const out: string[] = [];
     for (const u of [thumb, metaBg, item.background, item.poster]) {
@@ -144,9 +145,21 @@ export const ContinueCard = memo(function ContinueCard({
     }
     if (still && !seen.has(still)) out.unshift(still);
     return out;
-  }, [snapshot, epStill, settings.cwPreferEpisodeStill, metaBg, item.background, item.poster, upNext]);
+  }, [
+    snapshot,
+    epStill,
+    settings.cwPreferEpisodeStill,
+    metaBg,
+    item.background,
+    item.poster,
+    upNext,
+  ]);
 
   const src = candidates[imgIdx];
+
+  useEffect(() => {
+    setImgIdx(0);
+  }, [candidates]);
 
   useEffect(() => {
     setLogo(undefined);

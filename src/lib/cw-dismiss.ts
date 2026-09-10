@@ -185,8 +185,7 @@ export function dismissCw(item: LibraryItem, authKey: string | null): void {
   emit();
   if (!authKey || !item.state) return;
   const vid = item.state.video_id ?? "";
-  const kitsuThreeSeg =
-    /^(kitsu|mal|anilist|anidb):/.test(id) && vid.split(":").length === 3;
+  const kitsuThreeSeg = /^(kitsu|mal|anilist|anidb):/.test(id) && vid.split(":").length === 3;
   const se = kitsuThreeSeg ? null : episodeFromVideoId(item.state.video_id);
   clearResume(
     id,

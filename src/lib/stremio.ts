@@ -202,7 +202,10 @@ export async function libraryGetOne(authKey: string, id: string): Promise<Librar
   return items?.find((it) => it._id === id) ?? null;
 }
 
-export async function libraryGetOneStrict(authKey: string, id: string): Promise<LibraryItem | null> {
+export async function libraryGetOneStrict(
+  authKey: string,
+  id: string,
+): Promise<LibraryItem | null> {
   const items = await call<LibraryItem[]>("datastoreGet", {
     authKey,
     collection: "libraryItem",
@@ -241,7 +244,11 @@ export async function removeStremioLibraryItem(authKey: string, id: string): Pro
 export const CLOUD_OK = /^(tt\d|kitsu:|mal:|anilist:|anidb:|tmdb:)/;
 
 export const ANIME_CLOUD_ID = /^(kitsu|mal|anilist|anidb):/;
-export function cloudWriteId(metaId: string, resolved: string | null, verified: boolean): string | null {
+export function cloudWriteId(
+  metaId: string,
+  resolved: string | null,
+  verified: boolean,
+): string | null {
   if (metaId.startsWith("tt")) return metaId;
   if (ANIME_CLOUD_ID.test(metaId)) return null;
   if (verified && resolved && resolved.startsWith("tt")) return resolved;
