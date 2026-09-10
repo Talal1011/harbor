@@ -15,16 +15,16 @@ const hook = read("src/views/player/hooks/use-content-advisory.ts");
 const overlays = read("src/views/player/stage-overlays.tsx");
 const overlayLayers = read("src/views/player/player-overlay-layers.tsx");
 
-test("content advisory uses the approved translucent Harbor presentation", () => {
+test("content advisory uses the revised PR 1376 presentation", () => {
   assert.match(toast, /start-6 top-20/);
-  assert.match(toast, /w-\[264px\] overflow-hidden rounded-\[14px\]/);
-  assert.match(toast, /bg-black\/45[\s\S]*ring-1 ring-white\/10/);
+  assert.match(toast, /w-\[238px\]/);
+  assert.match(toast, /bg-black\/70/);
   assert.match(toast, /uppercase tracking-\[0\.16em\]/);
   assert.match(toast, /h-2\.5 w-1 rounded-full/);
-  assert.match(toast, /const HOLD_MS = 10_000/);
+  assert.match(toast, /const HOLD_MS = 28_000/);
   assert.match(toast, /const HOVER_TAIL_MS = 2_500/);
   assert.match(toast, /harbor-content-advisory-row/);
-  assert.match(toast, /h-\[2px\] bg-white\/10/);
+  assert.doesNotMatch(toast, /h-\[2px\] bg-white\/10/);
   assert.doesNotMatch(toast, /start-4 top-44|w-\[286px\]|bg-black\/80/);
 });
 

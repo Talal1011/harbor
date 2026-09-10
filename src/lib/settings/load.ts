@@ -204,6 +204,9 @@ export function loadStoredSettings(rawKey: string = STORAGE_KEY): Settings {
     if (parsed.contentAdvisoryTheme !== "monochrome" && parsed.contentAdvisoryTheme !== "colored") {
       parsed.contentAdvisoryTheme = "colored";
     }
+    if (typeof parsed.contentAdvisoryShowIgnore !== "boolean") {
+      parsed.contentAdvisoryShowIgnore = true;
+    }
     if (!parsed._skipButtonHideSecV2) {
       if (
         parsed.skipButtonHideSec === 10 ||
