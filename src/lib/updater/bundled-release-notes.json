@@ -1,0 +1,70 @@
+{
+  "notes": {
+    "0.9.125": {
+      "title": "Harbor Beta 0.9.125",
+      "intro": "Playback, subtitles, Continue Watching, navigation, and library improvements brought forward from Experimental 0.0.3 and 0.0.4, together with the latest approved beta changes.",
+      "sections": [
+        {
+          "heading": "Playback, subtitles, and X-Ray",
+          "items": [
+            "Fixed Arabic/English subtitle identity and grouping, and preserved manual Live Try timing through seeking and pause/resume.",
+            "Improved encrypted HLS playback to address repeated segment stalls (#1400).",
+            "Improved Windows audio-output switching and recovery (#1334), and restored window bounds and maximized state after leaving fullscreen (#1394).",
+            "Select an X-Ray actor to browse their movies and TV shows without leaving the player.",
+            "Added Linux MPRIS desktop media controls for playback, seeking, volume, and metadata (#1372)."
+          ]
+        },
+        {
+          "heading": "Continue Watching and your library",
+          "items": [
+            "Dismissed cards can return when you make further progress, including progress from Trakt and Simkl. Improved external-source refresh and retained shared-profile safeguards (#1411, #1359).",
+            "Added optional episode-still artwork for Continue Watching, with your saved frame as a fallback. This preference is off by default (#1411).",
+            "Season selection follows watch progress (#1401).",
+            "Added drag-and-drop list reordering (#1361) and descriptions for custom and featured lists (#1371)."
+          ]
+        },
+        {
+          "heading": "Navigation and appearance",
+          "items": [
+            "Improved TV/controller navigation across settings, settings focus, and home search (#1408).",
+            "Improved Arabic/RTL navigation in Big Picture, the poster dock, and live TV multiview (#1406).",
+            "Restored the standard row arrows while retaining navigation fixes. Liquid Glass arrows are unchanged.",
+            "Restored ElegantFin sidebar collapse and Back alignment (#1399).",
+            "Refreshed the content advisory popup with translucent styling and updated animations. Removed the migration that automatically enabled content advisories.",
+            "Updated studio/network facts: removed average-rating/runtime facts and display an IMDb score for the featured acclaimed title when available.",
+            "Added a custom background and dimming control for the Who's watching screen."
+          ]
+        },
+        {
+          "heading": "Books, manga, and more",
+          "items": [
+            "Added full Edge TTS voice discovery for ebooks (#1409).",
+            "Included manga downloads, browsing/extension improvements, and AniList/MAL progress tracking (#1385).",
+            "Included desktop notifications (#1398) and controller cursor toggle, idle auto-hide, and input-yield options (#1362).",
+            "Experimental release notes remain available after installation, including offline. Beta 0.9.125 includes its own bundled changelog fallback.",
+            "Updated regression coverage for navigation, subtitles, release notes, Continue Watching, and background controls."
+          ]
+        },
+        {
+          "heading": "Account changes",
+          "items": [
+            "Discord account sign-in, linking, and recovery have been removed. Discord Rich Presence is separate and remains available."
+          ]
+        },
+        {
+          "heading": "A note from Talal",
+          "items": [
+            "Sorry for the delay, everyone, and thank you for your patience. The stable release will be published soon. Thank you to every tester, developer, and contributor helping us improve Harbor."
+          ]
+        },
+        {
+          "heading": "Feedback and credits",
+          "items": [
+            "Report issues at https://harborsystem.online with your version, operating system, steps to reproduce, and expected versus actual results. Remove passwords, tokens, IPTV credentials, and private URLs from logs or screenshots.",
+            "Credits: Thunderhawkk, uddx7, O1Abdulrahman, anmol210202, pengunnn, OwaisByte, kalashnikxvxiii, Talal1011, and the Harbor contributors."
+          ]
+        }
+      ]
+    }
+  }
+}

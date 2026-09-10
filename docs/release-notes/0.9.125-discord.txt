@@ -1,0 +1,42 @@
+# <:harbor:1528569473659834459> Harbor Update
+
+**Hey @everyone!**
+[Beta] v0.9.125 is being prepared. <:hooray:1528571878866948258>
+
+**What's included:**
+
+**Playback, subtitles, and X-Ray**
+
+> - Arabic/English subtitle labels and grouping fixes, with manual Live Try timing preserved through seeking and pause/resume
+> - Encrypted HLS playback improvements, Windows audio-output recovery, and fullscreen window restoration
+> - Select an X-Ray actor to browse their movies and TV shows without leaving the player
+> - Linux desktop media controls for playback, seeking, volume, and metadata
+
+**Continue Watching and your library**
+
+> - Dismissed cards return when you make further progress, with Trakt/Simkl refresh improvements and shared-profile safeguards
+> - Optional episode-still artwork for Continue Watching, with your saved frame as a fallback
+> - Season selection follows watch progress
+> - Drag-and-drop list reordering and descriptions for custom and featured lists
+
+**Navigation, appearance, and more**
+
+> - TV/controller navigation, settings focus, home search, and Arabic/RTL improvements
+> - Restored standard row arrows and ElegantFin sidebar/back alignment fixes
+> - Refreshed content advisory popup and studio/network facts
+> - Custom background and dimming for the “Who's watching” screen
+> - Full Edge TTS voice discovery for ebooks, manga improvements, desktop notifications, and controller cursor options
+> - Experimental changelogs remain available after installation, including offline
+
+**Account changes**
+
+> - Discord account sign-in, linking, and recovery have been removed. Discord Rich Presence remains available.
+
+**A note from Talal**
+
+> Sorry for the delay, everyone, and thank you for your patience. We're getting this beta ready, and the stable release will be published soon. Thank you to every tester, developer, and contributor helping us improve Harbor.
+
+-# Report issues through [Harbor System](https://harborsystem.online). Include your version, OS, and steps to reproduce. Remove passwords, tokens, and private URLs from logs or screenshots.
+-# Credits: Thunderhawkk, uddx7, O1Abdulrahman, anmol210202, pengunnn, OwaisByte, kalashnikxvxiii, Talal1011, and the Harbor contributors.
+
+//Talal <:love:1528571945677754398>
