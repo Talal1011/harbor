@@ -43,3 +43,13 @@ test("Rust observes audio-device-list so the event reaches the frontend", () => 
 test("Rust allows the ao-reload command", () => {
   assert.match(mpvRs, /"ao-reload",/);
 });
+
+test("refocus reload waits for a long absence and removes both listeners on disposal", () => {
+  assert.match(mpv, /const FOCUS_RELOAD_MIN_ABSENT_MS = 60_000/);
+  assert.match(mpv, /const onWindowBlur = \(\) => \{\s*lastWindowBlur = Date.now\(\)/);
+  assert.match(mpv, /Date.now\(\) - lastWindowBlur < FOCUS_RELOAD_MIN_ABSENT_MS\) return;\s*scheduleAudioDeviceReload\(\)/);
+  for (const [event, callback] of [["blur", "onWindowBlur"], ["focus", "onWindowFocusRestore"]]) {
+    assert.ok(mpv.includes(`window.addEventListener("${event}", ${callback})`));
+    assert.ok(mpv.includes(`window.removeEventListener("${event}", ${callback})`));
+  }
+});

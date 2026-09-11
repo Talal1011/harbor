@@ -109,6 +109,7 @@ export function mpvBridgeHarness(prefs = { volume: 0.35, muted: false }) {
     },
   };
   const module = { exports: {} as { createMpvBridge: () => PlayerBridge } };
+  const windowEvents = new EventTarget();
   new Function("require", "module", "exports", "window", "console", compiled)(
     (id: string) => {
       if (!(id in dependencies)) throw new Error(`Unexpected dependency: ${id}`);
@@ -116,7 +117,14 @@ export function mpvBridgeHarness(prefs = { volume: 0.35, muted: false }) {
     },
     module,
     module.exports,
-    { dispatchEvent: (event: Event) => errors.push(event.type) },
+    {
+      addEventListener: windowEvents.addEventListener.bind(windowEvents),
+      removeEventListener: windowEvents.removeEventListener.bind(windowEvents),
+      dispatchEvent: (event: Event) => {
+        errors.push(event.type);
+        return windowEvents.dispatchEvent(event);
+      },
+    },
     { warn() {}, info() {} },
   );
   const bridge = module.exports.createMpvBridge();
