@@ -20,6 +20,7 @@ export function PickerBackground() {
 
   return (
     <BackgroundPicker
+      variant="picker"
       imageData={image}
       dim={dim / 100}
       onImageChange={(data) => {
@@ -27,8 +28,9 @@ export function PickerBackground() {
         void savePickerBg(data);
       }}
       onDimChange={(next) => {
-        setDim(next * 100);
-        void savePickerBgDim(next * 100);
+        const pct = Math.round(next * 100);
+        setDim(pct);
+        void savePickerBgDim(pct);
       }}
     />
   );

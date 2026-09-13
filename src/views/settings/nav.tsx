@@ -1126,7 +1126,7 @@ const SETTINGS_OPTIONS: SettingsOption[] = [
   {
     label: "Who's watching background",
     section: "account",
-    anchorTitle: "Who's watching",
+    anchorTitle: "Who's watching background",
     keywords: [
       "profile picker background",
       "whos watching wallpaper",
