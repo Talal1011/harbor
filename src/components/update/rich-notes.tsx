@@ -1,6 +1,4 @@
 import type { NoteMedia, ReleaseNote } from "@/lib/updater/release-notes";
-import { handleLinkOutActivation, safeExternalUrl } from "@/lib/social/link-out-activation";
-import { openUrl } from "@/lib/window";
 
 export function RichNote({ note }: { note: ReleaseNote }) {
   return (
@@ -34,23 +32,6 @@ export function RichNote({ note }: { note: ReleaseNote }) {
               </li>
             ))}
           </ul>
-          {section.links?.map((link, j) => {
-            const href = safeExternalUrl(link.url);
-            if (!href) return null;
-            return (
-              <a
-                key={j}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(event) => handleLinkOutActivation(event, openUrl)}
-                onAuxClick={(event) => handleLinkOutActivation(event, openUrl)}
-                className="self-start text-[13px] text-accent underline underline-offset-2 focus-visible:outline-auto focus-visible:outline-offset-2"
-              >
-                {link.label}
-              </a>
-            );
-          })}
         </div>
       ))}
     </div>

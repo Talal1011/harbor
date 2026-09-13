@@ -9,11 +9,7 @@ export type NoteMedia = {
   height?: number;
 };
 
-export type NoteSection = {
-  heading?: string;
-  items: string[];
-  links?: { label: string; url: string }[];
-};
+export type NoteSection = { heading?: string; items: string[] };
 
 export type ReleaseNote = {
   title?: string;
