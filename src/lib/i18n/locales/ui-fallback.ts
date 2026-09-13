@@ -1,5 +1,15 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "Who's watching background": "Who's watching background",
+  "Shown behind the profile picker only. It does not change the app theme or wallpaper.":
+    "Shown behind the profile picker only. It does not change the app theme or wallpaper.",
+  "No background yet. The picker blurs the app behind it.":
+    "No background yet. The picker blurs the app behind it.",
+  "Who's watching preview": "Who's watching preview",
+  "Profile names and avatars should stay readable at this dim.":
+    "Profile names and avatars should stay readable at this dim.",
+  "0% shows the raw image. 100% covers it in black. 60-80% keeps profiles readable.":
+    "0% shows the raw image. 100% covers it in black. 60-80% keeps profiles readable.",
   "Highest rated on IMDb": "Highest rated on IMDb",
   "Prefer episode still artwork": "Prefer episode still artwork",
   "Show the detail page's episode still on the card instead of your saved frame. The saved frame is kept as a fallback when no still exists.":
