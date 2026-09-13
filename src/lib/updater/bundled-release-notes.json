@@ -36,7 +36,6 @@
         {
           "heading": "Request security",
           "items": [
-            "Provider credentials are no longer forwarded to a different origin by Harbor's native HTTP and stream-proxy redirect handling. Same-origin requests retain their provider headers.",
             "Improved provider domain checks, including public suffixes and shared hosting domains."
           ]
         },
@@ -50,7 +49,13 @@
             "On Windows, switch from SDR playback with RTX enabled to HDR and back. Check the picture, seeking, audio, and fullscreen.",
             "Finish an episode offline, reconnect, and check tracker history. Switch profiles and confirm pending progress does not move to the other profile.",
             "Check custom screensaver playback, subtitle pop-out open/close, settings search, and separate-window placement on a second monitor.",
-            "Report problems through Harbor's official Discord support. Include your version, platform, steps, and expected result. Remove passwords, tokens, and private URLs from anything you share."
+            "Report problems in our Discord bug-report channel using the link below. Include your version, platform, steps, and expected result. Remove passwords, tokens, and private URLs from anything you share."
+          ],
+          "links": [
+            {
+              "label": "Report a bug on Discord",
+              "url": "https://discord.com/channels/1528501875241123901/1545791737111253085"
+            }
           ]
         },
         {
