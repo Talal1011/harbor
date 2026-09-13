@@ -1034,8 +1034,7 @@ pub async fn mpv_start(
     if let Some(subs) = &args.subtitles {
         for subtitle in subs {
             let url = subtitle.url.replace('\\', "/");
-            if let Err(error) = mpv_argv_command(&mpv_arc, &["sub-add", &url, "auto"])
-            {
+            if let Err(error) = mpv_argv_command(&mpv_arc, &["sub-add", &url, "auto"]) {
                 eprintln!("[harbor::mpv] sub-add failed for {}: {}", url, error);
             }
         }
@@ -1685,7 +1684,7 @@ fn monitor_index_of_hwnd(hwnd_raw: isize) -> Option<i32> {
     use windows::core::BOOL;
     use windows::Win32::Foundation::{HWND, LPARAM, RECT};
     use windows::Win32::Graphics::Gdi::{
-        EnumDisplayMonitors, HMONITOR, MonitorFromWindow, MONITOR_DEFAULTTONEAREST,
+        EnumDisplayMonitors, MonitorFromWindow, HMONITOR, MONITOR_DEFAULTTONEAREST,
     };
 
     struct State {
@@ -1797,21 +1796,24 @@ fn monitor_hdr_active(hwnd_raw: isize) -> bool {
 #[cfg(windows)]
 fn set_monitor_advanced_color(hwnd_raw: isize, enable: bool) -> bool {
     use windows::Win32::Devices::Display::{
-        DisplayConfigGetDeviceInfo, DisplayConfigSetDeviceInfo, QueryDisplayConfig,
-        QDC_ONLY_ACTIVE_PATHS, DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME,
+        DisplayConfigGetDeviceInfo, DisplayConfigSetDeviceInfo, GetDisplayConfigBufferSizes,
+        QueryDisplayConfig, DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME,
         DISPLAYCONFIG_DEVICE_INFO_SET_ADVANCED_COLOR_STATE, DISPLAYCONFIG_MODE_INFO,
         DISPLAYCONFIG_PATH_INFO, DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE,
-        DISPLAYCONFIG_SOURCE_DEVICE_NAME,
-    };
-    use windows::Win32::Foundation::WIN32_ERROR;
-    use windows::Win32::Graphics::Gdi::{
-        GetMonitorInfoW, MONITORINFOEXW, MonitorFromWindow, MONITOR_DEFAULTTONEAREST,
+        DISPLAYCONFIG_SOURCE_DEVICE_NAME, QDC_ONLY_ACTIVE_PATHS,
     };
     use windows::Win32::Foundation::HWND;
+    use windows::Win32::Foundation::WIN32_ERROR;
+    use windows::Win32::Graphics::Gdi::{
+        GetMonitorInfoW, MonitorFromWindow, MONITORINFOEXW, MONITOR_DEFAULTTONEAREST,
+    };
 
     fn wide_to_string(raw: &[u16]) -> String {
         String::from_utf16_lossy(
-            &raw.iter().take_while(|&&c| c != 0).copied().collect::<Vec<u16>>(),
+            &raw.iter()
+                .take_while(|&&c| c != 0)
+                .copied()
+                .collect::<Vec<u16>>(),
         )
     }
 
@@ -1833,14 +1835,8 @@ fn set_monitor_advanced_color(hwnd_raw: isize, enable: bool) -> bool {
     unsafe {
         let mut path_count = 0u32;
         let mut mode_count = 0u32;
-        if QueryDisplayConfig(
-            QDC_ONLY_ACTIVE_PATHS,
-            &mut path_count,
-            std::ptr::null_mut(),
-            &mut mode_count,
-            std::ptr::null_mut(),
-            None,
-        ) != WIN32_ERROR(0)
+        if GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &mut path_count, &mut mode_count)
+            != WIN32_ERROR(0)
             || path_count == 0
             || path_count > 64
         {
@@ -2796,11 +2792,7 @@ pub async fn mpv_stop(app: AppHandle, state: State<'_, MpvState>) -> Result<(), 
             });
             let _ = rx.recv_timeout(std::time::Duration::from_millis(4000));
         }
-        #[cfg(all(
-            not(target_os = "macos"),
-            not(target_os = "linux"),
-            not(windows)
-        ))]
+        #[cfg(all(not(target_os = "macos"), not(target_os = "linux"), not(windows)))]
         {
             let _ = session.mpv.command("quit", &[]);
             drop(session);
@@ -3358,7 +3350,10 @@ mod extra_option_parser_tests {
 
     #[test]
     fn drops_empty_keys() {
-        assert_eq!(parse_extra_option_lines("--=auto\n=auto\n  =  "), Vec::new());
+        assert_eq!(
+            parse_extra_option_lines("--=auto\n=auto\n  =  "),
+            Vec::new()
+        );
     }
 
     #[test]
@@ -3386,7 +3381,10 @@ mod script_pre_init_tests {
         assert_eq!(
             init_only,
             vec![
-                ("scripts".to_string(), "C:\\scripts\\hdr-mode.lua".to_string()),
+                (
+                    "scripts".to_string(),
+                    "C:\\scripts\\hdr-mode.lua".to_string()
+                ),
                 ("script-opts".to_string(), "hdr-mode=peak=1000".to_string()),
                 ("load-scripts".to_string(), "yes".to_string()),
             ]
@@ -3412,7 +3410,8 @@ mod script_pre_init_tests {
 
     #[test]
     fn join_scripts_uses_platform_separator_and_rejects_empty_entries() {
-        let (init_only, _) = split_extra_option_pairs("scripts=a.lua\nscripts=\nload-script=b.lua\n");
+        let (init_only, _) =
+            split_extra_option_pairs("scripts=a.lua\nscripts=\nload-script=b.lua\n");
         let joined = join_init_only_pairs(&init_only);
         let sep = if cfg!(windows) { ";" } else { ":" };
         assert_eq!(

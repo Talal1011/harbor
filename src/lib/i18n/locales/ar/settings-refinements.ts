@@ -774,6 +774,24 @@ const settingsRefinements: Record<string, string> = {
   "The settings sidebar uses a separate icon set, not drawn by Abiyyu.":
     "يستخدم الشريط الجانبي للإعدادات مجموعة أيقونات منفصلة لم يرسمها Abiyyu.",
   "Controller button glyphs:": "رموز أزرار وحدات التحكم:",
+  "Share as link": "مشاركة كرابط",
+  "Back in two weeks": "يعود بعد أسبوعين",
+  "Never shown again": "لن يظهر مجددًا",
+  "Directed by {name}": "إخراج {name}",
+  "Click to choose": "انقر للاختيار",
+  "Default drifts through backdrops from what's trending. Boat plays a hand drawn illustration. Custom plays your own videos, GIFs, or images.":
+    "يعرض الافتراضي خلفيات من المحتوى الرائج. يعرض القارب رسماً يدوياً. يعرض المخصص مقاطع الفيديو أو صور GIF أو الصور التي تختارها.",
+  Boat: "قارب",
+  "Your screensavers": "شاشات التوقف الخاصة بك",
+  "Add videos, GIFs, or images from this computer. Videos loop with the sound off, and everything fills the screen.":
+    "أضف مقاطع فيديو أو صور GIF أو صوراً من هذا الجهاز. تتكرر مقاطع الفيديو دون صوت، ويملأ المحتوى الشاشة.",
+  "Nothing added yet. The default screensaver plays until you add one.":
+    "لم تُضف شيئاً بعد. تظهر شاشة التوقف الافتراضية حتى تضيف محتوى.",
+  "Add video, GIF, or image": "إضافة فيديو أو صورة GIF أو صورة",
+  "Try it now": "جرّب الآن",
+  GIF: "GIF",
+  "{kind} · In use": "{kind} · قيد الاستخدام",
+  Use: "استخدام",
 };
 
 export default settingsRefinements;

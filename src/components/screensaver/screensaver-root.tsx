@@ -152,7 +152,13 @@ export function ScreensaverRoot() {
           onFail={() => setFailedId(customMedia.id)}
         />
       ) : (
-        <AmbientOverlay items={items} reduce={reduce} visible={visible} onDismiss={dismissAll} neverDeep />
+        <AmbientOverlay
+          items={items}
+          reduce={reduce}
+          visible={visible}
+          onDismiss={dismissAll}
+          neverDeep
+        />
       )}
     </Suspense>
   );

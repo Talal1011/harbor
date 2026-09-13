@@ -17,6 +17,8 @@
             "Fixed the Windows player startup background and cleanup of Harbor's RTX filter when switching between eligible SDR and HDR sources.",
             "Fixed subtitle text remaining visible after selecting Off, including late subtitle events.",
             "Included seeking, Windows audio recovery, and content-advisory updates.",
+            "Load custom mpv scripts before player initialization and open the separate Windows player on Harbor's display (#1422). HDR display restoration still needs device-specific verification, especially in separate-window mode.",
+            "Improved subtitle pop-out placement and prevented duplicate subtitle overlays while it is open.",
             "Improved playback statistics: unavailable drop counters no longer appear as a measured zero. This is not a universal fix for fullscreen stuttering."
           ]
         },
@@ -25,6 +27,8 @@
           "items": [
             "Improved Discover loading and scrolling behavior.",
             "Updated settings layouts and profile-background previews, and added the subtitle-FPS icon to the icon collection.",
+            "Added custom screensaver videos, GIFs and images, richer Voyage hover details, and corrected settings-search destinations.",
+            "Improved anime Continue Watching deduplication and Bleach TYBW episode labels. Added offline retry queues for Trakt and Simkl progress, isolated by Harbor profile (#1421).",
             "Retained the approved Continue Watching and plugin updates, along with earlier beta and experimental fixes.",
             "These version-specific release notes remain available offline after installation."
           ]
@@ -44,6 +48,8 @@
             "Check account actions after real session renewal without signing in again. Offline recovery and expiry retry have passed simulated tests; live verification is still pending.",
             "Turn subtitles Off while a line is visible, seek, then turn them on again. Check that no old line stays on screen.",
             "On Windows, switch from SDR playback with RTX enabled to HDR and back. Check the picture, seeking, audio, and fullscreen.",
+            "Finish an episode offline, reconnect, and check tracker history. Switch profiles and confirm pending progress does not move to the other profile.",
+            "Check custom screensaver playback, subtitle pop-out open/close, settings search, and separate-window placement on a second monitor.",
             "Report problems through Harbor's official Discord support. Include your version, platform, steps, and expected result. Remove passwords, tokens, and private URLs from anything you share."
           ]
         },

@@ -1,5 +1,10 @@
 import { simklRequest } from "./client";
-import { buildBody, type EpisodeRef, type ScrobbleAction, type ScrobbleInfo } from "./scrobble-body";
+import {
+  buildBody,
+  type EpisodeRef,
+  type ScrobbleAction,
+  type ScrobbleInfo,
+} from "./scrobble-body";
 
 export { buildBody };
 export type { EpisodeRef, ScrobbleAction, ScrobbleInfo };

@@ -2,6 +2,21 @@ import type { TraktEpisodeRef } from "./ids";
 import type { TraktTarget } from "./types";
 
 const KEY = "harbor.trakt.pendingstops.v1";
+// Tracker accounts belong to Harbor profiles; never replay an unowned legacy queue.
+import { activeProfileId } from "@/lib/active-profile-id";
+
+let generation = 0;
+function storageKey(): string {
+  return `${KEY}.${activeProfileId()}`;
+}
+export function clearPendingStops(): void {
+  generation += 1;
+  try {
+    localStorage.removeItem(storageKey());
+  } catch {
+    /* ignore unavailable storage */
+  }
+}
 const MAX = 50;
 const WATCHED_PCT = 70;
 
@@ -28,7 +43,7 @@ function keyOf(p: Pick<PendingStop, "metaId" | "episode">): string {
 
 function load(): PendingStop[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(storageKey());
     const parsed = raw ? (JSON.parse(raw) as PendingStop[]) : [];
     return Array.isArray(parsed) ? parsed.filter((p) => p && typeof p.metaId === "string") : [];
   } catch {
@@ -38,7 +53,7 @@ function load(): PendingStop[] {
 
 function save(list: PendingStop[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(list.slice(-MAX)));
+    localStorage.setItem(storageKey(), JSON.stringify(list.slice(0, MAX)));
   } catch {
     /* ignore */
   }
@@ -75,8 +90,12 @@ export async function flushPendingStops(
 ): Promise<{ flushed: number; remaining: number }> {
   const d = deps ?? flushDeps;
   if (!d || !d.hasSession()) return { flushed: 0, remaining: load().length };
+  const owner = storageKey();
+  const started = generation;
+  const stillOwned = () => owner === storageKey() && started === generation && d.hasSession();
   let flushed = 0;
   for (const p of load()) {
+    if (!stillOwned()) break;
     const key = keyOf(p);
     const target = d.resolveTarget(p.metaId, p.episode);
     if (!target) {
@@ -86,12 +105,13 @@ export async function flushPendingStops(
     let confirmed = false;
     try {
       const outcome = await d.stopScrobble(target, p.progress >= WATCHED_PCT ? 100 : p.progress);
+      if (!stillOwned()) break;
       confirmed = outcome === "recorded" || outcome === "already-recorded";
       if (!confirmed && p.progress >= WATCHED_PCT) confirmed = await d.markWatched(target);
     } catch {
       confirmed = false;
     }
-    if (confirmed) {
+    if (confirmed && stillOwned()) {
       flushed += 1;
       clearPending(key);
     }

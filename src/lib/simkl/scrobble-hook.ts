@@ -210,5 +210,3 @@ function sendBeacon(
     /* noop */
   }
 }
-
-

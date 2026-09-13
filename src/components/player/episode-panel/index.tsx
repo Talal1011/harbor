@@ -237,13 +237,13 @@ export function EpisodePanel({
       {resolvingFor && (
         <div className="pointer-events-auto absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/82 backdrop-blur-md animate-in fade-in duration-150">
           <HarborLoader size="md" caption={t("Connecting")} />
-            <p className="text-[13px] text-white/75">
-              {t("Loading {label}", {
-                label: `${displayEpLabel(resolvingFor, meta.id)}${
-                  resolvingFor.name ? ` · ${resolvingFor.name}` : ""
-                }`,
-              })}
-            </p>
+          <p className="text-[13px] text-white/75">
+            {t("Loading {label}", {
+              label: `${displayEpLabel(resolvingFor, meta.id)}${
+                resolvingFor.name ? ` · ${resolvingFor.name}` : ""
+              }`,
+            })}
+          </p>
           <button
             onClick={() => {
               resolveAcRef.current?.abort();

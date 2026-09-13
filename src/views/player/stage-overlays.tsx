@@ -71,14 +71,16 @@ export const StageOverlays = memo(function StageOverlays({
     !subAssNative && snap.subtitleTracks.some((track) => track.selected);
   return (
     <>
-      {(!pipMode || subShowInPip) && !captionsPopout && (!subAssNative || snap.secondarySubText) && (
-        <SubtitleOverlay
-          text={primarySubtitleVisible ? snap.subText : ""}
-          startSec={primarySubtitleVisible ? snap.subStartSec : 0}
-          scale={pipMode ? 0.45 : 1}
-          secondaryText={snap.secondarySubText}
-        />
-      )}
+      {(!pipMode || subShowInPip) &&
+        !captionsPopout &&
+        (!subAssNative || snap.secondarySubText) && (
+          <SubtitleOverlay
+            text={primarySubtitleVisible ? snap.subText : ""}
+            startSec={primarySubtitleVisible ? snap.subStartSec : 0}
+            scale={pipMode ? 0.45 : 1}
+            secondaryText={snap.secondarySubText}
+          />
+        )}
       {showStats && !pipMode && <StatsOverlay snap={snap} engine={engine} />}
       {!pipMode && <SubtitleOffsetIndicator delaySec={subtitleOffsetSec} />}
       {!pipMode && (

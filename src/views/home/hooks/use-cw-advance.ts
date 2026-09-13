@@ -4,7 +4,12 @@ import type { Meta } from "@/lib/cinemeta";
 import type { PlayEpisode } from "@/lib/view";
 import { getEpisodeProgress } from "@/lib/episode-progress";
 import { simklWatchedForId, statusForId, type WatchlistStatus } from "@/lib/simkl/list-status";
-import { episodeFromVideoId, isAnimeCwItem, libraryMetaType, type LibraryItem } from "@/lib/stremio";
+import {
+  episodeFromVideoId,
+  isAnimeCwItem,
+  libraryMetaType,
+  type LibraryItem,
+} from "@/lib/stremio";
 import { isEpisodeHidden } from "@/lib/hidden-episodes";
 import { isNextAired, resurfaceCandidates, type AnimeMode } from "@/lib/cw-resurface";
 import { lastPlayedEpisode } from "@/lib/resume";
@@ -109,7 +114,8 @@ function watchedPredicate(
     );
     if (prog.watched) return true;
     if (season === cur.season && episode === cur.episode) return finished;
-    if (simklCompleted && (season < cur.season || (season === cur.season && episode < cur.episode))) return true;
+    if (simklCompleted && (season < cur.season || (season === cur.season && episode < cur.episode)))
+      return true;
     return false;
   };
 }
@@ -290,7 +296,9 @@ export function useCwAdvance(
             waitingForAir: true as const,
             nextAirDate: nextEp.airDate,
           } as LibraryItem);
-        } else if (shouldDropFinished(list, fetchOk, i.state, animeMode, effCur, nextEp, hideCaughtUp)) {
+        } else if (
+          shouldDropFinished(list, fetchOk, i.state, animeMode, effCur, nextEp, hideCaughtUp)
+        ) {
           remove.add(i._id);
         }
       }
@@ -298,9 +306,12 @@ export function useCwAdvance(
       const inCw = new Set(items.map((i) => i._id));
       const watchedFor = (item: LibraryItem, c: { season: number; episode: number }) =>
         watchedPredicate(item, c, traktWatched, simklWatched, anilistWatched, simklStatus);
-      const resurfaced = await resurfaceCandidates(lib, inCw, { tmdbKey, animeMode }, watchedFor).catch(
-        () => new Map<string, { season: number; episode: number }>(),
-      );
+      const resurfaced = await resurfaceCandidates(
+        lib,
+        inCw,
+        { tmdbKey, animeMode },
+        watchedFor,
+      ).catch(() => new Map<string, { season: number; episode: number }>());
       if (cancelled) return;
       const extraItems: LibraryItem[] = [];
       for (const [id, ep] of resurfaced) {
@@ -348,7 +359,23 @@ export function useCwAdvance(
         airTimerRef.current = null;
       }
     };
-  }, [items, tmdbKey, enabled, library, animeMode, watchedVersion, traktWatched, simklWatched, anilistWatched, simklStatus, animeVersion, episodeHiding, hideCaughtUp, animeCwEnd, airTick]);
+  }, [
+    items,
+    tmdbKey,
+    enabled,
+    library,
+    animeMode,
+    watchedVersion,
+    traktWatched,
+    simklWatched,
+    anilistWatched,
+    simklStatus,
+    animeVersion,
+    episodeHiding,
+    hideCaughtUp,
+    animeCwEnd,
+    airTick,
+  ]);
 
   if (!enabled) return items;
   const base =

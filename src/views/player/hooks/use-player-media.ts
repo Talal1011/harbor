@@ -252,7 +252,15 @@ export function usePlayerMedia(params: {
     if (!subEmbed && !hdrNativeSurface) return;
     if (!bridgeReady) return;
     bridgeRef.current?.setSubVisible(subNativeRender && !captionsPopout);
-  }, [subEmbed, hdrNativeSurface, subNativeRender, selectedSubTrack?.id, bridgeReady, bridgeKey, captionsPopout]);
+  }, [
+    subEmbed,
+    hdrNativeSurface,
+    subNativeRender,
+    selectedSubTrack?.id,
+    bridgeReady,
+    bridgeKey,
+    captionsPopout,
+  ]);
   useEffect(() => {
     if (engine !== "html5") return;
     if (!bridgeReady) return;

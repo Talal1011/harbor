@@ -74,7 +74,9 @@ export function AutoPlayTransition({
         : `S${episode.imdbSeason ?? episode.season} · E${String(episode.imdbEpisode ?? episode.episode).padStart(2, "0")}`
       : null;
   return (
-    <main className={`harbor-connecting fixed inset-0 z-[120] overflow-hidden ${kid ? "bg-[#0c4a6e]" : "bg-black"}`}>
+    <main
+      className={`harbor-connecting fixed inset-0 z-[120] overflow-hidden ${kid ? "bg-[#0c4a6e]" : "bg-black"}`}
+    >
       <div data-tauri-drag-region className="absolute inset-x-0 top-0 z-20 h-16" />
       {backdrop && (
         <img

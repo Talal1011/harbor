@@ -1,4 +1,19 @@
 const KEY = "harbor.simkl.pendingwatched.v1";
+// Tracker accounts belong to Harbor profiles; never replay an unowned legacy queue.
+import { activeProfileId } from "@/lib/active-profile-id";
+
+let generation = 0;
+function storageKey(): string {
+  return `${KEY}.${activeProfileId()}`;
+}
+export function clearPendingWatches(): void {
+  generation += 1;
+  try {
+    localStorage.removeItem(storageKey());
+  } catch {
+    /* ignore unavailable storage */
+  }
+}
 const MAX = 50;
 
 export type PendingEpisode = {
@@ -19,10 +34,7 @@ export type PendingWatch = {
 
 export type FlushDeps = {
   hasSession: () => boolean;
-  stopScrobble: (
-    metaId: string,
-    episode: PendingEpisode | undefined,
-  ) => Promise<boolean>;
+  stopScrobble: (metaId: string, episode: PendingEpisode | undefined) => Promise<boolean>;
   recordWatched: (
     metaId: string,
     episode: PendingEpisode | undefined,
@@ -45,7 +57,7 @@ function validEpisode(v: number | undefined): v is number {
 
 function load(): PendingWatch[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(storageKey());
     const parsed = raw ? (JSON.parse(raw) as PendingWatch[]) : [];
     return Array.isArray(parsed) ? parsed.filter((p) => p && typeof p.metaId === "string") : [];
   } catch {
@@ -55,7 +67,7 @@ function load(): PendingWatch[] {
 
 function save(list: PendingWatch[]): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(list.slice(-MAX)));
+    localStorage.setItem(storageKey(), JSON.stringify(list.slice(0, MAX)));
   } catch {
     /* ignore */
   }
@@ -90,14 +102,17 @@ function cleanEpisode(ep: PendingEpisodeInput): PendingEpisode | undefined {
   return out;
 }
 
-export type PendingEpisodeInput = {
-  season?: number;
-  episode?: number;
-  imdbId?: string;
-  imdbSeason?: number;
-  imdbEpisode?: number;
-  tvdbEpisodeId?: number;
-} | undefined | null;
+export type PendingEpisodeInput =
+  | {
+      season?: number;
+      episode?: number;
+      imdbId?: string;
+      imdbSeason?: number;
+      imdbEpisode?: number;
+      tvdbEpisodeId?: number;
+    }
+  | undefined
+  | null;
 
 export function recordPendingWatch(
   metaId: string,
@@ -128,8 +143,12 @@ export async function flushPendingWatches(
 ): Promise<{ flushed: number; remaining: number }> {
   const d = deps ?? flushDeps;
   if (!d || !d.hasSession()) return { flushed: 0, remaining: load().length };
+  const owner = storageKey();
+  const started = generation;
+  const stillOwned = () => owner === storageKey() && started === generation && d.hasSession();
   let flushed = 0;
   for (const p of load()) {
+    if (!stillOwned()) break;
     const key = keyOf(p);
     let stopOk = false;
     let histOk = false;
@@ -141,11 +160,12 @@ export async function flushPendingWatches(
       stopOk = false;
     }
     try {
+      if (!stillOwned()) break;
       histOk = await d.recordWatched(p.metaId, p.episode, p.imdb);
     } catch {
       histOk = false;
     }
-    if (stopOk && histOk) {
+    if (stopOk && histOk && stillOwned()) {
       flushed += 1;
       clearPending(key);
     }

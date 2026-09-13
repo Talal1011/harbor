@@ -16,11 +16,14 @@ const compiled = ts.transpileModule(source, {
 }).outputText;
 const module = { exports: {} };
 const jsx = (type, props) => ({ type, props });
+let popoutOpen = false;
 new Function("require", "module", "exports", compiled)(
   (id) => {
     if (id === "react") return { memo: (component) => component };
     if (id === "react/jsx-runtime") return { jsx, jsxs: jsx, Fragment: "fragment" };
     if (id === "@/lib/i18n") return { useT: () => (text) => text };
+    if (id === "@/lib/player/captions-popout-state")
+      return { useCaptionsPopoutOpen: () => popoutOpen };
     if (id.startsWith("@/components/player/")) {
       return new Proxy({}, { get: (_, name) => name });
     }
@@ -53,3 +56,20 @@ for (const engine of ["mpv", "html5"]) {
     });
   }
 }
+
+test("opening the subtitle pop-out hides the duplicate player overlay", () => {
+  popoutOpen = true;
+  try {
+    const tree = module.exports.StageOverlays({
+      snap: { subtitleTracks: [{ selected: true }], subText: "Cue" },
+      volumeIndicator: { visible: false },
+      contentAdvisory: { categories: [] },
+    });
+    assert.equal(
+      tree.props.children.some((child) => child?.type === "SubtitleOverlay"),
+      false,
+    );
+  } finally {
+    popoutOpen = false;
+  }
+});

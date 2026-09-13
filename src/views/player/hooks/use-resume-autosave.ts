@@ -47,9 +47,13 @@ const animeTrackId = (s: PlayerSrc): string | null => {
 
 // Per-season sync resolution that also applies when a kitsu stream id is set.
 // Off the split-franchise allowlist this defers to stock eligibility.
-const animeIdentityEligibleForSync = (metaId: string, episode: PlayEpisode | undefined | null): boolean => {
+const animeIdentityEligibleForSync = (
+  metaId: string,
+  episode: PlayEpisode | undefined | null,
+): boolean => {
   if (typeof episode?.imdbSeason !== "number" || episode.imdbSeason < 1) return false;
-  if (!(isAnimeId(metaId) || metaId.startsWith("tt") || metaId.startsWith("tmdb:tv:"))) return false;
+  if (!(isAnimeId(metaId) || metaId.startsWith("tt") || metaId.startsWith("tmdb:tv:")))
+    return false;
   const kid = parseKitsuId(metaId) ?? parseKitsuId(episode?.kitsuStreamId ?? "");
   if (!isSplitFranchiseKitsu(kid)) return animeIdentityEligible(metaId, episode);
   return true;
@@ -99,8 +103,7 @@ export function useResumeAutosave(params: {
     se: number | undefined,
     cs: number | undefined,
     foreign: boolean,
-  ): number | undefined =>
-    splitFranchiseDisplaySeason(splitKitsuId(s)) ?? (foreign ? se : cs);
+  ): number | undefined => splitFranchiseDisplaySeason(splitKitsuId(s)) ?? (foreign ? se : cs);
 
   const splitSeasonForeign = (s: PlayerSrc, se?: number): boolean => {
     if (!isSplitFranchiseKitsu(splitKitsuId(s))) return false;
@@ -132,7 +135,13 @@ export function useResumeAutosave(params: {
       else clearResume(id, se, ep);
     } else if (covered.length) {
       for (const coveredEpisode of covered)
-        saveResumeMs(id, pos * 1000, se, coveredEpisode, displaySeasonFor(s, se, cs, seasonForeign));
+        saveResumeMs(
+          id,
+          pos * 1000,
+          se,
+          coveredEpisode,
+          displaySeasonFor(s, se, cs, seasonForeign),
+        );
     } else saveResumeMs(id, pos * 1000, se, ep, displaySeasonFor(s, se, cs, seasonForeign));
     if (typeof cs === "number") setViewedSeason(id, cs);
     if (isExternalPlaylistId(id)) return;
@@ -215,7 +224,9 @@ export function useResumeAutosave(params: {
     const trackEp =
       seasonForeign && typeof ep === "number"
         ? ep
-        : (s.episode?.sourceMetaId ? ep : (s.episode?.imdbEpisode ?? ep));
+        : s.episode?.sourceMetaId
+          ? ep
+          : (s.episode?.imdbEpisode ?? ep);
     const syncReady = finished || (sn.durationSec > 0 && pos / sn.durationSec >= SYNC_RATIO);
     const fireTrackers = (tid: string, tep: number | undefined): void => {
       if (anilistAutoSyncRef.current) void markAnimeWatching(tid, s.meta.name);

@@ -1,5 +1,23 @@
 // Newly introduced UI copy remains usable until each locale provides an override.
 const uiFallback: Record<string, string> = {
+  "Share as link": "Share as link",
+  "Back in two weeks": "Back in two weeks",
+  "Never shown again": "Never shown again",
+  "Directed by {name}": "Directed by {name}",
+  "Click to choose": "Click to choose",
+  "Default drifts through backdrops from what's trending. Boat plays a hand drawn illustration. Custom plays your own videos, GIFs, or images.":
+    "Default drifts through backdrops from what's trending. Boat plays a hand drawn illustration. Custom plays your own videos, GIFs, or images.",
+  Boat: "Boat",
+  "Your screensavers": "Your screensavers",
+  "Add videos, GIFs, or images from this computer. Videos loop with the sound off, and everything fills the screen.":
+    "Add videos, GIFs, or images from this computer. Videos loop with the sound off, and everything fills the screen.",
+  "Nothing added yet. The default screensaver plays until you add one.":
+    "Nothing added yet. The default screensaver plays until you add one.",
+  "Add video, GIF, or image": "Add video, GIF, or image",
+  "Try it now": "Try it now",
+  GIF: "GIF",
+  "{kind} · In use": "{kind} · In use",
+  Use: "Use",
   "Who's watching background": "Who's watching background",
   "Shown behind the profile picker only. It does not change the app theme or wallpaper.":
     "Shown behind the profile picker only. It does not change the app theme or wallpaper.",

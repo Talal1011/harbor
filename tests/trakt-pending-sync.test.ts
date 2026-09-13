@@ -13,7 +13,7 @@ import {
 } from "../src/lib/trakt/pending-sync.ts";
 
 function clearPending() {
-  localStorage.removeItem("harbor.trakt.pendingstops.v1");
+  localStorage.removeItem("harbor.trakt.pendingstops.v1.default");
 }
 
 test("failed terminal stops below the watched threshold are not queued", () => {
@@ -65,10 +65,7 @@ test("online arming is safe without a window", () => {
 });
 
 test("provider records failed stops and flushes on session", () => {
-  const src = readFileSync(
-    new URL("../src/lib/trakt/provider.tsx", import.meta.url),
-    "utf8",
-  );
+  const src = readFileSync(new URL("../src/lib/trakt/provider.tsx", import.meta.url), "utf8");
   assert.match(src, /recordPendingStop\(args\.metaId, args\.episode, progress\)/);
   assert.match(src, /armOnlineFlush\(\{/);
   assert.match(src, /flushPendingStops\(\)/);

@@ -385,7 +385,11 @@ export function SliderRow({
           {readout}
         </span>
         {resetTo !== undefined && (
-          <SliderReset settingName={label} show={value !== resetTo} onReset={() => onChange(resetTo)} />
+          <SliderReset
+            settingName={label}
+            show={value !== resetTo}
+            onReset={() => onChange(resetTo)}
+          />
         )}
       </div>
     </SettingRow>

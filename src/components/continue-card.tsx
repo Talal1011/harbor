@@ -63,7 +63,7 @@ function stripAnimeArcSuffix(name: string): string {
   for (const { matcher, replace } of ANIME_ARC_STRIP) {
     t = t.replace(new RegExp(`(?:\\s*[-:—]\\s*|\\s)${escapeRegExp(matcher)}$`, "i"), replace);
   }
-  return t.replace(/[\s°'."’˚_:\-]+$/g, "").trim();
+  return t.replace(/[\s°'."’˚_:-]+$/g, "").trim();
 }
 
 function escapeRegExp(s: string): string {

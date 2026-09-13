@@ -294,7 +294,11 @@ export function SettingsSidebar({
                     type="button"
                     onClick={() =>
                       onJump
-                        ? onJump(o.section, o.anchorTitle ? settingsAnchor(o.anchorTitle) : undefined, o.tab)
+                        ? onJump(
+                            o.section,
+                            o.anchorTitle ? settingsAnchor(o.anchorTitle) : undefined,
+                            o.tab,
+                          )
                         : onSelect(o.section, o.tab)
                     }
                     className="hset-rail-kid"

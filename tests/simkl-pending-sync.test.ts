@@ -13,7 +13,7 @@ import {
 } from "../src/lib/simkl/pending-sync.ts";
 
 function clearPending() {
-  localStorage.removeItem("harbor.simkl.pendingwatched.v1");
+  localStorage.removeItem("harbor.simkl.pendingwatched.v1.default");
 }
 
 test("watches without a usable identity are not queued", () => {
@@ -91,7 +91,11 @@ test("flush with no session is a no-op that preserves entries", async () => {
 test("flush replays the terminal stop before the history write", async () => {
   clearPending();
   const stops: Array<{ metaId: string; episode?: { season: number; episode: number } }> = [];
-  const watched: Array<{ metaId: string; episode?: { season: number; episode: number }; imdb?: string }> = [];
+  const watched: Array<{
+    metaId: string;
+    episode?: { season: number; episode: number };
+    imdb?: string;
+  }> = [];
   const deps = {
     hasSession: () => true,
     stopScrobble: async (
@@ -157,16 +161,10 @@ test("online arming is safe without a window", () => {
 });
 
 test("hook queues failed stops and provider flushes on session", () => {
-  const hook = readFileSync(
-    new URL("../src/lib/simkl/scrobble-hook.ts", import.meta.url),
-    "utf8",
-  );
+  const hook = readFileSync(new URL("../src/lib/simkl/scrobble-hook.ts", import.meta.url), "utf8");
   assert.match(hook, /recordPendingWatch\(prev\.metaId, prev\.episode,/);
   assert.match(hook, /recordPendingWatch\(a\.metaId, a\.episode,/);
-  const provider = readFileSync(
-    new URL("../src/lib/simkl/provider.tsx", import.meta.url),
-    "utf8",
-  );
+  const provider = readFileSync(new URL("../src/lib/simkl/provider.tsx", import.meta.url), "utf8");
   assert.match(provider, /armOnlineFlush\(\{/);
   assert.match(provider, /stopScrobble:/);
   assert.match(provider, /simklScrobble\("stop", metaId, episode, 100\)/);
@@ -174,10 +172,7 @@ test("hook queues failed stops and provider flushes on session", () => {
 });
 
 test("recordWatchedFallback reports its outcome", () => {
-  const src = readFileSync(
-    new URL("../src/lib/simkl/record-watched.ts", import.meta.url),
-    "utf8",
-  );
+  const src = readFileSync(new URL("../src/lib/simkl/record-watched.ts", import.meta.url), "utf8");
   assert.match(src, /Promise<boolean>/);
   assert.match(src, /if \(!t\) return false;/);
 });

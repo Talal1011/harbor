@@ -576,7 +576,15 @@ export function usePickHandler({
 }
 
 function metaEpisodeName(
-  meta: { videos?: Array<{ season?: number; episode?: number; number?: number; name?: string; title?: string }> },
+  meta: {
+    videos?: Array<{
+      season?: number;
+      episode?: number;
+      number?: number;
+      name?: string;
+      title?: string;
+    }>;
+  },
   episode: { season: number; episode: number },
 ): string | undefined {
   const match = meta.videos?.find(

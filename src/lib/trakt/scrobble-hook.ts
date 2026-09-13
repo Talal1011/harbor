@@ -111,15 +111,7 @@ export function useTraktScrobble({ src, snap }: { src: PlayerSrc; snap: Snap }):
       scrobble("pause", { metaId, episode: src.episode, progress });
       lastActionRef.current = "pause";
     }
-  }, [
-    isConnected,
-    resolveTarget,
-    scrobble,
-    metaId,
-    src.episode,
-    snap.status,
-    snap.durationSec,
-  ]);
+  }, [isConnected, resolveTarget, scrobble, metaId, src.episode, snap.status, snap.durationSec]);
 
   const seekTrackRef = useRef({ pos: 0, at: 0, lastResyncAt: 0 });
   useEffect(() => {
@@ -161,7 +153,11 @@ export function useTraktScrobble({ src, snap }: { src: PlayerSrc; snap: Snap }):
         const live = (getPlaybackPosition() / a.snap.durationSec) * 100;
         const progress = Math.min(100, Math.max(progressRef.current, live));
         const action = progress >= WATCHED_MARK_PCT ? "stop" : "pause";
-        scrobble(action, { metaId: a.metaId, episode: a.episode, progress: action === "stop" ? 100 : progress });
+        scrobble(action, {
+          metaId: a.metaId,
+          episode: a.episode,
+          progress: action === "stop" ? 100 : progress,
+        });
         lastActionRef.current = action;
       } else {
         lastActionRef.current = "pause";

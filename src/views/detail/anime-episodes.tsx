@@ -160,8 +160,7 @@ export function AnimeEpisodes({
     mwVersion,
   });
   const intentSeasonKey = useMemo(() => {
-    const partScoped =
-      splitFranchiseDisplaySeason(parseKitsuId(meta.id)) != null;
+    const partScoped = splitFranchiseDisplaySeason(parseKitsuId(meta.id)) != null;
     const counts = new Map<number, number>();
     for (const ep of episodes) {
       if (ep.sourceMetaId != null) continue;
@@ -528,10 +527,7 @@ export function AnimeEpisodes({
                 }
               />
             ) : tvdbPanel.active ? (
-              <div
-                aria-hidden
-                className="h-10 w-44 animate-pulse rounded-full bg-white/[0.06]"
-              />
+              <div aria-hidden className="h-10 w-44 animate-pulse rounded-full bg-white/[0.06]" />
             ) : effectiveOrder ? (
               <SeasonArcPicker
                 items={pickerItems}

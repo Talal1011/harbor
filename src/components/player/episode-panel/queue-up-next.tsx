@@ -23,14 +23,16 @@ export function QueueUpNext({
   const { openPicker } = useView();
   if (queue.length === 0) return null;
   const currentIdx = queueIndexOf(meta, currentEpisode);
-  const currentId = currentIdx >= 0 ? queue[currentIdx]?.id ?? null : null;
+  const currentId = currentIdx >= 0 ? (queue[currentIdx]?.id ?? null) : null;
   const nextId = queueItemAfter(meta, currentEpisode)?.id ?? null;
   return (
     <div className="mt-5 flex flex-col gap-2 border-t border-edge-soft/60 pt-4">
       <div className="flex items-center justify-between px-1">
         <h3 className="text-[11px] font-bold uppercase tracking-[0.22em] text-ink-subtle">
           {t("In your queue")}
-          <span className="ms-1.5 font-semibold tabular-nums text-ink-subtle/70">{queue.length}</span>
+          <span className="ms-1.5 font-semibold tabular-nums text-ink-subtle/70">
+            {queue.length}
+          </span>
         </h3>
         {!roomGuest && (
           <button
@@ -97,7 +99,9 @@ export function QueueUpNext({
                 )}
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="line-clamp-1 text-[14px] font-medium text-ink">{item.meta.name}</span>
+                <span className="line-clamp-1 text-[14px] font-medium text-ink">
+                  {item.meta.name}
+                </span>
                 <span className="flex items-center gap-1.5 text-[12px] text-ink-subtle">
                   {isNextUp && (
                     <span className="rounded-full bg-accent/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">

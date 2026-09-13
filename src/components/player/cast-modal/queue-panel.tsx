@@ -69,7 +69,9 @@ function CwSuggestionRow({
   const episode = cwEpisode(card);
   const queued = useIsQueued(meta, episode);
   const pct = Math.round(card.progress * 100);
-  const epLabel = episode ? `S${episode.season} · E${String(episode.episode).padStart(2, "0")}` : null;
+  const epLabel = episode
+    ? `S${episode.season} · E${String(episode.episode).padStart(2, "0")}`
+    : null;
   return (
     <div className="group flex items-center gap-3 rounded-xl bg-white/[0.04] p-2 transition-colors hover:bg-white/[0.07]">
       <button
@@ -180,9 +182,14 @@ export function QueuePanel({
       return;
     }
     let cancelled = false;
-    fetchUpcomingEpisodes(currentMeta, { season: currentEpisode.season, episode: currentEpisode.episode }, 8, {
-      tmdbKey: settings.tmdbKey,
-    })
+    fetchUpcomingEpisodes(
+      currentMeta,
+      { season: currentEpisode.season, episode: currentEpisode.episode },
+      8,
+      {
+        tmdbKey: settings.tmdbKey,
+      },
+    )
       .then((eps) => {
         if (!cancelled) setUpcoming(eps);
       })
@@ -230,9 +237,15 @@ export function QueuePanel({
                     <span className="line-clamp-1 text-[14px] font-medium text-white/90">
                       {ep.name || t("Episode {n}", { n: ep.episode })}
                     </span>
-                    <span className="text-[12px] text-white/45">{episodeLabel(ep, currentMeta?.id)}</span>
+                    <span className="text-[12px] text-white/45">
+                      {episodeLabel(ep, currentMeta?.id)}
+                    </span>
                   </div>
-                  <Play size={16} className="shrink-0 text-white/40 group-hover:text-white" fill="currentColor" />
+                  <Play
+                    size={16}
+                    className="shrink-0 text-white/40 group-hover:text-white"
+                    fill="currentColor"
+                  />
                 </button>
               ))}
             </div>
@@ -271,7 +284,9 @@ export function QueuePanel({
             type="button"
             onClick={() => setSleepAtEnd(!sleepAtEnd)}
             className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors ${
-              sleepAtEnd ? "bg-white text-black" : "bg-white/[0.08] text-white/70 ring-1 ring-white/12 hover:bg-white/15"
+              sleepAtEnd
+                ? "bg-white text-black"
+                : "bg-white/[0.08] text-white/70 ring-1 ring-white/12 hover:bg-white/15"
             }`}
           >
             <Moon size={15} strokeWidth={2.3} />
@@ -317,46 +332,51 @@ export function QueuePanel({
                 >
                   <GripVertical size={16} />
                 </button>
-                <span className="w-4 shrink-0 text-center text-[13px] font-bold text-white/35">{i + 1}</span>
-              <div className="h-14 w-24 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
-                {(item.meta.background || item.meta.poster) && (
-                  <img
-                    src={item.meta.background || item.meta.poster}
-                    alt=""
-                    draggable={false}
-                    className="h-full w-full object-cover"
-                  />
-                )}
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="line-clamp-1 text-[14.5px] font-semibold text-white">{item.meta.name}</span>
-                <span className="text-[12.5px] text-white/45">
-                  {[epLabel, mins > 0 ? `${mins}m` : null].filter(Boolean).join(" · ")}
+                <span className="w-4 shrink-0 text-center text-[13px] font-bold text-white/35">
+                  {i + 1}
                 </span>
+                <div className="h-14 w-24 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
+                  {(item.meta.background || item.meta.poster) && (
+                    <img
+                      src={item.meta.background || item.meta.poster}
+                      alt=""
+                      draggable={false}
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="line-clamp-1 text-[14.5px] font-semibold text-white">
+                    {item.meta.name}
+                  </span>
+                  <span className="text-[12.5px] text-white/45">
+                    {[epLabel, mins > 0 ? `${mins}m` : null].filter(Boolean).join(" · ")}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    queueRemove(item.id);
+                    onPlay(item.meta, item.episode);
+                  }}
+                  aria-label={t("Play")}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105"
+                >
+                  <Play size={17} fill="currentColor" className="ml-0.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => queueRemove(item.id)}
+                  aria-label={t("Remove from queue")}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/45 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <X size={18} strokeWidth={2.2} />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  queueRemove(item.id);
-                  onPlay(item.meta, item.episode);
-                }}
-                aria-label={t("Play")}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105"
-              >
-                <Play size={17} fill="currentColor" className="ml-0.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => queueRemove(item.id)}
-                aria-label={t("Remove from queue")}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/45 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                <X size={18} strokeWidth={2.2} />
-              </button>
-              </div>
-              {dragId != null && dragId !== item.id && dropIndex === queue.length && i === queue.length - 1 && (
-                <div className="mx-1 h-0.5 rounded-full bg-accent" />
-              )}
+              {dragId != null &&
+                dragId !== item.id &&
+                dropIndex === queue.length &&
+                i === queue.length - 1 && <div className="mx-1 h-0.5 rounded-full bg-accent" />}
             </div>
           );
         })}
