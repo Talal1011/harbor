@@ -7335,3 +7335,7 @@ button.hset-rail-me:hover,
   outline: 2px solid var(--color-accent) !important;
   outline-offset: 2px;
 }
+
+.harbor-queue-tile {
+  --poster-radius: var(--radius-md);
+}

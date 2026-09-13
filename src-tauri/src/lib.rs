@@ -44,6 +44,7 @@ mod app_icon;
 mod asr_model;
 #[cfg(desktop)]
 mod browser;
+mod browser_args;
 #[cfg(desktop)]
 mod captions;
 #[cfg(desktop)]

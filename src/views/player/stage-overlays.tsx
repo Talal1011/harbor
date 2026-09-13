@@ -19,6 +19,7 @@ import {
   type ContentAdvisoryPosition,
 } from "@/components/player/content-advisory-toast";
 import { useT } from "@/lib/i18n";
+import { useCaptionsPopoutOpen } from "@/lib/player/captions-popout-state";
 
 export const StageOverlays = memo(function StageOverlays({
   snap,
@@ -63,13 +64,14 @@ export const StageOverlays = memo(function StageOverlays({
   chromeVisible: boolean;
 }) {
   const t = useT();
+  const captionsPopout = useCaptionsPopoutOpen();
   const showVolumeIndicator = volumeIndicator.visible;
   const topVolumeShowing = showVolumeIndicator && volumeHudPosition === "top";
   const primarySubtitleVisible =
     !subAssNative && snap.subtitleTracks.some((track) => track.selected);
   return (
     <>
-      {(!pipMode || subShowInPip) && (!subAssNative || snap.secondarySubText) && (
+      {(!pipMode || subShowInPip) && !captionsPopout && (!subAssNative || snap.secondarySubText) && (
         <SubtitleOverlay
           text={primarySubtitleVisible ? snap.subText : ""}
           startSec={primarySubtitleVisible ? snap.subStartSec : 0}
