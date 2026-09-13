@@ -14,6 +14,7 @@ mod ebook_tts;
 mod fonts;
 mod gamepad;
 mod http_fetch;
+mod http_redirect;
 mod local_lib;
 mod media_server;
 mod power;
@@ -100,8 +101,6 @@ mod sub_extract;
 mod subsync;
 #[cfg(desktop)]
 mod svp;
-#[cfg(windows)]
-mod win_graphics;
 #[cfg(desktop)]
 mod thumbs;
 #[cfg(desktop)]
@@ -110,6 +109,8 @@ mod trailer;
 mod tray;
 #[cfg(desktop)]
 mod webview_helpers;
+#[cfg(windows)]
+mod win_graphics;
 
 // http_fetch calls crate::cf_solver on the challenge path, and the real solver
 // needs a hidden webview window that Android does not have. Rather than edit

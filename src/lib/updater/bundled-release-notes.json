@@ -24,8 +24,16 @@
           "heading": "Browsing and retained changes",
           "items": [
             "Improved Discover loading and scrolling behavior.",
+            "Updated settings layouts and profile-background previews, and added the subtitle-FPS icon to the icon collection.",
             "Retained the approved Continue Watching and plugin updates, along with earlier beta and experimental fixes.",
             "These version-specific release notes remain available offline after installation."
+          ]
+        },
+        {
+          "heading": "Request security",
+          "items": [
+            "Provider credentials are no longer forwarded to a different origin by Harbor's native HTTP and stream-proxy redirect handling. Same-origin requests retain their provider headers.",
+            "Improved provider domain checks, including public suffixes and shared hosting domains."
           ]
         },
         {

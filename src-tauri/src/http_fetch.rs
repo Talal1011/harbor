@@ -4,6 +4,7 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::OnceLock;
 use std::time::Duration;
 
+use crate::http_redirect::same_origin;
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{Semaphore, SemaphorePermit};
@@ -182,12 +183,6 @@ async fn validate_target(url: &reqwest::Url, allow_local: bool) -> Result<(), St
         }
     }
     Ok(())
-}
-
-fn same_origin(a: &reqwest::Url, b: &reqwest::Url) -> bool {
-    a.scheme() == b.scheme()
-        && a.host_str() == b.host_str()
-        && a.port_or_known_default() == b.port_or_known_default()
 }
 
 fn is_https_downgrade(a: &reqwest::Url, b: &reqwest::Url) -> bool {
@@ -473,20 +468,7 @@ async fn harbor_fetch_inner(
         }
         if cross_origin {
             subtitle_credential = None;
-            strip_headers(
-                &mut headers,
-                &[
-                    "authorization",
-                    "proxy-authorization",
-                    "x-api-key",
-                    "api-key",
-                    "x-auth-token",
-                    "x-harbor-auth",
-                    "cookie",
-                    "referer",
-                    "origin",
-                ],
-            );
+            headers.retain(|(name, _)| crate::http_redirect::safe_cross_origin_header(name));
         }
         if had_body && body.is_none() {
             strip_headers(
@@ -706,9 +688,10 @@ mod tests {
             ("X-API-Key".to_string(), "secret".to_string()),
             ("Authorization".to_string(), "Bearer secret".to_string()),
             ("Cookie".to_string(), "session=secret".to_string()),
+            ("X-Unknown-Token".to_string(), "synthetic-only".to_string()),
             ("Accept".to_string(), "application/zip".to_string()),
         ];
-        strip_headers(&mut headers, &["x-api-key", "authorization", "cookie"]);
+        headers.retain(|(name, _)| crate::http_redirect::safe_cross_origin_header(name));
         assert_eq!(
             headers,
             vec![("Accept".to_string(), "application/zip".to_string())]
@@ -809,12 +792,21 @@ mod tests {
             "http://169.254.169.254/latest/meta-data/",
         ] {
             let url: reqwest::Url = value.parse().unwrap();
-            assert!(validate_target(&url, false).await.is_err(), "{value} blocked");
-            assert!(validate_target(&url, true).await.is_ok(), "{value} allowed with allow_local");
+            assert!(
+                validate_target(&url, false).await.is_err(),
+                "{value} blocked"
+            );
+            assert!(
+                validate_target(&url, true).await.is_ok(),
+                "{value} allowed with allow_local"
+            );
         }
         for value in ["http://192.168.1.10:4567/api", "http://8.8.8.8:4567/api"] {
             let url: reqwest::Url = value.parse().unwrap();
-            assert!(validate_target(&url, false).await.is_ok(), "{value} public ok");
+            assert!(
+                validate_target(&url, false).await.is_ok(),
+                "{value} public ok"
+            );
         }
     }
 }

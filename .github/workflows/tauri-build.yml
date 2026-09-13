@@ -91,6 +91,11 @@ jobs:
       - name: Install JS deps
         run: pnpm install --frozen-lockfile
 
+      - name: Verify HTTP redirect boundaries
+        env:
+          CARGO_BUILD_JOBS: 2
+        run: cargo test --manifest-path scripts/http-redirect-tests/Cargo.toml --locked --lib
+
       - name: Fetch libmpv (Windows)
         if: contains(matrix.platform.runner, 'windows')
         run: pnpm run setup:libmpv
