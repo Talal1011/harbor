@@ -15,6 +15,82 @@ const tracks = [
   { type: "sub", id: 2, lang: "ar", selected: false },
 ];
 
+for (const paused of [false, true]) {
+  test(`confirmed subtitle Off clears a visible cue while ${paused ? "paused" : "playing"}`, async () => {
+    const h = mpvBridgeHarness();
+    await h.bridge.load({ url: "fixture.mkv" });
+    h.emit("track-list", tracks);
+    h.emit("pause", paused);
+    h.emit("sub-text", "Visible English cue");
+    h.emit("sub-start", 12);
+    h.emit("secondary-sub-text", "ترجمة ثانية");
+    h.bridge.setSubtitleTrack(null);
+    await flushBridge();
+    assert.equal(h.snapshot().subText, "");
+    assert.equal(h.snapshot().subStartSec, 0);
+    assert.equal(h.snapshot().secondarySubText, "ترجمة ثانية");
+    h.emit("sub-text", "Delayed old cue");
+    h.emit("sub-start", 12);
+    assert.equal(h.snapshot().subText, "");
+    assert.equal(h.snapshot().subStartSec, 0);
+    h.bridge.seek(20);
+    h.emit("sub-text", "Delayed cue after seek");
+    assert.equal(h.snapshot().subText, "");
+    h.bridge.setSubtitleTrack("2");
+    await flushBridge();
+    h.emit("sub-text", "ترجمة عربية");
+    h.emit("sub-start", 20);
+    assert.equal(h.snapshot().subText, "ترجمة عربية");
+    assert.equal(h.snapshot().subStartSec, 20);
+  });
+}
+
+test("native track deselection clears primary text without hiding secondary subtitles", async () => {
+  const h = mpvBridgeHarness();
+  await h.bridge.load({ url: "fixture.mkv" });
+  h.emit("track-list", tracks);
+  h.emit("sub-text", "Old primary cue");
+  h.emit("sub-start", 4);
+  h.emit("secondary-sub-text", "Secondary cue");
+  h.emit("track-list", [
+    { ...tracks[0], selected: false },
+    { ...tracks[1], selected: true, "main-selection": 1 },
+  ]);
+  assert.equal(h.snapshot().subText, "");
+  assert.equal(h.snapshot().subStartSec, 0);
+  assert.equal(h.snapshot().secondarySubText, "Secondary cue");
+  h.emit("sub-text", "Late primary cue");
+  assert.equal(h.snapshot().subText, "");
+});
+
+test("failed Off keeps the confirmed subtitle and its visible cue", async () => {
+  const h = mpvBridgeHarness();
+  await h.bridge.load({ url: "fixture.mkv" });
+  h.emit("track-list", tracks);
+  h.emit("sub-text", "Still selected");
+  h.writeWith(async (name) => {
+    if (name === "sid") throw new Error("fixture rejection");
+  });
+  h.bridge.setSubtitleTrack(null);
+  await flushBridge();
+  assert.equal(h.snapshot().subtitleTracks.find((track) => track.selected)?.id, "1");
+  assert.equal(h.snapshot().subText, "Still selected");
+  h.emit("sub-text", "Next selected cue");
+  assert.equal(h.snapshot().subText, "Next selected cue");
+});
+
+test("a new media load resets confirmed Off cue suppression", async () => {
+  const h = mpvBridgeHarness();
+  await h.bridge.load({ url: "fixture.mkv" });
+  h.emit("track-list", tracks);
+  h.bridge.setSubtitleTrack(null);
+  await flushBridge();
+  await h.bridge.load({ url: "next.mkv" });
+  h.emit("track-list", tracks);
+  h.emit("sub-text", "Next title cue");
+  assert.equal(h.snapshot().subText, "Next title cue");
+});
+
 for (const prefs of [
   { volume: 0.35, muted: false },
   { volume: 1, muted: true },

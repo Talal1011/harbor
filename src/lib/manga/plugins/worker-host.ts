@@ -28,6 +28,9 @@ export type PluginWorkerOptions = {
 };
 
 const MAX_CONCURRENT_HTTP = 6;
+const MAX_GLOBAL_HTTP = 16;
+let globalHttpInflight = 0;
+const globalHttpQueue: Array<() => void> = [];
 const MAX_HTML_BYTES = 6 * 1024 * 1024;
 const CANCEL_ACK_MS = 250;
 
@@ -88,7 +91,12 @@ export class PluginWorker {
     });
   }
 
-  async call(method: string, args: unknown[], timeoutMs: number, signal?: AbortSignal): Promise<unknown> {
+  async call(
+    method: string,
+    args: unknown[],
+    timeoutMs: number,
+    signal?: AbortSignal,
+  ): Promise<unknown> {
     if (signal?.aborted) throw abortError();
     await this.ensure();
     const w = this.worker;
@@ -231,15 +239,20 @@ export class PluginWorker {
     }
   }
 
-  private acquireHttp(): Promise<void> {
-    if (this.httpInflight < MAX_CONCURRENT_HTTP) {
-      this.httpInflight++;
-      return Promise.resolve();
-    }
-    return new Promise((resolve) => this.httpQueue.push(resolve));
+  private async acquireHttp(): Promise<void> {
+    if (this.httpInflight >= MAX_CONCURRENT_HTTP) {
+      await new Promise<void>((resolve) => this.httpQueue.push(resolve));
+    } else this.httpInflight++;
+    if (globalHttpInflight >= MAX_GLOBAL_HTTP) {
+      await new Promise<void>((resolve) => globalHttpQueue.push(resolve));
+    } else globalHttpInflight++;
   }
 
   private releaseHttp(): void {
+    // Hand off reserved slots before admitting new arrivals.
+    const globalNext = globalHttpQueue.shift();
+    if (globalNext) globalNext();
+    else globalHttpInflight--;
     const next = this.httpQueue.shift();
     if (next) next();
     else this.httpInflight--;

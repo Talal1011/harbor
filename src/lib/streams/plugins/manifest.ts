@@ -66,7 +66,12 @@ export function repoDisplayName(url: string): string {
     const u = new URL(url);
     const seg = u.pathname.split("/").filter(Boolean);
     const host = u.hostname.toLowerCase();
-    if ((host.endsWith("githubusercontent.com") || host === "github.com" || host.endsWith("gitlab.com")) && seg.length >= 2) {
+    if (
+      (host.endsWith("githubusercontent.com") ||
+        host === "github.com" ||
+        host.endsWith("gitlab.com")) &&
+      seg.length >= 2
+    ) {
       return `${seg[0]}/${seg[1].replace(/\.git$/, "")}`;
     }
     return host.replace(/^www\./, "");
@@ -106,7 +111,8 @@ function strList(v: unknown): string[] {
 function normalizeType(t: string): string | null {
   const v = t.toLowerCase();
   if (v === "movie" || v === "movies" || v === "film") return "movie";
-  if (v === "tv" || v === "series" || v === "show" || v === "shows" || v === "other") return "series";
+  if (v === "tv" || v === "series" || v === "show" || v === "shows" || v === "other")
+    return "series";
   return null;
 }
 
@@ -154,7 +160,10 @@ function harborEntry(v: unknown, manifestUrl: string): StreamRepoEntry | null {
     enabled: o.enabled !== false,
     platforms: strList(o.platforms).length ? strList(o.platforms) : undefined,
     minHarbor: str(o.minHarbor) || undefined,
-    timeoutMs: typeof o.timeoutMs === "number" && o.timeoutMs > 0 ? Math.min(o.timeoutMs, 60_000) : undefined,
+    timeoutMs:
+      typeof o.timeoutMs === "number" && o.timeoutMs > 0
+        ? Math.min(o.timeoutMs, 60_000)
+        : undefined,
     format: "harbor",
   };
 }
@@ -198,6 +207,30 @@ function providerEntry(v: unknown, manifestUrl: string): StreamRepoEntry | null 
   };
 }
 
+export function looksLikeAndroidExtensionRepo(
+  json: Record<string, unknown>,
+  parsed: unknown,
+): boolean {
+  if (Array.isArray(json.pluginLists)) return true;
+  const arr = Array.isArray(parsed) ? parsed : Array.isArray(json.plugins) ? json.plugins : null;
+  if (!arr) return false;
+  return arr.some((e) => {
+    if (!e || typeof e !== "object") return false;
+    const o = e as Record<string, unknown>;
+    if (typeof o.url === "string" && /\.cs3(\?|#|$)/i.test(o.url)) return true;
+    return typeof o.internalName === "string" && typeof o.apiVersion === "number";
+  });
+}
+
+export function looksLikeStremioAddon(json: Record<string, unknown>): boolean {
+  return (
+    typeof json.id === "string" &&
+    typeof json.version === "string" &&
+    Array.isArray(json.resources) &&
+    Array.isArray(json.types)
+  );
+}
+
 function looksLikeMangaRepo(json: Record<string, unknown>, parsed: unknown): boolean {
   if (str(json.type) === "manga" || str(json.type) === "ebook") return true;
   const arr = Array.isArray(parsed)
@@ -212,22 +245,26 @@ function looksLikeMangaRepo(json: Record<string, unknown>, parsed: unknown): boo
     (e) =>
       e &&
       typeof e === "object" &&
-      ("sourceCodeUrl" in e || "pkgPath" in e || ("apk" in e && "pkg" in e) || "contentRating" in e),
+      ("sourceCodeUrl" in e ||
+        "pkgPath" in e ||
+        ("apk" in e && "pkg" in e) ||
+        "contentRating" in e),
   );
 }
 
 export function parseStreamRepoManifest(parsed: unknown, manifestUrl: string): ParsedStreamRepo {
-  const json = (parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {}) as Record<
-    string,
-    unknown
-  >;
+  const json = (
+    parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {}
+  ) as Record<string, unknown>;
   const scrapers = Array.isArray(json.scrapers)
     ? json.scrapers
     : Array.isArray(parsed) && parsed.some((e) => e && typeof e === "object" && "filename" in e)
       ? parsed
       : null;
   if (scrapers) {
-    const entries = scrapers.map((s) => providerEntry(s, manifestUrl)).filter((e): e is StreamRepoEntry => !!e);
+    const entries = scrapers
+      .map((s) => providerEntry(s, manifestUrl))
+      .filter((e): e is StreamRepoEntry => !!e);
     return {
       name: repoTitle(str(json.name), manifestUrl),
       homepage: str(json.homepage) || undefined,
@@ -237,8 +274,11 @@ export function parseStreamRepoManifest(parsed: unknown, manifestUrl: string): P
   }
   if (Array.isArray(json.plugins)) {
     const type = str(json.type);
-    if (type && type !== "stream") throw new PluginError(type === "ebook" ? "ebook-repo" : "manga-repo");
-    const entries = json.plugins.map((p) => harborEntry(p, manifestUrl)).filter((e): e is StreamRepoEntry => !!e);
+    if (type && type !== "stream")
+      throw new PluginError(type === "ebook" ? "ebook-repo" : "manga-repo");
+    const entries = json.plugins
+      .map((p) => harborEntry(p, manifestUrl))
+      .filter((e): e is StreamRepoEntry => !!e);
     return {
       name: repoTitle(str(json.name), manifestUrl),
       homepage: str(json.homepage) || undefined,
@@ -246,6 +286,8 @@ export function parseStreamRepoManifest(parsed: unknown, manifestUrl: string): P
       entries,
     };
   }
+  if (looksLikeAndroidExtensionRepo(json, parsed)) throw new PluginError("android-extensions");
+  if (looksLikeStremioAddon(json)) throw new PluginError("stremio-addon");
   if (looksLikeMangaRepo(json, parsed)) throw new PluginError("manga-repo");
   throw new PluginError("not-a-repo");
 }

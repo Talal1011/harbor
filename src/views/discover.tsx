@@ -178,25 +178,37 @@ export function Discover({ active = true }: { active?: boolean }) {
     let cancelled = false;
     let full = false;
     setFeatReady(false);
-    buildFeaturedFast(settings.tmdbKey, settings)
-      .then((r) => !cancelled && !full && setFeat((prev) => (prev.pool.length ? prev : r)))
-      .catch(() => {});
-    const fullDone = buildFeatured(settings.tmdbKey, settings)
+    setFeat({ featured: [], reserve: [], pool: [] });
+    const fastDone = buildFeaturedFast(settings.tmdbKey, settings)
       .then((r) => {
-        if (cancelled) return;
-        full = true;
-        setFeat(r);
+        if (!cancelled && !full) setFeat(rescoreFeatured(r.pool));
       })
       .catch(() => {});
     const warmDone = prewarmExternalWatched()
       .then(() => !cancelled && setFeat((prev) => rescoreFeatured(prev.pool)))
       .catch(() => {});
-    const warmCap = new Promise<void>((res) => window.setTimeout(res, 4000));
-    void Promise.allSettled([fullDone, Promise.race([warmDone, warmCap])]).then(
-      () => !cancelled && setFeatReady(true),
-    );
+    let warmTimer = 0;
+    const warmCap = new Promise<void>((res) => {
+      warmTimer = window.setTimeout(res, 4000);
+    });
+    const historyReady = Promise.race([warmDone, warmCap]);
+    // Show the eligible fast pool without waiting for every personalized lane.
+    void Promise.allSettled([fastDone, historyReady]).then(() => !cancelled && setFeatReady(true));
+    // Give the fast pool's identity lookups the queue before the larger build.
+    void fastDone.then(async () => {
+      if (cancelled) return;
+      try {
+        const r = await buildFeatured(settings.tmdbKey, settings);
+        if (cancelled) return;
+        full = true;
+        setFeat(rescoreFeatured(r.pool));
+      } catch {
+        // A failed enrichment must not discard usable fast results.
+      }
+    });
     return () => {
       cancelled = true;
+      clearTimeout(warmTimer);
     };
   }, [
     settings.tmdbKey,
@@ -306,10 +318,7 @@ export function Discover({ active = true }: { active?: boolean }) {
           startTransition(() => setRails((prev) => ({ ...prev, [railId]: list })));
         })
         .catch(() => {
-          if (epochRef.current !== myEpoch) return;
-          railPagesRef.current[railId] = 1;
-          railExhaustedRef.current[railId] = true;
-          startTransition(() => setRails((prev) => ({ ...prev, [railId]: [] })));
+          // Leave the page retryable; a transport failure is not an empty catalog.
         })
         .finally(() => {
           if (epochRef.current === myEpoch) railLoadingRef.current[railId] = false;
@@ -331,16 +340,19 @@ export function Discover({ active = true }: { active?: boolean }) {
     railPagesRef.current = {};
     railExhaustedRef.current = {};
     railLoadingRef.current = {};
-    setEpoch((e) => e + 1);
+    epochRef.current += 1;
+    setEpoch(epochRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSig, settings.tmdbKey, settings.region, settings.streaming, settings.tmdbLanguage]);
 
   useEffect(() => {
+    if (!active) return;
     for (const id of DEDUP_PRIORITY) ensureLoadedRef.current(id);
-  }, [epoch]);
+  }, [epoch, active]);
 
   const loadMore = useCallback(
     (railId: string) => {
+      if (railPagesRef.current[railId] == null) return;
       if (railLoadingRef.current[railId]) return;
       if (railExhaustedRef.current[railId]) return;
       const cur = railPagesRef.current[railId] ?? 1;
@@ -348,10 +360,12 @@ export function Discover({ active = true }: { active?: boolean }) {
       const def = dailyRows.find((r) => r.id === railId);
       if (!def) return;
       const next = cur + 1;
+      const myEpoch = epoch;
       railLoadingRef.current[railId] = true;
       def
         .fetch(next)
         .then((list) => {
+          if (epochRef.current !== myEpoch) return;
           railPagesRef.current[railId] = next;
           if (list.length < MIN_PAGE_YIELD) railExhaustedRef.current[railId] = true;
           startTransition(() =>
@@ -360,10 +374,10 @@ export function Discover({ active = true }: { active?: boolean }) {
         })
         .catch(() => {})
         .finally(() => {
-          railLoadingRef.current[railId] = false;
+          if (epochRef.current === myEpoch) railLoadingRef.current[railId] = false;
         });
     },
-    [dailyRows],
+    [dailyRows, epoch],
   );
 
   const featuredIds = useMemo(() => new Set(featured.map((m) => m.id)), [featured]);
@@ -491,6 +505,7 @@ export function Discover({ active = true }: { active?: boolean }) {
       default:
         return (
           <Rail
+            active={active}
             railId={item.key}
             allRails={dailyRows}
             deduped={dedupedShown}

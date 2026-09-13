@@ -36,7 +36,6 @@
 
 > Sorry for the delay, everyone, and thank you for your patience. We're getting this beta ready, and the stable release will be published soon. Thank you to every tester, developer, and contributor helping us improve Harbor.
 
--# Report issues through [Harbor System](https://harborsystem.online). Include your version, OS, and steps to reproduce. Remove passwords, tokens, and private URLs from logs or screenshots.
 -# Credits: Thunderhawkk, uddx7, O1Abdulrahman, anmol210202, pengunnn, OwaisByte, kalashnikxvxiii, Talal1011, and the Harbor contributors.
 
 //Talal <:love:1528571945677754398>

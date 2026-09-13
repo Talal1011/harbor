@@ -65,12 +65,14 @@ export const StageOverlays = memo(function StageOverlays({
   const t = useT();
   const showVolumeIndicator = volumeIndicator.visible;
   const topVolumeShowing = showVolumeIndicator && volumeHudPosition === "top";
+  const primarySubtitleVisible =
+    !subAssNative && snap.subtitleTracks.some((track) => track.selected);
   return (
     <>
       {(!pipMode || subShowInPip) && (!subAssNative || snap.secondarySubText) && (
         <SubtitleOverlay
-          text={subAssNative ? "" : snap.subText}
-          startSec={snap.subStartSec}
+          text={primarySubtitleVisible ? snap.subText : ""}
+          startSec={primarySubtitleVisible ? snap.subStartSec : 0}
           scale={pipMode ? 0.45 : 1}
           secondaryText={snap.secondarySubText}
         />

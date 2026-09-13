@@ -14,7 +14,7 @@ import type {
 
 const IDLE_MS = 5 * 60_000;
 const MAX_IDLE_WORKERS = 4;
-const GLOBAL_CONCURRENCY = 12;
+const GLOBAL_CONCURRENCY = 8;
 const LOG_MAX = 200;
 const AUTO_PAUSE_FAILURES = 3;
 const READY_TIMEOUT = 10_000;
@@ -76,7 +76,15 @@ function learnHost(id: string, url: string): void {
 }
 
 function emptyHealth(): PluginHealth {
-  return { lastAt: null, lastMs: null, lastCount: null, lastError: null, lastSkip: null, lastTitle: null, seenHosts: [] };
+  return {
+    lastAt: null,
+    lastMs: null,
+    lastCount: null,
+    lastError: null,
+    lastSkip: null,
+    lastTitle: null,
+    seenHosts: [],
+  };
 }
 
 function workerKey(plugin: InstalledStreamPlugin): string {
@@ -348,7 +356,11 @@ export async function streamPluginSettingsFields(
     const meta = await worker.meta();
     if (!(meta.methods ?? []).includes("settings")) return [];
     const raw = await worker.call("settings", [], 10_000);
-    const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" && Array.isArray((raw as { fields?: unknown }).fields) ? (raw as { fields: unknown[] }).fields : [];
+    const list = Array.isArray(raw)
+      ? raw
+      : raw && typeof raw === "object" && Array.isArray((raw as { fields?: unknown }).fields)
+        ? (raw as { fields: unknown[] }).fields
+        : [];
     return list.map(normalizeField).filter((f): f is StreamPluginSettingsField => !!f);
   } finally {
     worker.dispose();

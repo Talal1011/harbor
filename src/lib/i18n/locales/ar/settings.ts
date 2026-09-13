@@ -1,4 +1,8 @@
 const settings: Record<string, string> = {
+  "Could not sync your display name. Check your connection and try again.":
+    "تعذّرت مزامنة اسم العرض. تحقّق من اتصالك وحاول مرة أخرى.",
+  "Syncing display name…": "جارٍ مزامنة اسم العرض…",
+  "Display name saved to your Harbor account.": "تم حفظ اسم العرض في حسابك في هاربور.",
   "Content advisory theme": "سمة التنبيه بالمحتوى",
   "Choose whether the content advisory appears in full color or a restrained monochrome tone.":
     "اختر ما إذا كان التنبيه بالمحتوى سيظهر بألوان كاملة أو بنمط أحادي اللون هادئ.",

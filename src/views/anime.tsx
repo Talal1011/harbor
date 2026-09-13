@@ -90,6 +90,7 @@ import { isAdultAnime } from "@/lib/addons-store/adult-filter";
 import { absorbCloudAnimeCw } from "@/lib/anime-cw-absorb";
 import {
   ANIME_CLOUD_ID,
+  cwSortKey,
   isAnimeCwItem,
   isCwMember,
   library,
@@ -427,11 +428,7 @@ export function AnimeView({ active = true }: { active?: boolean }) {
         seen.add(i._id);
         return true;
       })
-      .sort(
-        (a, b) =>
-          Date.parse(b.state?.lastWatched ?? b._mtime) -
-          Date.parse(a.state?.lastWatched ?? a._mtime),
-      )
+      .sort((a, b) => cwSortKey(b) - cwSortKey(a))
       .filter((i) => {
         const root = franchiseRootSync(i._id);
         if (!root) return true;

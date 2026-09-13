@@ -81,7 +81,8 @@ import { syncProfileStats } from "@/lib/social/stats-sync";
 import { useFeaturedListsSync } from "@/lib/social/use-featured-sync";
 import { useRatingsSync } from "@/lib/social/use-ratings-sync";
 import { useActivitySync } from "@/lib/social/use-activity-sync";
-import { authToken, currentAuthor, refreshToken } from "@/lib/theme-auth";
+import { authToken, currentAuthor } from "@/lib/theme-auth";
+import { startSessionRefresh } from "@/lib/account/session-refresh-runner";
 import { useAutoDownloadRunner } from "@/lib/auto-download/runner";
 import { RemindersRunner } from "@/lib/reminders-runner";
 import { MangaTrackingRunner } from "@/lib/manga-tracking";
@@ -565,38 +566,8 @@ function MediaServerSyncRunner() {
   return null;
 }
 
-const SESSION_REFRESH_MS = 6 * 60 * 60 * 1000;
-
 function SessionRefreshRunner() {
-  useEffect(() => {
-    let last = 0;
-    const refresh = () => {
-      const now = Date.now();
-      if (now - last < 60000) return;
-      last = now;
-      void refreshToken();
-    };
-    refresh();
-    const onProfile = () => {
-      last = 0;
-      refresh();
-    };
-    const onWake = () => {
-      if (document.visibilityState === "visible") refresh();
-    };
-    const timer = window.setInterval(refresh, SESSION_REFRESH_MS);
-    window.addEventListener("harbor:active-profile-changed", onProfile);
-    window.addEventListener("focus", onWake);
-    document.addEventListener("visibilitychange", onWake);
-    window.addEventListener("online", refresh);
-    return () => {
-      window.clearInterval(timer);
-      window.removeEventListener("harbor:active-profile-changed", onProfile);
-      window.removeEventListener("focus", onWake);
-      document.removeEventListener("visibilitychange", onWake);
-      window.removeEventListener("online", refresh);
-    };
-  }, []);
+  useEffect(startSessionRefresh, []);
   return null;
 }
 

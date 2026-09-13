@@ -1,5 +1,52 @@
 {
   "notes": {
+    "0.9.126": {
+      "title": "Harbor Beta 0.9.126",
+      "intro": "Account, playback, subtitle, and browsing improvements, with more reliable name saving and session handling.",
+      "sections": [
+        {
+          "heading": "Accounts and sessions",
+          "items": [
+            "Improved Harbor display-name saving, retry handling, and account isolation.",
+            "Added proactive Harbor session renewal and a single retry for eligible requests after an expired session. Temporary connection failures preserve your saved session; revoked sessions still require sign-in."
+          ]
+        },
+        {
+          "heading": "Playback and subtitles",
+          "items": [
+            "Fixed the Windows player startup background and cleanup of Harbor's RTX filter when switching between eligible SDR and HDR sources.",
+            "Fixed subtitle text remaining visible after selecting Off, including late subtitle events.",
+            "Included seeking, Windows audio recovery, and content-advisory updates.",
+            "Improved playback statistics: unavailable drop counters no longer appear as a measured zero. This is not a universal fix for fullscreen stuttering."
+          ]
+        },
+        {
+          "heading": "Browsing and retained changes",
+          "items": [
+            "Improved Discover loading and scrolling behavior.",
+            "Retained the approved Continue Watching and plugin updates, along with earlier beta and experimental fixes.",
+            "These version-specific release notes remain available offline after installation."
+          ]
+        },
+        {
+          "heading": "Please test",
+          "items": [
+            "Save a display name, reopen settings, and restart Harbor. Confirm the saved name and sign-in remain.",
+            "Check a failed save while offline, then reconnect and retry. A failed save must not report success.",
+            "Check account actions after real session renewal without signing in again. Offline recovery and expiry retry have passed simulated tests; live verification is still pending.",
+            "Turn subtitles Off while a line is visible, seek, then turn them on again. Check that no old line stays on screen.",
+            "On Windows, switch from SDR playback with RTX enabled to HDR and back. Check the picture, seeking, audio, and fullscreen.",
+            "Report problems through Harbor's official Discord support. Include your version, platform, steps, and expected result. Remove passwords, tokens, and private URLs from anything you share."
+          ]
+        },
+        {
+          "heading": "A note from Talal",
+          "items": [
+            "Thank you for helping improve Harbor. Please try the features you use every day and tell us if anything feels different. If something goes wrong, note what you were doing, your Harbor version, and your operating system. For playback issues, include whether HDR, RTX, or fullscreen was enabled. Clear steps and a short recording help us investigate. Please hide passwords, tokens, and private links before sharing. — Talal"
+          ]
+        }
+      ]
+    },
     "0.9.125": {
       "title": "Harbor Beta 0.9.125",
       "intro": "Playback, subtitles, Continue Watching, navigation, and library improvements brought forward from Experimental 0.0.3 and 0.0.4, together with the latest approved beta changes.",
@@ -58,9 +105,8 @@
           ]
         },
         {
-          "heading": "Feedback and credits",
+          "heading": "Credits",
           "items": [
-            "Report issues at https://harborsystem.online with your version, operating system, steps to reproduce, and expected versus actual results. Remove passwords, tokens, IPTV credentials, and private URLs from logs or screenshots.",
             "Credits: Thunderhawkk, uddx7, O1Abdulrahman, anmol210202, pengunnn, OwaisByte, kalashnikxvxiii, Talal1011, and the Harbor contributors."
           ]
         }

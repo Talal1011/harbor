@@ -85,6 +85,18 @@ let hasTvNavigationIntent = false;
 let lastFocusedEl: HTMLElement | null = null;
 let hoveredEl: HTMLElement | null = null;
 let suppressFocusScroll = false;
+function reflectCardFocus() {
+  if (typeof document === "undefined") return;
+  const active = document.activeElement;
+  const ring =
+    lastFocusedEl?.isConnected && lastFocusedEl.getAttribute("data-tv-focused") === "true"
+      ? lastFocusedEl
+      : null;
+  const onCard =
+    (active instanceof HTMLElement && active.hasAttribute("data-focused-card")) ||
+    (ring?.hasAttribute("data-focused-card") ?? false);
+  document.documentElement.toggleAttribute("data-card-focused", onCard);
+}
 
 export function tvFocus(el: HTMLElement) {
   focusElement(el);
@@ -709,6 +721,7 @@ function focusElement(el: HTMLElement, scroll: "center" | "nearest" | "none" = "
   }
 
   el.focus({ preventScroll: true });
+  reflectCardFocus();
   if (suppressFocusScroll) return;
 
   if (isInHero(el)) {
@@ -750,6 +763,7 @@ function clearTvFocusRing(except?: HTMLElement) {
   }
 
   clearSearchVisualFocus();
+  reflectCardFocus();
 
   if (!except?.hasAttribute("data-focused-card")) {
     document.getElementById("root")?.removeAttribute("data-card-focus-active");
@@ -1211,6 +1225,7 @@ export function useKeyboardNavigation(options: TVNavigationOptions = {}) {
       // Tab is native keyboard navigation, but does not call moveFocus().
       // Restore keyboard modality so its focus cues are not hidden after mouse use.
       if (e.key === "Tab") setKeysModality();
+      reflectCardFocus();
 
       const target = e.target instanceof HTMLElement ? e.target : null;
       const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -1429,6 +1444,8 @@ export function useKeyboardNavigation(options: TVNavigationOptions = {}) {
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("beforeinput", onBeforeInput, true);
     window.addEventListener("focusin", onFocusIn, true);
+    window.addEventListener("focusin", reflectCardFocus, true);
+    window.addEventListener("focusout", reflectCardFocus, true);
     window.addEventListener("pointerdown", onPointerDown, true);
 
     const onPointerMove = (e: PointerEvent) => notePointerMove(e.screenX, e.screenY);
@@ -1440,6 +1457,8 @@ export function useKeyboardNavigation(options: TVNavigationOptions = {}) {
       window.removeEventListener("keydown", onKeyDown, true);
       window.removeEventListener("beforeinput", onBeforeInput, true);
       window.removeEventListener("focusin", onFocusIn, true);
+      window.removeEventListener("focusin", reflectCardFocus, true);
+      window.removeEventListener("focusout", reflectCardFocus, true);
       window.removeEventListener("pointerdown", onPointerDown, true);
       window.removeEventListener("pointermove", onPointerMove, true);
       window.removeEventListener("wheel", onWheel, true);

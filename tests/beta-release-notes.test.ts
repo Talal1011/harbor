@@ -56,10 +56,11 @@ test("bundled beta notes never substitute for another version", async () => {
   assert.equal(h.requests(), 1);
 });
 
-test("beta notes include Talal's note, credits, and issue reporting", () => {
+test("beta notes include Talal's note and credits without advertising the private report system", () => {
   const note = bundled.notes["0.9.125"];
   assert.ok(note.sections.some((s: { heading: string }) => s.heading === "A note from Talal"));
   assert.match(JSON.stringify(note), /stable release will be published soon/);
-  assert.match(JSON.stringify(note), /https:\/\/harborsystem\.online/);
+  assert.doesNotMatch(JSON.stringify(note), /harborsystem\.online/i);
+  assert.doesNotMatch(read("docs/release-notes/0.9.125-discord.txt"), /harborsystem\.online/i);
   assert.match(JSON.stringify(note), /Thunderhawkk/);
 });

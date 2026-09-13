@@ -287,6 +287,15 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
   let suppressEndFileUntil = 0;
   let svpFilterFailed = false;
   let secondarySid: string | null = null;
+  let primarySubtitleOff = false;
+  const confirmPrimarySubtitleVisibility = (off: boolean) => {
+    primarySubtitleOff = off;
+    if (off) {
+      // mpv may not deliver an empty sub-text event when the track is disabled.
+      snap.subText = "";
+      snap.subStartSec = 0;
+    }
+  };
   let subtitleAddSelectionId = 0;
   const mainSubtitleSelection = new SubtitleSelectionCoordinator();
   const secondarySubtitleSelection = new SubtitleSelectionCoordinator();
@@ -697,11 +706,16 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
         }
         snap.audioTracks = audio;
         snap.subtitleTracks = subs;
+        confirmPrimarySubtitleVisibility(!subs.some((track) => track.selected));
       }
       if (name === "sub-delay" && typeof data === "number") snap.subDelaySec = data;
       if (name === "audio-delay" && typeof data === "number") snap.audioDelaySec = data;
-      if (name === "sub-text") snap.subText = typeof data === "string" ? data : "";
-      if (name === "sub-start" && typeof data === "number") snap.subStartSec = data;
+      if (name === "sub-text") {
+        snap.subText = !primarySubtitleOff && typeof data === "string" ? data : "";
+      }
+      if (name === "sub-start") {
+        snap.subStartSec = !primarySubtitleOff && typeof data === "number" ? data : 0;
+      }
       if (name === "secondary-sub-text") {
         snap.secondarySubText = typeof data === "string" ? data : "";
       }
@@ -829,6 +843,7 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
       snap.errorMessage = null;
       snap.audioTracks = [];
       snap.subtitleTracks = [];
+      primarySubtitleOff = false;
       snap.subText = "";
       snap.subStartSec = 0;
       snap.secondarySubText = "";
@@ -1003,8 +1018,16 @@ export function createMpvBridge(mpvOptions?: MpvOptions): PlayerBridge {
           value: id == null ? "no" : Number(id) || id,
         });
         if (requestMediaRevision !== mediaRevision) return;
-        const selectedSid = await invoke<string | number>("mpv_get_property", { name: "sid" });
+        const selectedSid = await invoke<string | number | boolean>("mpv_get_property", {
+          name: "sid",
+        });
         if (requestMediaRevision !== mediaRevision) return;
+        confirmPrimarySubtitleVisibility(
+          selectedSid === false ||
+            selectedSid === "no" ||
+            selectedSid === "" ||
+            selectedSid == null,
+        );
         snap.subtitleTracks = snap.subtitleTracks.map((track) => ({
           ...track,
           selected: track.id === String(selectedSid),

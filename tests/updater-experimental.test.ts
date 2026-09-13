@@ -354,27 +354,36 @@ test("account requests use native-aware transport and retry with the refreshed t
   let token = "old-test-token";
   const calls: unknown[] = [];
   const controller = new AbortController();
+  const mocks = {
+    "@/lib/theme-auth": {
+      authToken: () => token,
+      captureSessionScope: () => () => true,
+      refreshToken: async () => {
+        token = "new-test-token";
+        return true;
+      },
+    },
+    "@/lib/config/endpoints": { HARBOR_API_BASE: "https://example.test" },
+    "@/lib/safe-fetch": {
+      safeFetch: async (url: string, options: { headers: unknown; signal: unknown }) => {
+        calls.push({
+          url,
+          ...options,
+          headers: Object.fromEntries(new Headers(options.headers as HeadersInit)),
+        });
+        return {
+          status: calls.length === 1 ? 401 : 200,
+          ok: calls.length > 1,
+          json: async () => ({ user: { badges: [{ name: "tester" }] } }),
+        };
+      },
+    },
+  };
   const client = load<typeof import("../src/lib/account/client")>(
     "src/lib/account/client.ts",
     {
-      "@/lib/theme-auth": {
-        authToken: () => token,
-        refreshToken: async () => {
-          token = "new-test-token";
-          return true;
-        },
-      },
-      "@/lib/config/endpoints": { HARBOR_API_BASE: "https://example.test" },
-      "@/lib/safe-fetch": {
-        safeFetch: async (url: string, options: { headers: unknown; signal: unknown }) => {
-          calls.push({ url, ...options });
-          return {
-            status: calls.length === 1 ? 401 : 200,
-            ok: calls.length > 1,
-            json: async () => ({ user: { badges: [{ name: "tester" }] } }),
-          };
-        },
-      },
+      ...mocks,
+      "./authenticated-fetch": load("src/lib/account/authenticated-fetch.ts", mocks, {}),
     },
     {},
   );
@@ -383,7 +392,7 @@ test("account requests use native-aware transport and retry with the refreshed t
     calls,
     ["old-test-token", "new-test-token"].map((value) => ({
       url: "https://example.test/themes/api/identity/api/me",
-      headers: { Authorization: `Bearer ${value}` },
+      headers: { authorization: `Bearer ${value}` },
       signal: controller.signal,
     })),
   );

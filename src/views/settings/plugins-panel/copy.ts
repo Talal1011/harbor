@@ -19,6 +19,12 @@ export function errorText(t: T, e: unknown): string {
       );
     case "manga-repo":
       return t("This is a manga repository. Add it from the Manga page.");
+    case "android-extensions":
+      return t(
+        "These are compiled Android extensions (.cs3). Harbor runs script plugins only, so they cannot be installed here.",
+      );
+    case "stremio-addon":
+      return t("This is a Stremio addon manifest. Add it from the Addons page instead.");
     case "already-added":
       return t("Already added.");
     case "not-stream-plugin":
@@ -46,7 +52,9 @@ export function healthErrorText(t: T, error: string): string {
   const timeout = /timed out/i.exec(error);
   if (timeout) {
     const secs = /(\d+)\s*(?:ms|s)/.exec(error);
-    return t("Timed out after {n} seconds.", { n: secs ? Math.round(Number(secs[1]) / (error.includes("ms") ? 1000 : 1)) || 30 : 30 });
+    return t("Timed out after {n} seconds.", {
+      n: secs ? Math.round(Number(secs[1]) / (error.includes("ms") ? 1000 : 1)) || 30 : 30,
+    });
   }
   if (/did not start|initError|not-stream-plugin|SyntaxError/i.test(error)) {
     return t("Could not start: {error}", { error });
