@@ -4,6 +4,9 @@ use tauri::{
 
 pub const HDR_OVERLAY_LABEL: &str = "harbor-hdr-overlay";
 
+// Serialize creation with cleanup so stopping playback cannot leave a late overlay behind.
+static HDR_OVERLAY_OPERATION: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
 #[cfg(windows)]
 fn set_no_activate(app: &AppHandle) {
     use windows::Win32::Foundation::HWND;
@@ -44,57 +47,55 @@ fn main_rect(app: &AppHandle) -> Result<((f64, f64), (f64, f64)), String> {
 
 #[tauri::command]
 pub async fn hdr_overlay_open(app: AppHandle) -> Result<(), String> {
+    let _operation = HDR_OVERLAY_OPERATION.lock().await;
     if let Some(w) = app.get_webview_window(HDR_OVERLAY_LABEL) {
         let _ = w.show();
         return hdr_overlay_sync(app).await;
     }
     let ((px, py), (sw, sh)) = main_rect(&app)?;
     let app_clone = app.clone();
-    let (tx, rx) = std::sync::mpsc::channel::<Result<(), String>>();
-    app.run_on_main_thread(move || {
+    // WebView2 creation must not run inside the UI event loop: it can deadlock
+    // that loop, including the tray and every other Harbor window.
+    tauri::async_runtime::spawn_blocking(move || -> Result<(), String> {
         let url = WebviewUrl::App("index.html?harbor-overlay=1".into());
         let builder = WebviewWindowBuilder::new(&app_clone, HDR_OVERLAY_LABEL, url)
             .title("Harbor HDR")
             .inner_size(sw, sh)
             .position(px, py)
             .resizable(false)
-            .always_on_top(true)
             .decorations(false)
             .skip_taskbar(true)
             .shadow(false)
             .visible(true)
             .focused(false);
         #[cfg(windows)]
-        let builder = builder.transparent(true);
+        let builder = {
+            let main = app_clone
+                .get_webview_window("main")
+                .ok_or_else(|| "main missing".to_string())?;
+            // An owned window stays above Harbor, not above unrelated applications.
+            builder
+                .transparent(true)
+                .parent(&main)
+                .map_err(|e| e.to_string())?
+        };
         let builder = crate::browser_args::match_main(&app_clone, builder);
-        let result = builder.build();
-        match result {
-            Ok(_) => {
-                let _ = tx.send(Ok(()));
-            }
-            Err(e) => {
-                let _ = tx.send(Err(e.to_string()));
-            }
-        }
+        builder.build().map_err(|e| e.to_string())?;
+        Ok(())
     })
-    .map_err(|e| format!("run_on_main_thread: {}", e))?;
-
-    match rx.recv() {
-        Ok(Ok(())) => {
-            #[cfg(windows)]
-            {
-                set_no_activate(&app);
-                crate::webview_helpers::apply_transparency(&app, HDR_OVERLAY_LABEL);
-            }
-            Ok(())
-        }
-        Ok(Err(e)) => Err(e),
-        Err(e) => Err(format!("channel: {}", e)),
+    .await
+    .map_err(|e| format!("overlay creation worker: {e}"))??;
+    #[cfg(windows)]
+    {
+        set_no_activate(&app);
+        crate::webview_helpers::apply_transparency(&app, HDR_OVERLAY_LABEL);
     }
+    Ok(())
 }
 
 #[tauri::command]
 pub async fn hdr_overlay_close(app: AppHandle) -> Result<(), String> {
+    let _operation = HDR_OVERLAY_OPERATION.lock().await;
     if let Some(w) = app.get_webview_window(HDR_OVERLAY_LABEL) {
         let _ = w.close();
     }
@@ -103,6 +104,7 @@ pub async fn hdr_overlay_close(app: AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn hdr_overlay_hide(app: AppHandle) -> Result<(), String> {
+    let _operation = HDR_OVERLAY_OPERATION.lock().await;
     if let Some(w) = app.get_webview_window(HDR_OVERLAY_LABEL) {
         let _ = w.hide();
     }

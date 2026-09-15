@@ -334,7 +334,74 @@ unsafe extern "system" fn maxguard_subclass_proc(
             mmi.ptMaxSize.y = mi.rcWork.bottom - mi.rcWork.top;
         }
     }
+    if matches!(
+        msg,
+        windows::Win32::UI::WindowsAndMessaging::WM_NCPAINT
+            | windows::Win32::UI::WindowsAndMessaging::WM_NCACTIVATE
+    ) && MAXGUARD_CLAMP.load(std::sync::atomic::Ordering::Relaxed)
+    {
+        paint_main_taskbar_gap(hwnd);
+    }
     res
+}
+
+#[cfg(windows)]
+unsafe fn paint_main_taskbar_gap(hwnd: windows::Win32::Foundation::HWND) {
+    use windows::Win32::Foundation::{POINT, RECT};
+    use windows::Win32::Graphics::Gdi::{
+        ClientToScreen, FillRect, GetMonitorInfoW, GetStockObject, GetWindowDC, MonitorFromWindow,
+        ReleaseDC, BLACK_BRUSH, HBRUSH, MONITORINFO, MONITOR_DEFAULTTONEAREST,
+    };
+    use windows::Win32::UI::WindowsAndMessaging::{GetClientRect, GetWindowRect, IsZoomed};
+    if !IsZoomed(hwnd).as_bool() {
+        return;
+    }
+    let mut client = RECT::default();
+    let mut outer = RECT::default();
+    let mut origin = POINT::default();
+    let mut monitor = MONITORINFO {
+        cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+        ..Default::default()
+    };
+    if GetClientRect(hwnd, &mut client).is_err()
+        || GetWindowRect(hwnd, &mut outer).is_err()
+        || !ClientToScreen(hwnd, &mut origin).as_bool()
+        || !GetMonitorInfoW(
+            MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST),
+            &mut monitor,
+        )
+        .as_bool()
+    {
+        return;
+    }
+    let work = monitor.rcWork;
+    // Tao reserves one nonclient pixel for an auto-hidden taskbar. The WebView
+    // cannot paint it. Own that strip's paint without changing its hit testing,
+    // the client bounds, or the normal restored-window frame.
+    if origin.x != work.left
+        || origin.y != work.top
+        || origin.x + client.right != work.right
+        || origin.y + client.bottom != work.bottom - 1
+        || outer.left > work.left
+        || outer.right < work.right
+        || outer.top > work.bottom - 1
+        || outer.bottom < work.bottom
+    {
+        return;
+    }
+    let dc = GetWindowDC(Some(hwnd));
+    if dc.0.is_null() {
+        return;
+    }
+    let strip = RECT {
+        left: work.left - outer.left,
+        right: work.right - outer.left,
+        top: work.bottom - 1 - outer.top,
+        bottom: work.bottom - outer.top,
+    };
+    let brush = HBRUSH(GetStockObject(BLACK_BRUSH).0);
+    let _ = FillRect(dc, &strip, brush);
+    let _ = ReleaseDC(Some(hwnd), dc);
 }
 
 #[cfg(windows)]
@@ -358,6 +425,37 @@ fn install_maximize_guard(app: &tauri::AppHandle) {
         );
     }
     eprintln!("[harbor::maxguard] WM_GETMINMAXINFO work-area guard installed");
+}
+
+// Opt-in geometry-only diagnostics: never log player URLs or account data.
+#[cfg(windows)]
+fn log_main_geometry(app: &tauri::AppHandle, reason: &'static str) {
+    use tauri::Manager;
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    if !*ENABLED.get_or_init(|| std::env::var_os("HARBOR_WINDOW_DIAGNOSTICS").is_some()) {
+        return;
+    }
+    let Some(window) = app.get_webview_window("main") else {
+        return;
+    };
+    let native_window = window.clone();
+    let _ = window.with_webview(move |webview| unsafe {
+        let Ok(hwnd) = native_window.hwnd() else { return };
+        use windows::Win32::Foundation::{POINT, RECT};
+        use windows::Win32::Graphics::Gdi::{ClientToScreen, GetMonitorInfoW, MonitorFromWindow, MONITORINFO, MONITOR_DEFAULTTONEAREST};
+        use windows::Win32::UI::WindowsAndMessaging::{GetClientRect, GetWindowRect, IsZoomed};
+        let mut outer = RECT::default();
+        let mut client = RECT::default();
+        let mut origin = POINT::default();
+        let mut bounds = RECT::default();
+        let mut monitor = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
+        let outer_ok = GetWindowRect(hwnd, &mut outer).is_ok();
+        let client_ok = GetClientRect(hwnd, &mut client).is_ok();
+        let origin_ok = ClientToScreen(hwnd, &mut origin).as_bool();
+        let monitor_ok = GetMonitorInfoW(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &mut monitor).as_bool();
+        let bounds_ok = webview.controller().Bounds(&mut bounds).is_ok();
+        eprintln!("[harbor::window-geometry] {reason} zoomed={} outer={outer:?}/{outer_ok} client={client:?}/{client_ok} origin={origin:?}/{origin_ok} webview={bounds:?}/{bounds_ok} monitor={:?} work={:?}/{monitor_ok}", IsZoomed(hwnd).as_bool(), monitor.rcMonitor, monitor.rcWork);
+    });
 }
 
 #[tauri::command]
@@ -662,15 +760,18 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        .plugin(
-            tauri_plugin_window_state::Builder::default()
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::SIZE
-                        | tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
-                )
-                .build(),
-        )
+        .plugin({
+            let builder = tauri_plugin_window_state::Builder::default().with_state_flags(
+                tauri_plugin_window_state::StateFlags::SIZE
+                    | tauri_plugin_window_state::StateFlags::POSITION
+                    | tauri_plugin_window_state::StateFlags::MAXIMIZED,
+            );
+            // Restore the Windows main window only after its maximize guard is
+            // installed, so startup uses the same work-area rules as user maximize.
+            #[cfg(windows)]
+            let builder = builder.skip_initial_state("main");
+            builder.build()
+        })
         .manage(proxy_state)
         .manage(mpv_state)
         .manage(pip_state)
@@ -708,8 +809,6 @@ pub fn run() {
             }
             proc_guard::init();
             proc_guard::reap_orphans();
-            display_fit::install(app.handle());
-            install_reveal_failsafe(app.handle());
             #[cfg(windows)]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
@@ -730,6 +829,20 @@ pub fn run() {
             make_main_transparent(&app.handle());
             #[cfg(windows)]
             install_maximize_guard(&app.handle());
+            #[cfg(windows)]
+            {
+                use tauri::Manager;
+                use tauri_plugin_window_state::{StateFlags, WindowExt};
+                if let Some(window) = app.get_webview_window("main") {
+                    if let Err(error) = window.restore_state(
+                        StateFlags::SIZE | StateFlags::POSITION | StateFlags::MAXIMIZED,
+                    ) {
+                        eprintln!("[harbor::window] startup restore failed: {error}");
+                    }
+                }
+            }
+            display_fit::install(app.handle());
+            install_reveal_failsafe(app.handle());
             ensure_window_on_screen(&app.handle());
             #[cfg(target_os = "macos")]
             {
@@ -774,6 +887,15 @@ pub fn run() {
                 return;
             }
             use tauri::Manager;
+            #[cfg(windows)]
+            match event {
+                tauri::WindowEvent::Resized(_) => log_main_geometry(window.app_handle(), "resized"),
+                tauri::WindowEvent::Moved(_) => log_main_geometry(window.app_handle(), "moved"),
+                tauri::WindowEvent::Focused(true) => {
+                    log_main_geometry(window.app_handle(), "focused")
+                }
+                _ => {}
+            }
             match event {
                 tauri::WindowEvent::CloseRequested { api, .. } => {
                     if tray::close_to_tray() {
